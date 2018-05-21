@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:orientation="vertical"
+        android:background="@color/colorWight"
+        android:gravity="center_horizontal|bottom">
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@mipmap/head_boy"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="小叮噹"
+            android:gravity="center"
+            android:padding="15dp"/>
+    </LinearLayout>
+
+    <View style="@style/underLine"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="20dp"
+        android:background="@color/colorWight">
+        <LinearLayout
+            android:id="@+id/mine_obligation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/mine_obligation"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="待付款"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/mine_to_be_send"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/mine_to_be_send"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="代發貨"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/mine_wait_for_receiving"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/mine_wait_for_receiving"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="待收貨"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/mine_to_evaluate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/mine_to_evaluate"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="待評價"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/mine_all_order"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        style="@style/mineLinearLayout">
+        <ImageView
+            style="@style/MineItemImageView"
+            android:src="@mipmap/all_order"/>
+
+        <TextView
+            style="@style/MineItemTextView"
+            android:text="全部訂單"/>
+
+        <ImageView
+            style="@style/MineItemImageNext"/>
+    </LinearLayout>
+
+    <View style="@style/underLine"/>
+
+    <LinearLayout
+        android:id="@+id/mine_shopping_cart"
+        android:orientation="horizontal"
+        style="@style/mineLinearLayout">
+        <ImageView
+            style="@style/MineItemImageView"
+            android:src="@mipmap/shopping_cart"/>
+
+        <TextView
+            style="@style/MineItemTextView"
+            android:text="我的購物車"/>
+
+        <ImageView
+            style="@style/MineItemImageNext"/>
+    </LinearLayout>
+
+    <View style="@style/underLine"/>
+</LinearLayout>

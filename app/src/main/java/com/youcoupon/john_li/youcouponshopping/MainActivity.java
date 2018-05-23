@@ -3,6 +3,7 @@ package com.youcoupon.john_li.youcouponshopping;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +17,7 @@ import com.alibaba.baichuan.android.trade.adapter.login.AlibcLogin;
 import com.alibaba.baichuan.android.trade.callback.AlibcLoginCallback;
 import com.alibaba.baichuan.android.trade.model.AlibcShowParams;
 import com.alibaba.baichuan.android.trade.model.OpenType;
+import com.alibaba.fastjson.JSON;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.MineActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -70,10 +72,15 @@ public class MainActivity extends AppCompatActivity {
      * 登录
      */
     public void login() {
-        AlibcLogin alibcLogin = AlibcLogin.getInstance();
+        final AlibcLogin alibcLogin = AlibcLogin.getInstance();
         alibcLogin.showLogin(this, new AlibcLoginCallback() {
             @Override
             public void onSuccess() {
+                //获取淘宝用户信息
+                String s = JSON.toJSONString(AlibcLogin.getInstance().getSession());
+                Log.i("MainActivity", "获取淘宝用户信息: "+AlibcLogin.getInstance().getSession());
+                String nick = AlibcLogin.getInstance().getSession().nick;
+                String avatarUrl = AlibcLogin.getInstance().getSession().avatarUrl;
                 Toast.makeText(MainActivity.this, "登录成功 ", Toast.LENGTH_LONG).show();
             }
 

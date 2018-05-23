@@ -2,6 +2,7 @@ package com.youcoupon.john_li.youcouponshopping.YouActivity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -14,9 +15,12 @@ import com.alibaba.baichuan.android.trade.model.TradeResult;
 import com.alibaba.baichuan.android.trade.page.AlibcBasePage;
 import com.alibaba.baichuan.android.trade.page.AlibcMyCartsPage;
 import com.alibaba.baichuan.android.trade.page.AlibcMyOrdersPage;
+import com.alibaba.fastjson.JSON;
 import com.youcoupon.john_li.youcouponshopping.R;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**

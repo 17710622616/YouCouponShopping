@@ -25,4 +25,11 @@
         android:layout_height="wrap_content"
         android:text="我的"
         android:padding="15dp" />
+
+    <TextView
+        android:id="@+id/taobao_coupon_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="领券"
+        android:padding="15dp" />
 </LinearLayout>

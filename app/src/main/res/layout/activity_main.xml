@@ -5,31 +5,18 @@
     android:layout_height="match_parent"
     android:gravity="center">
 
-    <TextView
-        android:id="@+id/taobao_login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="doLogin"
-        android:padding="15dp"/>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <FrameLayout
+            android:id="@+id/main_containor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </FrameLayout>
 
-    <TextView
-        android:id="@+id/taobao_login_out"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="loginOut"
-        android:padding="15dp"/>
+    <View style="@style/underLine"/>
 
-    <TextView
-        android:id="@+id/taobao_mine"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="我的"
-        android:padding="15dp" />
-
-    <TextView
-        android:id="@+id/taobao_coupon_test"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="领券"
-        android:padding="15dp" />
+    <include
+        layout="@layout/layout_bottom_of_main"/>
 </LinearLayout>

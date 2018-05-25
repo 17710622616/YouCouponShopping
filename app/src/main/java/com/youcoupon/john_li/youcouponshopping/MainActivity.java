@@ -1,10 +1,16 @@
 package com.youcoupon.john_li.youcouponshopping;
 
 import android.content.Intent;
+import android.support.annotation.IdRes;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,13 +28,21 @@ import com.alibaba.baichuan.android.trade.model.OpenType;
 import com.alibaba.baichuan.android.trade.model.TradeResult;
 import com.alibaba.baichuan.android.trade.page.AlibcPage;
 import com.alibaba.fastjson.JSON;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.MineActivity;
+import com.youcoupon.john_li.youcouponshopping.YouFragment.MainFragment;
+import com.youcoupon.john_li.youcouponshopping.YouFragment.MineFragment;
+import com.youcoupon.john_li.youcouponshopping.YouFragment.RecommendFragment;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
-    private TextView doLoginTv, loginOutTv, mineTv, couponTestTv;
+public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedChangeListener {
+    private RadioButton park_rb,forum_rb,mine_rb;
+    private RadioGroup bottom_group;
+    private FragmentManager fm;
+    private Fragment cacheFragment;
 
     private AlibcShowParams alibcShowParams;//页面打开方式，默认，H5，Native
     private Map<String, String> exParams;//yhhpass参数
@@ -36,39 +50,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initView();
+        setListener();
+        initData();
 
 
-        alibcShowParams = new AlibcShowParams(OpenType.Native, false);
+        /*alibcShowParams = new AlibcShowParams(OpenType.Native, false);
         exParams = new HashMap<>();
         exParams.put("isv_code", "appisvcode");
         exParams.put("alibaba", "阿里巴巴");//自定义参数部分，可任意增删改
         AlibcTradeSDK.setForceH5(false);
-        doLoginTv = (TextView) findViewById(R.id.taobao_login);
-        doLoginTv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                login();
-            }
-        });
-        loginOutTv = (TextView) findViewById(R.id.taobao_login_out);
-        loginOutTv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                loginOut();
-            }
-        });
-        mineTv = (TextView) findViewById(R.id.taobao_mine);
-        mineTv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, MineActivity.class));
-            }
-        });
         couponTestTv = (TextView) findViewById(R.id.taobao_coupon_test);
         couponTestTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlibcTrade.show(MainActivity.this, new AlibcPage("https:\\/\\/uland.taobao.com\\/coupon\\/edetail?e=3gHdzhvvfsIbwa0ArmopK2WYw/uDVc7E6PY46DJ9FdPsDPqV6z5bwXlk/0rWSVNXZAKyMKvD7j3QFdbmkMGiBbPKSUvn0t4PbBob79wv3zvITlCiu79rPkbAz7YOFP0iYfFeq5PfaO00neHPq6gjTVhAmztsbMhPVe6qZbIEZohIH07HK3v5wE7zov4IbAY1AO/Yfxygms8=&amp;traceId=0bfa322515270666651678793e"), alibcShowParams, null, exParams , new AlibcTradeCallback() {
+                AlibcTrade.show(MainActivity.this, new AlibcPage("https://uland.taobao.com/coupon/edetail?e=IFYm0w6Tqb0GQASttHIRqa0KuqDKtdl7mOe3Zy3ORIrSJ8DRB+FABT4G6p9xPaetXP616cnJp9+s6qWhAtAEiAas4jbyTDVDDfqEFBOhTcxNQ0HDGNWn0sKx7sA6hYu1TG+QkQpnVyCA+Lj8OlpHEGPfrr0N2WBehkvjNmX0iiHk92+M7h46cxOTXEDgQqt83bbMXRH/cNI=&traceId=0bfaef8215272314603452398"), alibcShowParams, null, exParams , new AlibcTradeCallback() {
                     @Override
                     public void onFailure(int i, String s) {
                         Toast.makeText(MainActivity.this, "打开领券界面失败", Toast.LENGTH_SHORT).show();
@@ -80,45 +76,87 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
-        });
+        });*/
     }
 
-    private void loginOut() {
-        AlibcLogin alibcLogin = AlibcLogin.getInstance();
+    @Override
+    public void initView() {
+        bottom_group = (RadioGroup)findViewById(R.id.bottom_main_group);
+        park_rb = (RadioButton) findViewById(R.id.bottom_main);
+        forum_rb = (RadioButton) findViewById(R.id.bottom_main_recommend);
+        mine_rb = (RadioButton) findViewById(R.id.bottom_main_mine);
 
-        alibcLogin.logout(MainActivity.this, new LogoutCallback() {
-            @Override
-            public void onSuccess() {
-                Toast.makeText(MainActivity.this, "退出登录成功", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(int code, String msg) {
-                Toast.makeText(MainActivity.this, "退出登录失败 " + code + msg, Toast.LENGTH_SHORT).show();
-            }
-        });
+        //iv = findViewById(R.id.order_icon);
     }
 
-    /**
-     * 登录
-     */
-    public void login() {
-        final AlibcLogin alibcLogin = AlibcLogin.getInstance();
-        alibcLogin.showLogin(this, new AlibcLoginCallback() {
-            @Override
-            public void onSuccess() {
-                //获取淘宝用户信息
-                String s = JSON.toJSONString(AlibcLogin.getInstance().getSession());
-                Log.i("MainActivity", "获取淘宝用户信息: "+AlibcLogin.getInstance().getSession());
-                String nick = AlibcLogin.getInstance().getSession().nick;
-                String avatarUrl = AlibcLogin.getInstance().getSession().avatarUrl;
-                Toast.makeText(MainActivity.this, "登录成功 ", Toast.LENGTH_LONG).show();
-            }
+    @Override
+    public void setListener() {
+        bottom_group.setOnCheckedChangeListener(this);
+    }
 
-            @Override
-            public void onFailure(int i, String s) {
-                Toast.makeText(MainActivity.this, "登录失敗 ", Toast.LENGTH_LONG).show();
+    @Override
+    public void initData() {
+        fm = getSupportFragmentManager();
+        FragmentTransaction traslation = fm.beginTransaction();
+        cacheFragment = new MainFragment();
+        traslation.add(R.id.main_containor,cacheFragment,MainFragment.TAG);
+        traslation.commit();
+    }
+
+
+    @Override
+    public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
+        switch (i){
+            case R.id.bottom_main:
+                park_rb.setTextColor(getResources().getColor(R.color.colorSkyBlue));
+                forum_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
+                mine_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
+                switchPages(MainFragment.class,MainFragment.TAG);
+                break;
+            case R.id.bottom_main_recommend:
+                park_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
+                forum_rb.setTextColor(getResources().getColor(R.color.colorSkyBlue));
+                mine_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
+                switchPages(RecommendFragment.class,RecommendFragment.TAG);
+                break;
+            case R.id.bottom_main_mine:
+                park_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
+                forum_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
+                mine_rb.setTextColor(getResources().getColor(R.color.colorSkyBlue));
+                switchPages(MineFragment.class,MineFragment.TAG);
+                break;
+        }
+    }
+
+    private void switchPages(Class<?> cls, String tag){
+        FragmentTransaction transaction = fm.beginTransaction();
+        if (cacheFragment != null){
+            transaction.hide(cacheFragment);
+        }
+        cacheFragment = fm.findFragmentByTag(tag);
+        if (cacheFragment != null){
+            transaction.show(cacheFragment);
+        } else {
+            try{
+                cacheFragment = (Fragment) cls.getConstructor().newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (Exception e){
+                e.printStackTrace();
             }
-        });
+            transaction.add(R.id.main_containor, cacheFragment, tag);
+        }
+        transaction.commit();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

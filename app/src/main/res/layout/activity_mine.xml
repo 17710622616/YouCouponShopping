@@ -5,17 +5,21 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/user_info"
         android:layout_width="match_parent"
         android:layout_height="180dp"
         android:orientation="vertical"
         android:background="@color/colorWight"
         android:gravity="center_horizontal|bottom">
-        <ImageView
+
+        <com.youcoupon.john_li.youcouponshopping.YouView.YouCycleImageView
+            android:id="@+id/user_head"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@mipmap/head_boy"/>
 
         <TextView
+            android:id="@+id/user_nick_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="小叮噹"
@@ -132,6 +136,24 @@
         <TextView
             style="@style/MineItemTextView"
             android:text="我的購物車"/>
+
+        <ImageView
+            style="@style/MineItemImageNext"/>
+    </LinearLayout>
+
+    <View style="@style/underLine"/>
+
+    <LinearLayout
+        android:id="@+id/mine_setting"
+        android:orientation="horizontal"
+        style="@style/mineLinearLayout">
+        <ImageView
+            style="@style/MineItemImageView"
+            android:src="@mipmap/setting"/>
+
+        <TextView
+            style="@style/MineItemTextView"
+            android:text="退出登錄"/>
 
         <ImageView
             style="@style/MineItemImageNext"/>

@@ -6,6 +6,8 @@ import android.widget.Toast;
 import com.alibaba.baichuan.android.trade.AlibcTradeSDK;
 import com.alibaba.baichuan.android.trade.callback.AlibcTradeInitCallback;
 
+import org.xutils.x;
+
 /**
  * Created by John on 20/5/2018.
  */
@@ -14,7 +16,7 @@ public class YouApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        x.Ext.init(this);
         AlibcTradeSDK.asyncInit(this, new AlibcTradeInitCallback() {
             @Override
             public void onSuccess() {

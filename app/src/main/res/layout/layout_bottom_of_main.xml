@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorLightGray">
+    <RadioGroup
+        android:id="@+id/bottom_main_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/colorWight">
+        <RadioButton
+            android:id="@+id/bottom_main"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="5dp"
+            android:button="@null"
+            android:gravity="center"
+            android:text="首頁"
+            android:textSize="10sp"
+            android:textColor="@color/colorSkyBlue"
+            android:checked="true"
+            android:drawableTop="@drawable/selector_main"/>
+
+        <RadioButton
+            android:id="@+id/bottom_main_recommend"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableTop="@drawable/selector_recommend"
+            android:gravity="center"
+            android:text="推薦"
+            android:textColor="@color/colorDrakGray"
+            android:textSize="10sp" />
+
+        <RadioButton
+            android:id="@+id/bottom_main_mine"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="5dp"
+            android:button="@null"
+            android:gravity="center"
+            android:text="我的"
+            android:textSize="10sp"
+            android:textColor="@color/colorDrakGray"
+            android:drawableTop="@drawable/selector_mine"/>
+    </RadioGroup>
+</LinearLayout>

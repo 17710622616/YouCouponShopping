@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="180dp"
         android:orientation="vertical"
-        android:background="@color/colorWight"
+        android:background="@color/colorWhite"
         android:gravity="center_horizontal|bottom">
 
         <com.youcoupon.john_li.youcouponshopping.YouView.YouCycleImageView
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="20dp"
-        android:background="@color/colorWight">
+        android:background="@color/colorWhite">
         <LinearLayout
             android:id="@+id/mine_obligation"
             android:layout_width="0dp"

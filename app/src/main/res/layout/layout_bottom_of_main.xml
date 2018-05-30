@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/colorWight">
+        android:background="@color/colorWhite">
         <RadioButton
             android:id="@+id/bottom_main"
             android:layout_width="0dp"

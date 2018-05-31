@@ -73,7 +73,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     }
 
     public void initData() {
-        alibcShowParams = new AlibcShowParams(OpenType.Auto, false);
+        alibcShowParams = new AlibcShowParams(OpenType.Native, false);
 
         exParams = new HashMap<>();
         exParams.put("isv_code", "appisvcode");

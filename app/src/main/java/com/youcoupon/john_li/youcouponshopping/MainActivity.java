@@ -1,6 +1,7 @@
 package com.youcoupon.john_li.youcouponshopping;
 
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -50,6 +52,13 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //当系统版本为4.4或者4.4以上时可以使用沉浸式状态栏
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            //透明状态栏
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            //透明导航栏
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }
         initView();
         setListener();
         initData();
@@ -108,21 +117,21 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
         switch (i){
             case R.id.bottom_main:
-                park_rb.setTextColor(getResources().getColor(R.color.colorSkyBlue));
+                park_rb.setTextColor(getResources().getColor(R.color.colorPrimary));
                 forum_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
                 mine_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
                 switchPages(MainFragment.class,MainFragment.TAG);
                 break;
             case R.id.bottom_main_recommend:
                 park_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
-                forum_rb.setTextColor(getResources().getColor(R.color.colorSkyBlue));
+                forum_rb.setTextColor(getResources().getColor(R.color.colorPrimary));
                 mine_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
                 switchPages(RecommendFragment.class,RecommendFragment.TAG);
                 break;
             case R.id.bottom_main_mine:
                 park_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
                 forum_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
-                mine_rb.setTextColor(getResources().getColor(R.color.colorSkyBlue));
+                mine_rb.setTextColor(getResources().getColor(R.color.colorPrimary));
                 switchPages(MineFragment.class,MineFragment.TAG);
                 break;
         }

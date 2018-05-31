@@ -20,7 +20,7 @@
             android:gravity="center"
             android:text="首頁"
             android:textSize="10sp"
-            android:textColor="@color/colorSkyBlue"
+            android:textColor="@color/colorPrimary"
             android:checked="true"
             android:drawableTop="@drawable/selector_main"/>
 

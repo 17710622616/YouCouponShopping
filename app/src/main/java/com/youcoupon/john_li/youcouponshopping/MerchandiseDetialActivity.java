@@ -31,6 +31,7 @@ import com.alibaba.baichuan.android.trade.page.AlibcShopPage;
 import com.alibaba.fastjson.JSON;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.CollapsingAdapter;
+import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteItemOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.MerchandiseOutModel;
 
 import org.xutils.image.ImageOptions;
@@ -61,7 +62,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
 
     // 界面數據
     private List<ImageView> imgList;
-    private MerchandiseOutModel.TbkUatmFavoritesItemGetResponseBean.ResultsBean.UatmTbkItemBean mUatmTbkItemBean;
+    private FavoriteItemOutModel.DataBean.FavoriteItemModel mFavoriteItemModel;
     private CollapsingAdapter mCollapsingAdapter;
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
     @Override
@@ -80,20 +81,20 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         articalToolbar = (Toolbar) findViewById(R.id.merchandise_detial_toolbar);
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.merchandise_detial_collapsing_toolbar);
         mViewPager = (ViewPager) findViewById(R.id.merchandise_detial_vp);
-        shopIconIv = findViewById(R.id.merchandise_detial_shop_icon);
-        merchandiseTitleTv = findViewById(R.id.merchandise_detial_title);
-        afterPriceTv = findViewById(R.id.merchandise_detial_after);
-        beforePriceTv = findViewById(R.id.merchandise_detial_before);
-        inSaleTv = findViewById(R.id.merchandise_detial_in_sales);
-        merchantsTypeTv = findViewById(R.id.merchandise_detial_merchants_type);
-        couponValueTv = findViewById(R.id.merchandise_detial_coupon);
-        couponRemainCountTv = findViewById(R.id.merchandise_detial_coupon_remain_coun);
-        storeLL = findViewById(R.id.merchandise_detial_store);
-        shoppingCartLL = findViewById(R.id.merchandise_detial_shopping_cart);
-        couponRedemptionTv = findViewById(R.id.merchandise_detial_coupon_redemption);
-        sellerNickTv = findViewById(R.id.merchandise_detial_seller_nick);
-        shopTitleTv = findViewById(R.id.merchandise_detial_seller_shop_title);
-        shopProvcitytV = findViewById(R.id.merchandise_detial_seller_shop_provcity);
+        shopIconIv = (ImageView) findViewById(R.id.merchandise_detial_shop_icon);
+        merchandiseTitleTv = (TextView) findViewById(R.id.merchandise_detial_title);
+        afterPriceTv = (TextView) findViewById(R.id.merchandise_detial_after);
+        beforePriceTv = (TextView) findViewById(R.id.merchandise_detial_before);
+        inSaleTv = (TextView) findViewById(R.id.merchandise_detial_in_sales);
+        merchantsTypeTv = (TextView) findViewById(R.id.merchandise_detial_merchants_type);
+        couponValueTv = (TextView) findViewById(R.id.merchandise_detial_coupon);
+        couponRemainCountTv = (TextView) findViewById(R.id.merchandise_detial_coupon_remain_coun);
+        storeLL = (LinearLayout) findViewById(R.id.merchandise_detial_store);
+        shoppingCartLL = (LinearLayout) findViewById(R.id.merchandise_detial_shopping_cart);
+        couponRedemptionTv = (TextView) findViewById(R.id.merchandise_detial_coupon_redemption);
+        sellerNickTv = (TextView) findViewById(R.id.merchandise_detial_seller_nick);
+        shopTitleTv = (TextView) findViewById(R.id.merchandise_detial_seller_shop_title);
+        shopProvcitytV = (TextView) findViewById(R.id.merchandise_detial_seller_shop_provcity);
 
         beforePriceTv.getPaint().setFlags(Paint. STRIKE_THRU_TEXT_FLAG); //中划线
         //setFlags(Paint. STRIKE_THRU_TEXT_FLAG|Paint.ANTI_ALIAS_FLAG); // 设置中划线并加清晰
@@ -108,7 +109,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     public void initData() {
         // 獲取帖文資料
         Intent intent = getIntent();
-        mUatmTbkItemBean = JSON.parseObject(intent.getStringExtra("MerchandiseModel"), MerchandiseOutModel.TbkUatmFavoritesItemGetResponseBean.ResultsBean.UatmTbkItemBean.class);
+        mFavoriteItemModel = JSON.parseObject(intent.getStringExtra("MerchandiseModel"), FavoriteItemOutModel.DataBean.FavoriteItemModel.class);
 
         // 初始化阿里百川
         //提供给三方传递配置参数
@@ -124,27 +125,27 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         mCollapsingToolbarLayout.setExpandedTitleGravity(Gravity.CENTER);////设置展开后标题的位置
         mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimary));//设置展开后标题的颜色*/
         // 設置標題及內容
-        merchandiseTitleTv.setText(mUatmTbkItemBean.getTitle());
-        afterPriceTv.setText("券后價¥" + mUatmTbkItemBean.getZk_final_price());
-        beforePriceTv.setText("原價¥" + mUatmTbkItemBean.getReserve_price());
-        inSaleTv.setText("月銷量：" + String.valueOf(mUatmTbkItemBean.getVolume()));
-        if (mUatmTbkItemBean.getUser_type() == 0) {
+        merchandiseTitleTv.setText(mFavoriteItemModel.getTitle());
+        afterPriceTv.setText("券后價¥" + mFavoriteItemModel.getZkFinalPrice());
+        beforePriceTv.setText("原價¥" + mFavoriteItemModel.getReservePrice());
+        inSaleTv.setText("月銷量：" + String.valueOf(mFavoriteItemModel.getVolume()));
+        if (mFavoriteItemModel.getUserType() == 0) {
             merchantsTypeTv.setText("淘寶：包郵");
         } else {
             merchantsTypeTv.setText("天貓：包郵");
         }
-        couponValueTv.setText("¥" + String.valueOf(mUatmTbkItemBean.getCoupon_info()));
-        couponRemainCountTv.setText("剩餘數量：" + String.valueOf(mUatmTbkItemBean.getCoupon_remain_count()));
+        couponValueTv.setText("¥" + String.valueOf(mFavoriteItemModel.getCouponInfo()));
+        couponRemainCountTv.setText("剩餘數量：" + String.valueOf(mFavoriteItemModel.getCouponRemainCount()));
 
-        sellerNickTv.setText(mUatmTbkItemBean.getNick());
-        shopTitleTv.setText(mUatmTbkItemBean.getShop_title());
-        shopProvcitytV.setText(mUatmTbkItemBean.getProvcity());
-        if (mUatmTbkItemBean.getUser_type() != 0) {
+        sellerNickTv.setText(mFavoriteItemModel.getNick());
+        shopTitleTv.setText(mFavoriteItemModel.getShopTitle());
+        shopProvcitytV.setText(mFavoriteItemModel.getProvcity());
+        if (mFavoriteItemModel.getType() != 0) {
             shopIconIv.setImageResource(R.mipmap.tianmao);
         }
         // 頭部的圖片列表
         imgList = new ArrayList<>();
-        for (String imgUrl : mUatmTbkItemBean.getSmall_images().getString()) {
+        for (String imgUrl : mFavoriteItemModel.getSmallImages()) {
             ImageView iv = new ImageView(this);
             iv.setBackgroundColor(getResources().getColor(R.color.colorMineGray));
             iv.setImageResource(R.mipmap.img_loading);
@@ -173,7 +174,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                 //设置页面打开方式
                 AlibcShowParams showParamsStore = new AlibcShowParams(OpenType.H5, false);;
                 //实例化URL打开page
-                detailPage = new AlibcShopPage(String.valueOf(mUatmTbkItemBean.getSeller_id()));
+                detailPage = new AlibcShopPage(String.valueOf(mFavoriteItemModel.getSellerId()));
                 //使用百川sdk提供默认的Activity打开detail
                 AlibcTrade.show(this, detailPage, showParamsStore, null, exParams , new AlibcTradeCallback() {
                     @Override
@@ -209,7 +210,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                 //设置页面打开方式
                 AlibcShowParams showParamsCouponRedemption = new AlibcShowParams(OpenType.Native, false);;
                 //实例化URL打开page
-                detailPage = new AlibcPage(mUatmTbkItemBean.getCoupon_click_url());
+                detailPage = new AlibcPage(mFavoriteItemModel.getCouponClickUrl());
                 //使用百川sdk提供默认的Activity打开detail
                 AlibcTrade.show(this, detailPage, showParamsCouponRedemption, null, exParams , new AlibcTradeCallback() {
                     @Override

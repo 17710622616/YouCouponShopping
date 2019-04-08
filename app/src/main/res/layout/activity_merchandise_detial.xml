@@ -211,7 +211,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:padding="10dp"
+            android:padding="5dp"
             android:gravity="center"
             android:background="@color/colorWhite">
             <ImageView
@@ -251,7 +251,7 @@
             android:layout_weight="2"
             android:gravity="center"
             android:text="領券購買"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textColor="@color/colorWhite"
             android:background="@color/colorPrimary"/>
     </LinearLayout>

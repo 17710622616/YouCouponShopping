@@ -8,16 +8,17 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="5dp">
 
         <ImageView
             android:id="@+id/item_main_merchandise_iv"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
             android:layout_marginRight="5dp"
             android:scaleType="fitXY"
-            android:src="@mipmap/img_loading" />
+            android:src="@mipmap/img_loading"
+            android:layout_gravity="center_horizontal"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -30,29 +31,25 @@
                 android:text="標題"
                 android:textColor="@color/colorBlack" />
 
-            <ImageView
-                android:id="@+id/item_main_merchandise_business_type"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:src="@mipmap/taobao"
-                android:layout_centerVertical="true"/>
-
             <TextView
                 android:id="@+id/item_main_merchandise_original_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/item_main_merchandise_title"
+                android:layout_marginTop="2dp"
                 android:text="原價"
                 android:textColor="@color/colorDrakGray"
-                android:textSize="12sp"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@id/item_main_merchandise_business_type"/>
+                android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/item_main_merchandise_after_discount"
+                android:id="@+id/item_main_merchandise_volume"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:text="券后價"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/item_main_merchandise_title"
+                android:layout_marginTop="2dp"
+                android:layout_marginRight="5dp"
+                android:text="月销"
                 android:textColor="@color/colorDrakGray"
                 android:textSize="12sp" />
 
@@ -60,21 +57,39 @@
                 android:id="@+id/item_main_merchandise_price_after_discount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
+                android:layout_below="@id/item_main_merchandise_original_price"
                 android:text="30"
+                android:textColor="@color/colorAccent"
+                android:textSize="22sp" />
+
+
+            <TextView
+                android:id="@+id/item_main_merchandise_after_discount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/item_main_merchandise_price_after_discount"
+                android:layout_toLeftOf="@id/item_main_merchandise_price_after_discount"
+                android:layout_below="@id/item_main_merchandise_original_price"
+                android:layout_marginTop="2dp"
+                android:gravity="bottom"
+                android:text="券后價："
                 android:textColor="@color/colorDrakGray"
-                android:textSize="12sp"
-                android:layout_toRightOf="@id/item_main_merchandise_after_discount"/>
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/item_main_merchandise_original_coupon_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="券50"
-                android:textColor="@color/colorDrakGray"
-                android:textSize="12sp"
+                android:layout_alignBottom="@id/item_main_merchandise_price_after_discount"
                 android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="true"/>
+                android:layout_marginBottom="2dp"
+                android:layout_marginRight="5dp"
+                android:paddingLeft="3.5dp"
+                android:paddingRight="5dp"
+                android:background="@mipmap/coupon"
+                android:text="券50"
+                android:textColor="@color/colorWhite"
+                android:textSize="12sp" />
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

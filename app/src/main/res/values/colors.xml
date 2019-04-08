@@ -2,7 +2,8 @@
 <resources>
     <color name="colorPrimary">#FB648F</color>
     <color name="colorPrimaryDark">#FB648F</color>
-    <color name="colorAccent">#FF4081</color>
+    <!--<color name="colorAccent">#FF4081</color>-->
+    <color name="colorAccent">#FE2C2D</color>
     <color name="colorSkyBlue">#0286FF</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorMineGray">#F5F5F5</color>

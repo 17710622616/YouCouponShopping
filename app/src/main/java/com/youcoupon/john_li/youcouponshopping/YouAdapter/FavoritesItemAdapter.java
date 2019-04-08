@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.youcoupon.john_li.youcouponshopping.R;
+import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteItemOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.MerchandiseOutModel;
 
 import org.xutils.image.ImageOptions;
@@ -21,13 +22,13 @@ import java.util.List;
  * Created by John_Li on 30/5/2018.
  */
 
-public class MainMerchandiseAdapter extends BaseAdapter {
-    private List<MerchandiseOutModel.TbkUatmFavoritesItemGetResponseBean.ResultsBean.UatmTbkItemBean> list;
+public class FavoritesItemAdapter extends BaseAdapter {
+    private List<FavoriteItemOutModel.DataBean.FavoriteItemModel> list;
     private Context mContext;
     private LayoutInflater mInflater;
 
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
-    public MainMerchandiseAdapter(List<MerchandiseOutModel.TbkUatmFavoritesItemGetResponseBean.ResultsBean.UatmTbkItemBean> list, Context context) {
+    public FavoritesItemAdapter(List<FavoriteItemOutModel.DataBean.FavoriteItemModel> list, Context context) {
         this.list = list;
         mContext = context;
         mInflater = LayoutInflater.from(context);
@@ -55,28 +56,29 @@ public class MainMerchandiseAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.merchandise_iv = convertView.findViewById(R.id.item_main_merchandise_iv);
             holder.merchandise_title = convertView.findViewById(R.id.item_main_merchandise_title);
-            holder.merchandise_business_type = convertView.findViewById(R.id.item_main_merchandise_business_type);
             holder.merchandise_original_price = convertView.findViewById(R.id.item_main_merchandise_original_price);
             holder.merchandise_after_discoun = convertView.findViewById(R.id.item_main_merchandise_after_discount);
             holder.merchandise_price_after_discount = convertView.findViewById(R.id.item_main_merchandise_price_after_discount);
             holder.merchandise_original_coupon_value = convertView.findViewById(R.id.item_main_merchandise_original_coupon_value);
+            holder.item_main_merchandise_volume = convertView.findViewById(R.id.item_main_merchandise_volume);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
 
-        x.image().bind(holder.merchandise_iv, list.get(position).getPict_url(), options);
+        x.image().bind(holder.merchandise_iv, list.get(position).getPictUrl(), options);
         holder.merchandise_title.setText(list.get(position).getTitle());
-        holder.merchandise_original_price.setText("原價：" + list.get(position).getReserve_price());
-        holder.merchandise_after_discoun.setText("券后價");
-        holder.merchandise_price_after_discount.setText(list.get(position).getZk_final_price());
-        holder.merchandise_original_coupon_value.setText("券：" + list.get(position).getCoupon_info());
+        holder.merchandise_original_price.setText("原價：¥" + list.get(position).getReservePrice());
+        holder.merchandise_after_discoun.setText("券后價：");
+        holder.merchandise_price_after_discount.setText("¥" + list.get(position).getZkFinalPrice());
+        holder.merchandise_original_coupon_value.setText(list.get(position).getCouponInfo());
+        holder.item_main_merchandise_volume.setText("月销：" + list.get(position).getVolume());
         return convertView;
     }
 
     class ViewHolder {
-        public ImageView merchandise_iv, merchandise_business_type;
-        public TextView merchandise_title, merchandise_original_price, merchandise_after_discoun, merchandise_price_after_discount, merchandise_original_coupon_value;
+        public ImageView merchandise_iv;
+        public TextView merchandise_title, merchandise_original_price, merchandise_after_discoun, merchandise_price_after_discount, merchandise_original_coupon_value,item_main_merchandise_volume;
     }
 }

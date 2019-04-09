@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.baichuan.android.trade.AlibcTrade;
 import com.alibaba.baichuan.android.trade.callback.AlibcTradeCallback;
@@ -32,8 +33,14 @@ import com.alibaba.fastjson.JSON;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.CollapsingAdapter;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteItemOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.MerchandiseOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.SellerOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
 
+import org.xutils.common.Callback;
+import org.xutils.http.RequestParams;
 import org.xutils.image.ImageOptions;
 import org.xutils.x;
 
@@ -53,7 +60,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     private ViewPager mViewPager;
     private ImageView shopIconIv;
     private LinearLayout storeLL, shoppingCartLL;
-    private TextView merchandiseTitleTv, afterPriceTv, beforePriceTv, inSaleTv, merchantsTypeTv, couponValueTv, couponRemainCountTv, couponRedemptionTv, sellerNickTv, shopTitleTv, shopProvcitytV;
+    private TextView merchandiseTitleTv, afterPriceTv, beforePriceTv, inSaleTv, merchantsTypeTv, couponValueTv, couponRemainCountTv, couponRedemptionTv, sellerNickTv, shopTypeTv, shopProvcitytV;
 
     // 淘寶相關信息
     private Map<String, String> exParams;
@@ -63,6 +70,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     // 界面數據
     private List<ImageView> imgList;
     private FavoriteItemOutModel.DataBean.FavoriteItemModel mFavoriteItemModel;
+    private SellerOutModel.DataBean.SellerModel mSellerModel;
     private CollapsingAdapter mCollapsingAdapter;
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
     @Override
@@ -93,7 +101,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         shoppingCartLL = (LinearLayout) findViewById(R.id.merchandise_detial_shopping_cart);
         couponRedemptionTv = (TextView) findViewById(R.id.merchandise_detial_coupon_redemption);
         sellerNickTv = (TextView) findViewById(R.id.merchandise_detial_seller_nick);
-        shopTitleTv = (TextView) findViewById(R.id.merchandise_detial_seller_shop_title);
+        shopTypeTv = (TextView) findViewById(R.id.merchandise_detial_seller_type);
         shopProvcitytV = (TextView) findViewById(R.id.merchandise_detial_seller_shop_provcity);
 
         beforePriceTv.getPaint().setFlags(Paint. STRIKE_THRU_TEXT_FLAG); //中划线
@@ -126,7 +134,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimary));//设置展开后标题的颜色*/
         // 設置標題及內容
         merchandiseTitleTv.setText(mFavoriteItemModel.getTitle());
-        afterPriceTv.setText("券后價¥" + mFavoriteItemModel.getZkFinalPrice());
+        afterPriceTv.setText(String.valueOf(mFavoriteItemModel.getZkFinalPrice()));
         beforePriceTv.setText("原價¥" + mFavoriteItemModel.getReservePrice());
         inSaleTv.setText("月銷量：" + String.valueOf(mFavoriteItemModel.getVolume()));
         if (mFavoriteItemModel.getUserType() == 0) {
@@ -134,15 +142,15 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         } else {
             merchantsTypeTv.setText("天貓：包郵");
         }
-        couponValueTv.setText("¥" + String.valueOf(mFavoriteItemModel.getCouponInfo()));
+        couponValueTv.setText(String.valueOf(mFavoriteItemModel.getCouponInfo()));
         couponRemainCountTv.setText("剩餘數量：" + String.valueOf(mFavoriteItemModel.getCouponRemainCount()));
 
-        sellerNickTv.setText(mFavoriteItemModel.getNick());
-        shopTitleTv.setText(mFavoriteItemModel.getShopTitle());
+        // 商家资料
         shopProvcitytV.setText(mFavoriteItemModel.getProvcity());
         if (mFavoriteItemModel.getType() != 0) {
             shopIconIv.setImageResource(R.mipmap.tianmao);
         }
+        callNetGetSellerInfo(mFavoriteItemModel.getNick());
         // 頭部的圖片列表
         imgList = new ArrayList<>();
         for (String imgUrl : mFavoriteItemModel.getSmallImages()) {
@@ -155,6 +163,52 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
 
         mCollapsingAdapter = new CollapsingAdapter(imgList);
         mViewPager.setAdapter(mCollapsingAdapter);
+    }
+
+    /**
+     * 获取商家详情
+     */
+    private void callNetGetSellerInfo(String sellerName) {
+        Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("pageno", "1");
+        paramsMap.put("pagesize", "1");
+        paramsMap.put("sellername", sellerName);
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.SELLER_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
+        params.setConnectTimeout(30 * 1000);
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                SellerOutModel model = JSON.parseObject(result, SellerOutModel.class);
+                if (model.getStatus() == 0) {
+                    for (int i = 0; i < model.getData().getResults().size(); i++) {
+                        // 只取一个所以只会轮询到第一个
+                        mSellerModel = model.getData().getResults().get(i);
+                        sellerNickTv.setText(model.getData().getResults().get(i).getShopTitle() + "/" + model.getData().getResults().get(i).getSellerNick());
+                        if (model.getData().getResults().get(i).getShopType().equals("B")) {
+                            shopTypeTv.setText("天猫");
+                        }
+                        x.image().bind(shopIconIv, model.getData().getResults().get(i).getPictUrl());
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "獲取商家详情失敗！", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(getApplicationContext(), "獲取商家详情失敗！", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
     }
 
     @Override

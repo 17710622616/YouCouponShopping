@@ -39,8 +39,6 @@ import java.util.Map;
 
 public class MainFragment extends LazyLoadFragment implements View.OnClickListener{
     public static String TAG = MainFragment.class.getName();
-    private ImageView taoqianggouIV, juhuasuanIV;
-    //private TabLayout mTabLayout;
     private NoScrollGridView mListView;
     private NoScrollGridView mGridView;
     private RefreshLayout mRefreshLayout;
@@ -63,9 +61,6 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     }
 
     private void initView() {
-        taoqianggouIV = (ImageView) findViewById(R.id.main_taoqianggou);
-        juhuasuanIV = (ImageView) findViewById(R.id.main_juhuasuan);
-        //mTabLayout = (TabLayout) findViewById(R.id.title_tabLayout);
         mRefreshLayout = (RefreshLayout) findViewById(R.id.main_srl);
         mListView = (NoScrollGridView) findViewById(R.id.main_lv);
         mGridView = (NoScrollGridView) findViewById(R.id.main_classify);
@@ -78,8 +73,6 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     }
 
     private void setListener() {
-        taoqianggouIV.setOnClickListener(this);
-        juhuasuanIV.setOnClickListener(this);
         mRefreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
             @Override
             public void onLoadmore(RefreshLayout refreshlayout) {
@@ -127,10 +120,6 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.main_taoqianggou:
-                break;
-            case R.id.main_juhuasuan:
-                break;
         }
     }
 

@@ -170,63 +170,93 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:padding="5dp"
-                    android:background="@color/colorWhite"
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:id="@+id/main_taoqianggou"
+                        android:id="@+id/main_ad1"
                         android:layout_width="0dp"
-                        android:layout_height="100dp"
+                        android:layout_height="180dp"
                         android:layout_weight="1"
-                        android:paddingRight="2.5dp"
                         android:scaleType="fitXY"
-                        android:src="@mipmap/taoqianggou" />
+                        android:src="@mipmap/ad1"
+                        android:layout_margin="0.5dp"/>
 
-                    <ImageView
-                        android:id="@+id/main_juhuasuan"
+                    <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="100dp"
-                        android:layout_weight="1"
-                        android:paddingLeft="2.5dp"
-                        android:scaleType="fitXY"
-                        android:src="@mipmap/juhuasuan" />
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/main_ad2"
+                            android:layout_width="match_parent"
+                            android:layout_height="89dp"
+                            android:scaleType="fitXY"
+                            android:src="@mipmap/ad2"
+                            android:layout_margin="0.5dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="89dp"
+                            android:layout_weight="2"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/main_ad3"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:scaleType="fitXY"
+                                android:src="@mipmap/ad3"
+                                android:layout_margin="0.5dp"/>
+
+                            <ImageView
+                                android:id="@+id/main_ad4"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:scaleType="fitXY"
+                                android:src="@mipmap/ad4"
+                                android:layout_margin="0.5dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
 
-                <!--<HorizontalScrollView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:scrollbars="none"
-                    android:background="@color/colorWhite">
-                    <android.support.design.widget.AppBarLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:elevation="0dp">
-                        <android.support.design.widget.TabLayout
-                            android:id="@+id/title_tabLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@color/colorWhite"
-                            app:tabTextColor="@color/colorBlack"
-                            app:tabSelectedTextColor="@color/colorPrimary"
-                            app:tabIndicatorColor="@color/colorPrimary"
-                            app:tabIndicatorHeight="2dp"
-                            app:tabGravity="fill"
-                            app:tabMode="fixed"/>
-                    </android.support.design.widget.AppBarLayout>
-                </HorizontalScrollView>-->
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="0.3dp"
                     android:paddingTop="3dp"
                     android:paddingBottom="3dp"
-                    android:paddingLeft="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="1dp"
-                    android:text="爆款推荐"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="20sp"
-                    android:background="@color/colorWhite"/>
+                    android:background="@color/colorWhite">
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0.3dp"
+                        android:layout_weight="3"
+                        android:layout_marginLeft="30dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/colorWayOringe"
+                        android:layout_gravity="center_vertical"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="为您推荐"
+                        android:textColor="@color/colorWayOringe"
+                        android:textSize="20sp"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0.3dp"
+                        android:layout_weight="3"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="30dp"
+                        android:background="@color/colorWayOringe"
+                        android:layout_gravity="center_vertical"/>
+                </LinearLayout>
+
                 <com.youcoupon.john_li.youcouponshopping.YouView.NoScrollGridView
                     android:id="@+id/main_lv"
                     android:layout_width="match_parent"

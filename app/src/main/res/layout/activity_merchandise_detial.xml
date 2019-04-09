@@ -41,165 +41,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/collapsing_comment_sv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:background="@color/colorMineGray">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="10dp"
-                android:background="@color/colorWhite">
-
-                <TextView
-                    android:id="@+id/merchandise_detial_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:textColor="@color/colorBlack"/>
-
-                <TextView
-                    android:id="@+id/merchandise_detial_coupon_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="券"
-                    android:textSize="18sp"
-                    android:textColor="@color/colorWhite"
-                    android:padding="3dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_below="@id/merchandise_detial_title"
-                    android:background="@drawable/shape_coupon_icon"/>
-
-                <TextView
-                    android:id="@+id/merchandise_detial_coupon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="10"
-                    android:textSize="18sp"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_marginTop="5dp"
-                    android:layout_below="@id/merchandise_detial_title"
-                    android:layout_toRightOf="@id/merchandise_detial_coupon_tv"
-                    android:background="@drawable/shape_coupon_side"/>
-
-                <TextView
-                    android:id="@+id/merchandise_detial_coupon_remain_coun"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="剩餘數量："
-                    android:textSize="14sp"
-                    android:textColor="@color/colorDrakGray"
-                    android:layout_alignBaseline="@id/merchandise_detial_coupon_tv"
-                    android:layout_alignParentRight="true"/>
-
-                <TextView
-                    android:id="@+id/merchandise_detial_after"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="券后：¥"
-                    android:textSize="16sp"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_marginTop="5dp"
-                    android:layout_below="@id/merchandise_detial_coupon_tv"/>
-
-                <TextView
-                    android:id="@+id/merchandise_detial_before"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="5dp"
-                    android:text="原價：¥"
-                    android:textSize="12sp"
-                    android:textColor="@color/colorLineGray"
-                    android:layout_marginTop="5dp"
-                    android:layout_below="@id/merchandise_detial_coupon_tv"
-                    android:layout_toRightOf="@id/merchandise_detial_after"
-                    android:layout_alignBaseline="@id/merchandise_detial_after"/>
-
-                <TextView
-                    android:id="@+id/merchandise_detial_in_sales"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="月銷量："
-                    android:textSize="14sp"
-                    android:textColor="@color/colorDrakGray"
-                    android:layout_marginTop="5dp"
-                    android:layout_below="@id/merchandise_detial_coupon_tv"
-                    android:layout_alignParentRight="true"/>
-
-                <TextView
-                    android:id="@+id/merchandise_detial_merchants_type"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="天貓：包郵"
-                    android:textSize="12sp"
-                    android:textColor="@color/colorDrakGray"
-                    android:layout_marginTop="5dp"
-                    android:layout_below="@id/merchandise_detial_after"/>
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:padding="5dp"
-                android:background="@color/colorWhite">
-
-                <ImageView
-                    android:id="@+id/merchandise_detial_shop_icon"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:src="@mipmap/taobao"
-                    android:layout_centerVertical="true"
-                    android:paddingRight="5dp"/>
-
-                <TextView
-                    android:id="@+id/merchandise_detial_seller_nick"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="@color/colorDrakGray"
-                    android:layout_toRightOf="@id/merchandise_detial_shop_icon"/>
-
-                <TextView
-                    android:id="@+id/merchandise_detial_seller_shop_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="@color/colorDrakGray"
-                    android:layout_below="@id/merchandise_detial_seller_nick"
-                    android:layout_toRightOf="@id/merchandise_detial_shop_icon"/>
-
-                <TextView
-                    android:id="@+id/merchandise_detial_seller_shop_provcity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="@color/colorDrakGray"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"/>
-            </RelativeLayout>
-
-            <com.youcoupon.john_li.youcouponshopping.YouView.NoScrollGridView
-                android:id="@+id/merchandise_detial_lv"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@color/colorWhite"
-                android:divider="#F1F1F1"
-                android:groupIndicator="@null"
-                android:paddingTop="10dp" />
-        </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -255,5 +96,174 @@
             android:textColor="@color/colorWhite"
             android:background="@color/colorPrimary"/>
     </LinearLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/collapsing_comment_sv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorCommentGray"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorWhite"
+                android:orientation="horizontal"
+                android:padding="10dp">
+
+                <LinearLayout
+                    android:id="@+id/merchandise_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="券后:¥"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="12sp"
+                        android:gravity="bottom"/>
+                    <TextView
+                        android:id="@+id/merchandise_detial_after"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:paddingTop="3dp"
+                        android:text="0.0"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="20sp"
+                        android:gravity="bottom"/>
+
+                    <TextView
+                        android:id="@+id/merchandise_detial_coupon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:background="@mipmap/coupon"
+                        android:text="10"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="12sp"
+                        android:gravity="bottom"/>
+
+                    <TextView
+                        android:id="@+id/merchandise_detial_coupon_remain_coun"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="剩餘數量："
+                        android:textColor="@color/colorDrakGray"
+                        android:textSize="14sp"
+                        android:gravity="right|bottom"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/merchandise_detial_before"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/merchandise_text"
+                    android:layout_marginTop="5dp"
+                    android:text="原價：¥"
+                    android:textColor="@color/colorLineGray"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/merchandise_detial_merchants_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@id/merchandise_detial_before"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="5dp"
+                    android:text="天貓：包郵"
+                    android:textColor="@color/colorDrakGray"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/merchandise_detial_in_sales"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@id/merchandise_detial_before"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="5dp"
+                    android:text="月銷量："
+                    android:textColor="@color/colorDrakGray"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/merchandise_detial_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/merchandise_detial_merchants_type"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="18sp"
+                    android:layout_marginTop="10dp"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="@color/colorWhite"
+                android:padding="5dp">
+
+                <ImageView
+                    android:id="@+id/merchandise_detial_shop_icon"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5dp"
+                    android:scaleType="fitXY"
+                    android:src="@mipmap/taobao" />
+
+                <TextView
+                    android:id="@+id/merchandise_detial_seller_nick"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/merchandise_detial_shop_icon"
+                    android:text="店铺名称"
+                    android:textColor="@color/colorDrakGray"
+                    android:textSize="18sp"
+                    android:layout_marginTop="3dp"/>
+
+                <TextView
+                    android:id="@+id/merchandise_detial_seller_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toRightOf="@id/merchandise_detial_shop_icon"
+                    android:textColor="@color/colorDrakGray"
+                    android:text="淘宝"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="3dp"/>
+
+                <TextView
+                    android:id="@+id/merchandise_detial_seller_shop_provcity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"
+                    android:text="商户地址"
+                    android:textColor="@color/colorDrakGray"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="3dp"/>
+            </RelativeLayout>
+
+            <com.youcoupon.john_li.youcouponshopping.YouView.NoScrollGridView
+                android:id="@+id/merchandise_detial_lv"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@color/colorWhite"
+                android:divider="#F1F1F1"
+                android:groupIndicator="@null"
+                android:paddingTop="10dp" />
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 
 </android.support.design.widget.CoordinatorLayout>

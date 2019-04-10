@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorMineGray">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/colorWhite"
+        android:layout_margin="0.5dp">
+        <ImageView
+            android:id="@+id/item_seller_recon_iv"
+            android:layout_width="123dp"
+            android:layout_height="123dp"
+            android:scaleType="fitXY"
+            android:src="@mipmap/loading"
+            android:padding="5dp"
+            android:layout_gravity="center"/>
+        <TextView
+            android:id="@+id/item_seller_recon_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:textColor="@color/colorBlack"
+            android:text="666"
+            android:padding="3dp"
+            android:singleLine="true"/>
+        </LinearLayout>
+</LinearLayout>

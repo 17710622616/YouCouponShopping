@@ -11,6 +11,10 @@ public class YouConfigor {
     public static final String FAVORITES_LIST = "api/Uatm/GetFavorites?";
     // 選品庫宝贝详情API
     public static final String FAVORITES_ITEM_LIST = "api/Uatm/GetFavoritesItem?";
-    // 商家详情API
+    // 商品详情API
+    public static final String ITEM_INFO = "api/Item/GetItemInfo?";
+    // 相关商家API
     public static final String SELLER_LIST = "api/Shop/GetShopRecommend?";
+    // 商品推荐API
+    public static final String ITEM_RECOMMEND_LIST = "api/Item/GetRecommend?";
 }

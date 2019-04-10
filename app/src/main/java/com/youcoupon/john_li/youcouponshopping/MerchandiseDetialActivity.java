@@ -32,12 +32,17 @@ import com.alibaba.baichuan.android.trade.page.AlibcShopPage;
 import com.alibaba.fastjson.JSON;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.CollapsingAdapter;
+import com.youcoupon.john_li.youcouponshopping.YouAdapter.ItemRecommendAdapter;
+import com.youcoupon.john_li.youcouponshopping.YouAdapter.SellerRecommondAdapter;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteItemOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.ItemInfoOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.ItemRecommondOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.MerchandiseOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.SellerOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
+import com.youcoupon.john_li.youcouponshopping.YouView.NoScrollGridView;
 
 import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
@@ -60,7 +65,9 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     private ViewPager mViewPager;
     private ImageView shopIconIv;
     private LinearLayout storeLL, shoppingCartLL;
-    private TextView merchandiseTitleTv, afterPriceTv, beforePriceTv, inSaleTv, merchantsTypeTv, couponValueTv, couponRemainCountTv, couponRedemptionTv, sellerNickTv, shopTypeTv, shopProvcitytV;
+    private TextView merchandiseTitleTv, afterPriceTv, beforePriceTv, inSaleTv, merchantsTypeTv, couponValueTv, couponRemainCountTv, couponRedemptionTv, sellerNickTv, storeRatingTv, sellerRateTv, shopProvcitytV, itemDetialTv;
+    private NoScrollGridView mStoreRecommonGv;
+    private NoScrollGridView mItemRecommonGv;
 
     // 淘寶相關信息
     private Map<String, String> exParams;
@@ -70,8 +77,16 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     // 界面數據
     private List<ImageView> imgList;
     private FavoriteItemOutModel.DataBean.FavoriteItemModel mFavoriteItemModel;
+    private ItemInfoOutModel.DataBean.ItemInfoModel mItemInfoModel;
     private SellerOutModel.DataBean.SellerModel mSellerModel;
+    private List<SellerOutModel.DataBean.SellerModel> sellerModelList;
+    private long totalCount = 20;
+    private long pageNo = 1;
+    private long pageSize = 10;
+    private List<ItemRecommondOutModel.DataBean.ItemRecommendModel> mItemRecommendModelList;
     private CollapsingAdapter mCollapsingAdapter;
+    private SellerRecommondAdapter mSellerRecommondAdapter;
+    private ItemRecommendAdapter mItemRecommendAdapter;
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -101,8 +116,12 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         shoppingCartLL = (LinearLayout) findViewById(R.id.merchandise_detial_shopping_cart);
         couponRedemptionTv = (TextView) findViewById(R.id.merchandise_detial_coupon_redemption);
         sellerNickTv = (TextView) findViewById(R.id.merchandise_detial_seller_nick);
-        shopTypeTv = (TextView) findViewById(R.id.merchandise_detial_seller_type);
+        storeRatingTv = (TextView) findViewById(R.id.merchandise_detial_store_ratings);
+        sellerRateTv = (TextView) findViewById(R.id.merchandise_detial_seller_rating);
         shopProvcitytV = (TextView) findViewById(R.id.merchandise_detial_seller_shop_provcity);
+        itemDetialTv = (TextView) findViewById(R.id.merchandise_detial);
+        mStoreRecommonGv = (NoScrollGridView) findViewById(R.id.merchandise_store_recommended);
+        mItemRecommonGv = (NoScrollGridView) findViewById(R.id.merchandise_item_recommended);
 
         beforePriceTv.getPaint().setFlags(Paint. STRIKE_THRU_TEXT_FLAG); //中划线
         //setFlags(Paint. STRIKE_THRU_TEXT_FLAG|Paint.ANTI_ALIAS_FLAG); // 设置中划线并加清晰
@@ -112,6 +131,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         shoppingCartLL.setOnClickListener(this);
         storeLL.setOnClickListener(this);
         couponRedemptionTv.setOnClickListener(this);
+        itemDetialTv.setOnClickListener(this);
     }
 
     public void initData() {
@@ -132,6 +152,10 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         /*mCollapsingToolbarLayout.setCollapsedTitleGravity(Gravity.CENTER);//设置收缩后标题的位置
         mCollapsingToolbarLayout.setExpandedTitleGravity(Gravity.CENTER);////设置展开后标题的位置
         mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimary));//设置展开后标题的颜色*/
+
+        // 商品详情
+        callNetGetItemInfo(mFavoriteItemModel.getNumIid());
+
         // 設置標題及內容
         merchandiseTitleTv.setText(mFavoriteItemModel.getTitle());
         afterPriceTv.setText(String.valueOf(mFavoriteItemModel.getZkFinalPrice()));
@@ -151,6 +175,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
             shopIconIv.setImageResource(R.mipmap.tianmao);
         }
         callNetGetSellerInfo(mFavoriteItemModel.getNick());
+
         // 頭部的圖片列表
         imgList = new ArrayList<>();
         for (String imgUrl : mFavoriteItemModel.getSmallImages()) {
@@ -163,6 +188,58 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
 
         mCollapsingAdapter = new CollapsingAdapter(imgList);
         mViewPager.setAdapter(mCollapsingAdapter);
+
+        // 相关店铺推荐
+        sellerModelList = new ArrayList<>();
+        mSellerRecommondAdapter = new SellerRecommondAdapter(sellerModelList, this, mStoreRecommonGv);
+        mStoreRecommonGv.setAdapter(mSellerRecommondAdapter);
+        callNetGetStoreRecommond(mFavoriteItemModel.getSellerId());
+
+        // 相关商品推荐
+        mItemRecommendModelList = new ArrayList<>();
+        mItemRecommendAdapter = new ItemRecommendAdapter(mItemRecommendModelList, this);
+        mItemRecommonGv.setAdapter(mItemRecommendAdapter);
+        callNetGetItemRecommond(mFavoriteItemModel.getNumIid());
+    }
+
+    /**
+     * 获取商品详情
+     */
+    private void callNetGetItemInfo(long numIids) {
+        Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("pageno", "1");
+        paramsMap.put("pagesize", "1");
+        paramsMap.put("numIids", String.valueOf(numIids));
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.ITEM_INFO + YouCommonUtils.createLinkStringByGet(paramsMap));
+        params.setConnectTimeout(30 * 1000);
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                ItemInfoOutModel model = JSON.parseObject(result, ItemInfoOutModel.class);
+                if (model.getStatus() == 0) {
+                    mItemInfoModel = model.getData().getResults().get(0);
+                    storeRatingTv.setText("店铺评分:" + mItemInfoModel.getShopDsr());
+                    sellerRateTv.setText("卖家等级:" + mItemInfoModel.getRatesum());
+                } else {
+                    Toast.makeText(getApplicationContext(), "获取商品详情失敗！", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(getApplicationContext(), "获取商品详情失敗！", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
     }
 
     /**
@@ -184,9 +261,6 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                         // 只取一个所以只会轮询到第一个
                         mSellerModel = model.getData().getResults().get(i);
                         sellerNickTv.setText(model.getData().getResults().get(i).getShopTitle() + "/" + model.getData().getResults().get(i).getSellerNick());
-                        if (model.getData().getResults().get(i).getShopType().equals("B")) {
-                            shopTypeTv.setText("天猫");
-                        }
                         x.image().bind(shopIconIv, model.getData().getResults().get(i).getPictUrl());
                     }
                 } else {
@@ -197,6 +271,85 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
                 Toast.makeText(getApplicationContext(), "獲取商家详情失敗！", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
+    }
+
+    /**
+     * 获取相关店铺
+     */
+    private void callNetGetStoreRecommond(long sellerId) {
+        Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("pageno", "1");
+        paramsMap.put("pagesize", "10");
+        paramsMap.put("userId", String.valueOf(sellerId));
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.SELLER_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
+        params.setConnectTimeout(30 * 1000);
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                SellerOutModel model = JSON.parseObject(result, SellerOutModel.class);
+                if (model.getStatus() == 0) {
+                    sellerModelList.addAll(model.getData().getResults());
+                    mSellerRecommondAdapter.refreshData(sellerModelList);
+                } else {
+                    Toast.makeText(getApplicationContext(), "獲取相关店铺失敗！", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(getApplicationContext(), "獲取相关店铺失敗！", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
+    }
+
+    /**
+     * 获取商品相关推荐
+     * @param numIid
+     */
+    private void callNetGetItemRecommond(long numIid) {
+        Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("pageno", "1");
+        paramsMap.put("pagesize", "20");
+        paramsMap.put("numIid", String.valueOf(numIid));
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.ITEM_RECOMMEND_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
+        params.setConnectTimeout(30 * 1000);
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                ItemRecommondOutModel model = JSON.parseObject(result, ItemRecommondOutModel.class);
+                if (model.getStatus() == 0) {
+                    mItemRecommendModelList.addAll(model.getData().getResults());
+                    mItemRecommendAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(getApplicationContext(), "获取商品相关推荐失敗！", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(getApplicationContext(), "获取商品相关推荐失敗！", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -277,6 +430,8 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                         //打开电商组件，用户操作中错误信息回调。code：错误码；msg：错误信息
                     }
                 });
+                break;
+            case R.id.merchandise_detial:
                 break;
         }
     }

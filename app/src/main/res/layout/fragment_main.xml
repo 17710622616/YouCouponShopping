@@ -262,7 +262,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:numColumns="2"
-                    android:background="@color/colorWhite"/>
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginRight="1dp"/>
             </LinearLayout>
         </ScrollView>
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>

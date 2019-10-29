@@ -3,13 +3,13 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorLightGray">
+    android:background="@color/colorWhite">
     <RadioGroup
         android:id="@+id/bottom_main_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/colorWhite">
+        android:background="@color/colorMineGray">
         <RadioButton
             android:id="@+id/bottom_main"
             android:layout_width="0dp"
@@ -33,7 +33,7 @@
             android:button="@null"
             android:drawableTop="@drawable/selector_recommend"
             android:gravity="center"
-            android:text="推薦"
+            android:text="购物车"
             android:textColor="@color/colorDrakGray"
             android:textSize="10sp" />
 

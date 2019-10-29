@@ -1,6 +1,7 @@
 package com.youcoupon.john_li.youcouponshopping.YouAdapter;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,11 +12,14 @@ import android.widget.TextView;
 import com.youcoupon.john_li.youcouponshopping.R;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteItemOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.MerchandiseOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 
 import org.xutils.image.ImageOptions;
 import org.xutils.x;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 主页的产品列表适配器
@@ -27,11 +31,14 @@ public class FavoritesItemAdapter extends BaseAdapter {
     private Context mContext;
     private LayoutInflater mInflater;
 
-    private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
+    private ImageOptions options;
     public FavoritesItemAdapter(List<FavoriteItemOutModel.DataBean.FavoriteItemModel> list, Context context) {
         this.list = list;
         mContext = context;
         mInflater = LayoutInflater.from(context);
+        int screemWith = YouCommonUtils.getDeviceWitdh(context);
+        int imgWitdh = screemWith / 2 - 5;
+        options = new ImageOptions.Builder().setSize(imgWitdh, imgWitdh).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
     }
     @Override
     public int getCount() {
@@ -69,10 +76,27 @@ public class FavoritesItemAdapter extends BaseAdapter {
 
         x.image().bind(holder.merchandise_iv, list.get(position).getPictUrl(), options);
         holder.merchandise_title.setText(list.get(position).getTitle());
-        holder.merchandise_original_price.setText("原價：¥" + list.get(position).getReservePrice());
+        holder.merchandise_original_price.setText("原價：¥" + list.get(position).getZkFinalPriceWap());
+        holder.merchandise_original_price.getPaint().setFlags(Paint. STRIKE_THRU_TEXT_FLAG); //中划线
         holder.merchandise_after_discoun.setText("券后價：");
         holder.merchandise_price_after_discount.setText("¥" + list.get(position).getZkFinalPrice());
-        holder.merchandise_original_coupon_value.setText(list.get(position).getCouponInfo());
+        if (list.get(position).getCouponInfo() != null) {
+            holder.merchandise_original_coupon_value.setText(list.get(position).getCouponInfo());
+            // 按指定模式在字符串查找
+            Pattern p=Pattern.compile("\\d+");
+            Matcher m=p.matcher(list.get(position).getCouponInfo());
+            while(m.find()) {
+                if (Double.parseDouble(list.get(position).getZkFinalPrice()) >= Double.parseDouble(m.group())) {
+                    if (m.find()) {
+                        holder.merchandise_price_after_discount.setText("¥" + String.format("%.2f", (Double.parseDouble(list.get(position).getZkFinalPrice()) - Double.parseDouble(m.group()))));
+                    }
+
+                    break;
+                }
+            }
+        } else {
+            holder.merchandise_original_coupon_value.setVisibility(View.GONE);
+        }
         holder.item_main_merchandise_volume.setText("月销：" + list.get(position).getVolume());
         return convertView;
     }

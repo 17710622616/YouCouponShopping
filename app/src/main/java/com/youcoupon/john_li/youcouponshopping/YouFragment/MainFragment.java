@@ -2,26 +2,37 @@ package com.youcoupon.john_li.youcouponshopping.YouFragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v17.leanback.widget.ArrayObjectAdapter;
+import android.support.v17.leanback.widget.HorizontalGridView;
+import android.support.v17.leanback.widget.ItemBridgeAdapter;
+import android.support.v17.leanback.widget.OnChildViewHolderSelectedListener;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.gyf.immersionbar.ImmersionBar;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.youcoupon.john_li.youcouponshopping.MerchandiseDetialActivity;
 import com.youcoupon.john_li.youcouponshopping.R;
-import com.youcoupon.john_li.youcouponshopping.YouAdapter.MainClassifyAdapter;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.CategoryListingsActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.SearchActivity;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.FavoritesItemAdapter;
+import com.youcoupon.john_li.youcouponshopping.YouAdapter.MainClassifyAdapter;
+import com.youcoupon.john_li.youcouponshopping.YouAdapter.MainHotRefreshAdapter;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteItemOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteOutModel;
-import com.youcoupon.john_li.youcouponshopping.YouModel.MerchandiseOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
 import com.youcoupon.john_li.youcouponshopping.YouView.NoScrollGridView;
-import com.youcoupon.john_li.youcouponshopping.YouView.NoScrollListView;
 
 import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
@@ -39,15 +50,19 @@ import java.util.Map;
 
 public class MainFragment extends LazyLoadFragment implements View.OnClickListener{
     public static String TAG = MainFragment.class.getName();
+    private RecyclerView mHotListView;
     private NoScrollGridView mListView;
     private NoScrollGridView mGridView;
     private RefreshLayout mRefreshLayout;
+    private Toolbar mToolbar;
 
     private long totalCount = 20;
     private long pageNo = 1;
     private long pageSize = 10;
     private List<FavoriteOutModel.DataBean.Favorites> favoritesList;
+    private List<FavoriteItemOutModel.DataBean.FavoriteItemModel> mainHotItemModelList;
     private List<FavoriteItemOutModel.DataBean.FavoriteItemModel> mFavoriteItemModelList;
+    private MainHotRefreshAdapter mMainHotRefreshAdapter;
     private MainClassifyAdapter mMainClassifyAdapter;
     private FavoritesItemAdapter mFavoritesItemAdapter;
 
@@ -55,13 +70,26 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     protected void onCreateViewLazy(Bundle savedInstanceState) {
         super.onCreateViewLazy(savedInstanceState);
         setContentView(R.layout.fragment_main);
+        initBar();
         initView();
         setListener();
         initData();
     }
 
+    private void initBar() {
+        ImmersionBar.with(this).titleBar(mToolbar)
+                .setOnNavigationBarListener(show -> {
+                    //initView();
+                    Toast.makeText(getApplicationContext(), "导航栏" + (show ? "显示了" : "隐藏了"), Toast.LENGTH_SHORT).show();
+                }).init();
+    }
+
     private void initView() {
+        mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         mRefreshLayout = (RefreshLayout) findViewById(R.id.main_srl);
+        mHotListView = (RecyclerView) findViewById(R.id.main_hot_lv);
+        mHotListView.setHasFixedSize(true);
+
         mListView = (NoScrollGridView) findViewById(R.id.main_lv);
         mGridView = (NoScrollGridView) findViewById(R.id.main_classify);
 
@@ -90,8 +118,18 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
+                pageNo = 1;
                 mFavoriteItemModelList.clear();
                 callNetGetMerchandiseList();
+            }
+        });
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getActivity(), CategoryListingsActivity.class);
+                intent.putExtra("FavoriteId", String.valueOf(favoritesList.get(position).getFavorites_id()));
+                intent.putExtra("FavoriteName", favoritesList.get(position).getFavorites_title());
+                startActivity(intent);
             }
         });
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -113,7 +151,24 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         mFavoritesItemAdapter = new FavoritesItemAdapter(mFavoriteItemModelList, getActivity());
         mListView.setAdapter(mFavoritesItemAdapter);
 
+        int spanCount = 1; // 只显示一行
+        mainHotItemModelList = new ArrayList<>();
+        mMainHotRefreshAdapter = new MainHotRefreshAdapter(getActivity(), mainHotItemModelList);
+        RecyclerView.LayoutManager layoutManager = new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.HORIZONTAL);
+        mHotListView.setLayoutManager(layoutManager);
+        mHotListView.setAdapter(mMainHotRefreshAdapter);
+
+        mMainHotRefreshAdapter.setOnItemClickListenr(new MainHotRefreshAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Intent intent = new Intent(getActivity(), MerchandiseDetialActivity.class);
+                intent.putExtra("MerchandiseModel", JSON.toJSONString(mainHotItemModelList.get(position)));
+                startActivity(intent);
+            }
+        });
+
         callNetGetTitleList();
+        callNetGetHotMerchandiseList();
         mRefreshLayout.autoRefresh();
     }
 
@@ -126,7 +181,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     private void callNetGetTitleList() {
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("pageno", "1");
-        paramsMap.put("pagesize", "20");
+        paramsMap.put("pagesize", "5");
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.FAVORITES_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
         params.setConnectTimeout(30 * 1000);
         x.http().get(params, new Callback.CommonCallback<String>() {
@@ -165,6 +220,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         paramsMap.put("pageno", String.valueOf(pageNo));
         paramsMap.put("pagesize", String.valueOf(pageSize));
         paramsMap.put("favoritesid", "17481407");
+        paramsMap.put("orderby", "1");
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.FAVORITES_ITEM_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
         params.setConnectTimeout(30 * 1000);
         x.http().get(params, new Callback.CommonCallback<String>() {
@@ -175,6 +231,45 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
                     totalCount = model.getData().getTotal_results();
                     mFavoriteItemModelList.addAll(model.getData().getResults());
                     mFavoritesItemAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(getApplicationContext(), "獲取每日上新数据失敗！", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(getApplicationContext(), "獲取每日上新数据失敗！", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+                mRefreshLayout.finishRefresh();
+                mRefreshLayout.finishLoadmore();
+            }
+        });
+    }
+
+    private void callNetGetHotMerchandiseList() {
+        Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("pageno", String.valueOf(pageNo));
+        paramsMap.put("pagesize", String.valueOf(pageSize));
+        paramsMap.put("favoritesid", "17487441");
+        paramsMap.put("orderby", "1");
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.FAVORITES_ITEM_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
+        params.setConnectTimeout(30 * 1000);
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                FavoriteItemOutModel model = JSON.parseObject(result, FavoriteItemOutModel.class);
+                if (model.getStatus() == 0) {
+                    totalCount = model.getData().getTotal_results();
+                    mainHotItemModelList.addAll(model.getData().getResults());
+                    mMainHotRefreshAdapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(getApplicationContext(), "獲取每日上新数据失敗！", Toast.LENGTH_SHORT).show();
                 }

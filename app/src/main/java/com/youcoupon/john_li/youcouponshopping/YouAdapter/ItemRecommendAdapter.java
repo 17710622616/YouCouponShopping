@@ -70,7 +70,7 @@ public class ItemRecommendAdapter extends BaseAdapter {
         x.image().bind(holder.merchandise_iv, list.get(position).getPictUrl(), options);
         holder.merchandise_title.setText(list.get(position).getTitle());
         holder.merchandise_original_price.setText("原價：¥" + list.get(position).getReservePrice());
-        holder.merchandise_after_discoun.setText("折后价：");
+        holder.merchandise_after_discoun.setText("券后:");
         holder.merchandise_price_after_discount.setText("¥" + list.get(position).getZkFinalPrice());
         holder.merchandise_original_coupon_value.setVisibility(View.GONE);
         holder.item_main_merchandise_volume.setText("月销：" + list.get(position).getVolume());

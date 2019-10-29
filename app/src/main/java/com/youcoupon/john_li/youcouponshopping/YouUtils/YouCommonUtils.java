@@ -1,5 +1,8 @@
 package com.youcoupon.john_li.youcouponshopping.YouUtils;
 
+import android.content.Context;
+import android.util.DisplayMetrics;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -35,5 +38,25 @@ public class YouCommonUtils {
             ex.printStackTrace();
         }
         return prestr;
+    }
+
+
+    /**
+     * 获取屏幕密度
+     * @param context
+     * @return
+     */
+    public static int getDeviceWitdh(Context context) {
+        DisplayMetrics dm = new DisplayMetrics();
+        dm = context.getResources().getDisplayMetrics();
+
+        return dm.widthPixels;      // 屏幕宽（像素，如：480px）
+    }
+
+    /**
+     * 获取屏幕宽度(px)
+     */
+    public static int getScreenWidth(Context context) {
+        return context.getResources().getDisplayMetrics().widthPixels;
     }
 }

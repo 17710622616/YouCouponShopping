@@ -3,33 +3,16 @@ package com.youcoupon.john_li.youcouponshopping.YouActivity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.alibaba.baichuan.android.trade.AlibcTrade;
-import com.alibaba.baichuan.android.trade.adapter.login.AlibcLogin;
-import com.alibaba.baichuan.android.trade.callback.AlibcLoginCallback;
-import com.alibaba.baichuan.android.trade.callback.AlibcTradeCallback;
 import com.alibaba.baichuan.android.trade.model.AlibcShowParams;
-import com.alibaba.baichuan.android.trade.model.OpenType;
-import com.alibaba.baichuan.android.trade.model.TradeResult;
-import com.alibaba.baichuan.android.trade.page.AlibcBasePage;
-import com.alibaba.baichuan.android.trade.page.AlibcMyCartsPage;
-import com.alibaba.baichuan.android.trade.page.AlibcMyOrdersPage;
-import com.alibaba.fastjson.JSON;
-import com.youcoupon.john_li.youcouponshopping.MainActivity;
 import com.youcoupon.john_li.youcouponshopping.R;
 
 import org.xutils.image.ImageOptions;
-import org.xutils.x;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -76,30 +59,30 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void initData() {
-        alibcShowParams = new AlibcShowParams(OpenType.Auto, false);
-
-        exParams = new HashMap<>();
-        exParams.put("isv_code", "appisvcode");
-        exParams.put("alibaba", "阿里巴巴");//自定义参数部分，可任意增删改
-
-        //获取淘宝用户信息
-        if (!JSON.toJSONString(AlibcLogin.getInstance().getSession()).equals("{}")) {
-            String nick = AlibcLogin.getInstance().getSession().nick;
-            String avatarUrl = AlibcLogin.getInstance().getSession().avatarUrl;
-            x.image().bind(headIv, avatarUrl, options);
-            nickTv.setText(nick);
-        } else {
-            nickTv.setText("请先登录！");
-        }
+//        alibcShowParams = new AlibcShowParams(OpenType.Auto, false);
+//
+//        exParams = new HashMap<>();
+//        exParams.put("isv_code", "appisvcode");
+//        exParams.put("alibaba", "阿里巴巴");//自定义参数部分，可任意增删改
+//
+//        //获取淘宝用户信息
+//        if (!JSON.toJSONString(AlibcLogin.getInstance().getSession()).equals("{}")) {
+//            String nick = AlibcLogin.getInstance().getSession().nick;
+//            String avatarUrl = AlibcLogin.getInstance().getSession().avatarUrl;
+//            x.image().bind(headIv, avatarUrl, options);
+//            nickTv.setText(nick);
+//        } else {
+//            nickTv.setText("请先登录！");
+//        }
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.user_info:
-                if (JSON.toJSONString(AlibcLogin.getInstance().getSession()).equals("{}")) {
-                    login();
-                }
+//                if (JSON.toJSONString(AlibcLogin.getInstance().getSession()).equals("{}")) {
+//                    login();
+//                }
                 break;
             case R.id.mine_all_order:
                 showAllOrder(0);
@@ -127,41 +110,41 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
      * @param orderType 0：全部；1：待付款；2：待发货；3：待收货；4：待评价
      */
     private void showAllOrder(int orderType) {
-        boolean isAllOrder = true; //false 进行订单分域（只展示通过当前app下单的订单），true 显示所有订单
-        AlibcBasePage alibcBasePage = new AlibcMyOrdersPage(orderType, isAllOrder);
-        AlibcTrade.show(this, alibcBasePage, alibcShowParams, null, exParams, new AlibcTradeCallback() {
-            @Override
-            public void onTradeSuccess(TradeResult tradeResult) {
-                //打开电商组件，用户操作中成功信息回调。tradeResult：成功信息（结果类型：加购，支付；支付结果）
-                Toast.makeText(MineActivity.this, "成功打開所有訂單", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onFailure(int i, String s) {
-                //打开电商组件，用户操作中错误信息回调。code：错误码；msg：错误信息
-                Toast.makeText(MineActivity.this, "打開失敗", Toast.LENGTH_LONG).show();
-            }
-        });
+//        boolean isAllOrder = true; //false 进行订单分域（只展示通过当前app下单的订单），true 显示所有订单
+//        AlibcBasePage alibcBasePage = new AlibcMyOrdersPage(orderType, isAllOrder);
+//        AlibcTrade.show(this, alibcBasePage, alibcShowParams, null, exParams, new AlibcTradeCallback() {
+//            @Override
+//            public void onTradeSuccess(TradeResult tradeResult) {
+//                //打开电商组件，用户操作中成功信息回调。tradeResult：成功信息（结果类型：加购，支付；支付结果）
+//                Toast.makeText(MineActivity.this, "成功打開所有訂單", Toast.LENGTH_LONG).show();
+//            }
+//
+//            @Override
+//            public void onFailure(int i, String s) {
+//                //打开电商组件，用户操作中错误信息回调。code：错误码；msg：错误信息
+//                Toast.makeText(MineActivity.this, "打開失敗", Toast.LENGTH_LONG).show();
+//            }
+//        });
     }
 
     /**
      * 顯示我的購物車
      */
     private void showMyShoppingCart() {
-        AlibcBasePage alibcBasePage = new AlibcMyCartsPage();
-        AlibcTrade.show(this, alibcBasePage, alibcShowParams, null, exParams, new AlibcTradeCallback() {
-            @Override
-            public void onTradeSuccess(TradeResult tradeResult) {
-                //打开电商组件，用户操作中成功信息回调。tradeResult：成功信息（结果类型：加购，支付；支付结果）
-                Toast.makeText(MineActivity.this, "成功打開所有訂單", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onFailure(int i, String s) {
-                //打开电商组件，用户操作中错误信息回调。code：错误码；msg：错误信息
-                Toast.makeText(MineActivity.this, "打開失敗", Toast.LENGTH_LONG).show();
-            }
-        });
+//        AlibcBasePage alibcBasePage = new AlibcMyCartsPage();
+//        AlibcTrade.show(this, alibcBasePage, alibcShowParams, null, exParams, new AlibcTradeCallback() {
+//            @Override
+//            public void onTradeSuccess(TradeResult tradeResult) {
+//                //打开电商组件，用户操作中成功信息回调。tradeResult：成功信息（结果类型：加购，支付；支付结果）
+//                Toast.makeText(MineActivity.this, "成功打開所有訂單", Toast.LENGTH_LONG).show();
+//            }
+//
+//            @Override
+//            public void onFailure(int i, String s) {
+//                //打开电商组件，用户操作中错误信息回调。code：错误码；msg：错误信息
+//                Toast.makeText(MineActivity.this, "打開失敗", Toast.LENGTH_LONG).show();
+//            }
+//        });
     }
 
 
@@ -169,17 +152,17 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
      * 登录
      */
     public void login() {
-        final AlibcLogin alibcLogin = AlibcLogin.getInstance();
-        alibcLogin.showLogin(this, new AlibcLoginCallback() {
-            @Override
-            public void onSuccess() {
-                Toast.makeText(MineActivity.this, "登录成功 ", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onFailure(int i, String s) {
-                Toast.makeText(MineActivity.this, "登录失敗 ", Toast.LENGTH_LONG).show();
-            }
-        });
+//        final AlibcLogin alibcLogin = AlibcLogin.getInstance();
+//        alibcLogin.showLogin(this, new AlibcLoginCallback() {
+//            @Override
+//            public void onSuccess() {
+//                Toast.makeText(MineActivity.this, "登录成功 ", Toast.LENGTH_LONG).show();
+//            }
+//
+//            @Override
+//            public void onFailure(int i, String s) {
+//                Toast.makeText(MineActivity.this, "登录失敗 ", Toast.LENGTH_LONG).show();
+//            }
+//        });
     }
 }

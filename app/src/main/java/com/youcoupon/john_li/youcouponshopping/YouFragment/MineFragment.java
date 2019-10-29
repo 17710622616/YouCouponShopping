@@ -2,6 +2,8 @@ package com.youcoupon.john_li.youcouponshopping.YouFragment;
 
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -9,15 +11,17 @@ import android.widget.Toast;
 
 import com.ali.auth.third.login.callback.LogoutCallback;
 import com.alibaba.baichuan.android.trade.AlibcTrade;
-import com.alibaba.baichuan.android.trade.adapter.login.AlibcLogin;
-import com.alibaba.baichuan.android.trade.callback.AlibcLoginCallback;
 import com.alibaba.baichuan.android.trade.callback.AlibcTradeCallback;
 import com.alibaba.baichuan.android.trade.model.AlibcShowParams;
 import com.alibaba.baichuan.android.trade.model.OpenType;
-import com.alibaba.baichuan.android.trade.model.TradeResult;
 import com.alibaba.baichuan.android.trade.page.AlibcBasePage;
 import com.alibaba.baichuan.android.trade.page.AlibcMyCartsPage;
 import com.alibaba.baichuan.android.trade.page.AlibcMyOrdersPage;
+import com.alibaba.baichuan.trade.biz.context.AlibcTradeResult;
+import com.alibaba.baichuan.trade.biz.core.taoke.AlibcTaokeParams;
+import com.alibaba.baichuan.trade.biz.login.AlibcLogin;
+import com.alibaba.baichuan.trade.biz.login.AlibcLoginCallback;
+import com.alibaba.baichuan.trade.common.utils.AlibcLogger;
 import com.alibaba.fastjson.JSON;
 import com.youcoupon.john_li.youcouponshopping.R;
 
@@ -73,7 +77,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     }
 
     public void initData() {
-        alibcShowParams = new AlibcShowParams(OpenType.Native, false);
+        alibcShowParams = new AlibcShowParams();
 
         exParams = new HashMap<>();
         exParams.put("isv_code", "appisvcode");
@@ -82,9 +86,13 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         //获取淘宝用户信息
         String nick = AlibcLogin.getInstance().getSession().nick;
         String avatarUrl = AlibcLogin.getInstance().getSession().avatarUrl;
-        if (!nick.equals("") && !avatarUrl.equals("")) {
-            x.image().bind(headIv, avatarUrl, options);
-            nickTv.setText(nick);
+        if (nick != null && avatarUrl != null) {
+            if (!nick.equals("") && !avatarUrl.equals("")) {
+                x.image().bind(headIv, avatarUrl, options);
+                nickTv.setText(nick);
+            } else {
+                nickTv.setText("请先登录！");
+            }
         } else {
             nickTv.setText("请先登录！");
         }
@@ -96,8 +104,12 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             case R.id.user_info:
                 String nick = AlibcLogin.getInstance().getSession().nick;
                 String avatarUrl = AlibcLogin.getInstance().getSession().avatarUrl;
-                if (nick.equals("") || avatarUrl.equals("")) {
+                if (nick == null || avatarUrl == null) {
                     login();
+                } else {
+                    if (nick.equals("") || avatarUrl.equals("")) {
+                        login();
+                    }
                 }
                 break;
             case R.id.mine_all_order:
@@ -129,41 +141,80 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
      * @param orderType 0：全部；1：待付款；2：待发货；3：待收货；4：待评价
      */
     private void showAllOrder(int orderType) {
+        Toast.makeText(getActivity(),"orderType=" + orderType, Toast.LENGTH_SHORT).show();
+        //展示参数配置
+        AlibcTaokeParams taokeParams = new AlibcTaokeParams("", "", "");
+        taokeParams.setPid("mm_132021823_45408225_571244745");
+        //taokeParams.setAdzoneid("29932014");
+        //adzoneid是需要taokeAppkey参数才可以转链成功&店铺页面需要卖家id（sellerId），具体设置方式如下：
+        taokeParams.extraParams = new HashMap<>();
+        taokeParams.extraParams.put("taokeAppkey", "24882815");
+        //自定义参数
+        Map<String, String> trackParams = new HashMap<>();
+        trackParams.put("isv_code", "appisvcode");
+        trackParams.put("alibaba", "阿里巴巴");//自定义参数部分，可任意增删改
+
         boolean isAllOrder = true; //false 进行订单分域（只展示通过当前app下单的订单），true 显示所有订单
         AlibcBasePage alibcBasePage = new AlibcMyOrdersPage(orderType, isAllOrder);
-        AlibcTrade.show(getActivity(), alibcBasePage, alibcShowParams, null, exParams, new AlibcTradeCallback() {
-            @Override
-            public void onTradeSuccess(TradeResult tradeResult) {
-                //打开电商组件，用户操作中成功信息回调。tradeResult：成功信息（结果类型：加购，支付；支付结果）
-                Toast.makeText(getActivity(), "成功打開所有訂單", Toast.LENGTH_LONG).show();
-            }
+        alibcShowParams = new AlibcShowParams(OpenType.Native);
 
-            @Override
-            public void onFailure(int i, String s) {
-                //打开电商组件，用户操作中错误信息回调。code：错误码；msg：错误信息
-                Toast.makeText(getActivity(), "打開失敗", Toast.LENGTH_LONG).show();
-            }
-        });
+        AlibcTrade.openByBizCode(getActivity(), alibcBasePage, null, new WebViewClient(),
+                new WebChromeClient(), "order", alibcShowParams, taokeParams,
+                trackParams, new AlibcTradeCallback() {
+                    @Override
+                    public void onTradeSuccess(AlibcTradeResult tradeResult) {
+                        // 交易成功回调（其他情形不回调）
+                        Toast.makeText(getActivity(),"open detail page success", Toast.LENGTH_SHORT).show();
+                    }
+                    @Override
+                    public void onFailure(int code, String msg) {
+                        // 失败回调信息
+                        AlibcLogger.e(TAG, "code=" + code + ", msg=" + msg);
+                        if (code == -1) {
+                            Toast.makeText(getActivity(), "唤端失败，失败模式为none" + ",code=" + code + ", msg=" + msg, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
     }
 
     /**
      * 顯示我的購物車
      */
     private void showMyShoppingCart() {
-        AlibcBasePage alibcBasePage = new AlibcMyCartsPage();
-        AlibcTrade.show(getActivity(), alibcBasePage, alibcShowParams, null, exParams, new AlibcTradeCallback() {
-            @Override
-            public void onTradeSuccess(TradeResult tradeResult) {
-                //打开电商组件，用户操作中成功信息回调。tradeResult：成功信息（结果类型：加购，支付；支付结果）
-                Toast.makeText(getActivity(), "成功打開所有訂單", Toast.LENGTH_LONG).show();
-            }
+        //展示参数配置
+        AlibcTaokeParams taokeParams = new AlibcTaokeParams("", "", "");
+        taokeParams.setPid("mm_132021823_45408225_571244745");
+        //taokeParams.setAdzoneid("29932014");
+        //adzoneid是需要taokeAppkey参数才可以转链成功&店铺页面需要卖家id（sellerId），具体设置方式如下：
+        taokeParams.extraParams = new HashMap<>();
+        taokeParams.extraParams.put("taokeAppkey", "24882815");
+        //自定义参数
+        Map<String, String> trackParams = new HashMap<>();
+        trackParams.put("isv_code", "appisvcode");
+        trackParams.put("alibaba", "阿里巴巴");//自定义参数部分，可任意增删改
 
-            @Override
-            public void onFailure(int i, String s) {
-                //打开电商组件，用户操作中错误信息回调。code：错误码；msg：错误信息
-                Toast.makeText(getActivity(), "打開失敗", Toast.LENGTH_LONG).show();
-            }
-        });
+        AlibcBasePage alibcBasePage = new AlibcMyCartsPage();
+        alibcShowParams = new AlibcShowParams(OpenType.Native);
+        //AlibcTrade.openByBizCode(getActivity(), alibcBasePage, alibcShowParams, null, exParams, new WebChromeClient());
+
+        AlibcTrade.openByBizCode(getActivity(), alibcBasePage, null, new WebViewClient(),
+                new WebChromeClient(), "cart", alibcShowParams, taokeParams,
+                trackParams, new AlibcTradeCallback() {
+                    @Override
+                    public void onTradeSuccess(AlibcTradeResult tradeResult) {
+                        // 交易成功回调（其他情形不回调）
+                        AlibcLogger.i(TAG, "open detail page success");
+                    }
+                    @Override
+                    public void onFailure(int code, String msg) {
+                        // 失败回调信息
+                        AlibcLogger.e(TAG, "code=" + code + ", msg=" + msg);
+                        if (code == -1) {
+                            Toast.makeText(getActivity(), "唤端失败，失败模式为none",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
 
@@ -172,16 +223,21 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
      */
     public void login() {
         final AlibcLogin alibcLogin = AlibcLogin.getInstance();
-        alibcLogin.showLogin(getActivity(), new AlibcLoginCallback() {
+        alibcLogin.showLogin(new AlibcLoginCallback() {
             @Override
-            public void onSuccess() {
-                Toast.makeText(getActivity(), "登录成功 ", Toast.LENGTH_LONG).show();
+            public void onSuccess(int loginResult, String openId, String userNick) {
+                // 参数说明：
+                // loginResult(0--登录初始化成功；1--登录初始化完成；2--登录成功)
+                // openId：用户id
+                // userNick: 用户昵称
+                Toast.makeText(getActivity(), "登录成功 " + AlibcLogin.getInstance().getSession(), Toast.LENGTH_LONG).show();
                 reFreshUI();
             }
 
             @Override
-            public void onFailure(int i, String s) {
-                Toast.makeText(getActivity(), "登录失敗 ", Toast.LENGTH_LONG).show();
+            public void onFailure(int code, String msg) {
+                // code：错误码  msg： 错误信息
+                Toast.makeText(getActivity(), "登录失敗，" + msg + ":" + code, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -189,16 +245,20 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
 
     private void loginOut() {
         AlibcLogin alibcLogin = AlibcLogin.getInstance();
-
-        alibcLogin.logout(getActivity(), new LogoutCallback() {
+        alibcLogin.logout(new AlibcLoginCallback() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(int loginResult, String openId, String userNick) {
+                // 参数说明：
+                // loginResult(3--登出成功)
+                // openId：用户id
+                // userNick: 用户昵称
                 Toast.makeText(getActivity(), "退出登录成功", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int code, String msg) {
-                Toast.makeText(getActivity(), "退出登录失败 " + code + msg, Toast.LENGTH_SHORT).show();
+                // code：错误码  msg： 错误信息
+                Toast.makeText(getActivity(), "退出登录失败 " + msg + code, Toast.LENGTH_SHORT).show();
             }
         });
     }

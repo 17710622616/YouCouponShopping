@@ -17,6 +17,7 @@ public class YouApplication extends Application {
     public void onCreate() {
         super.onCreate();
         x.Ext.init(this);
+       //CrashCatchHandler.getInstance().init(this);
         AlibcTradeSDK.asyncInit(this, new AlibcTradeInitCallback() {
             @Override
             public void onSuccess() {

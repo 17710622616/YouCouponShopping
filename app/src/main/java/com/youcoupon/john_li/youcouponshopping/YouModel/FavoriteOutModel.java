@@ -77,6 +77,15 @@ public class FavoriteOutModel {
             private String favorites_title;
             private int favorites_id;
             private int type;
+            private String img_url;
+
+            public String getImg_url() {
+                return img_url;
+            }
+
+            public void setImg_url(String img_url) {
+                this.img_url = img_url;
+            }
 
             public String getFavorites_title() {
                 return favorites_title;

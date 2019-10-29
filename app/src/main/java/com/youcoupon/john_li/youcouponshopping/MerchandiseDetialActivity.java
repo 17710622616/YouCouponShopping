@@ -1,44 +1,45 @@
 package com.youcoupon.john_li.youcouponshopping;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.webkit.WebChromeClient;
+import android.webkit.WebViewClient;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.baichuan.android.trade.AlibcTrade;
 import com.alibaba.baichuan.android.trade.callback.AlibcTradeCallback;
-import com.alibaba.baichuan.android.trade.constants.AlibcConstants;
 import com.alibaba.baichuan.android.trade.model.AlibcShowParams;
 import com.alibaba.baichuan.android.trade.model.OpenType;
-import com.alibaba.baichuan.android.trade.model.TradeResult;
 import com.alibaba.baichuan.android.trade.page.AlibcBasePage;
 import com.alibaba.baichuan.android.trade.page.AlibcMyCartsPage;
-import com.alibaba.baichuan.android.trade.page.AlibcMyOrdersPage;
-import com.alibaba.baichuan.android.trade.page.AlibcPage;
-import com.alibaba.baichuan.android.trade.page.AlibcShopPage;
+import com.alibaba.baichuan.trade.biz.context.AlibcTradeResult;
+import com.alibaba.baichuan.trade.biz.core.taoke.AlibcTaokeParams;
+import com.alibaba.baichuan.trade.common.utils.AlibcLogger;
 import com.alibaba.fastjson.JSON;
-import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
+import com.gyf.immersionbar.ImmersionBar;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.CollapsingAdapter;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.ItemRecommendAdapter;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.SellerRecommondAdapter;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteItemOutModel;
-import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.ItemInfoOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.ItemRecommondOutModel;
-import com.youcoupon.john_li.youcouponshopping.YouModel.MerchandiseOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.SellerOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
@@ -53,23 +54,29 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by John_Li on 31/5/2018.
  */
 
 public class MerchandiseDetialActivity extends AppCompatActivity implements View.OnClickListener{
+    public static String TAG = MerchandiseDetialActivity.class.getName();
     private AppBarLayout appbar;
     private Toolbar articalToolbar;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private ViewPager mViewPager;
     private ImageView shopIconIv;
+    private RelativeLayout itemDetialIv;
     private LinearLayout storeLL, shoppingCartLL;
-    private TextView merchandiseTitleTv, afterPriceTv, beforePriceTv, inSaleTv, merchantsTypeTv, couponValueTv, couponRemainCountTv, couponRedemptionTv, sellerNickTv, storeRatingTv, sellerRateTv, shopProvcitytV, itemDetialTv;
+    private TextView merchandiseTitleTv, afterPriceTv, beforePriceTv, inSaleTv, merchantsTypeTv, couponValueTv, couponRemainCountTv, couponRedemptionTv, sellerNickTv, storeRatingTv, sellerRateTv, shopProvcitytV, getCouponTv;
+    private RelativeLayout shopRL;
     private NoScrollGridView mStoreRecommonGv;
     private NoScrollGridView mItemRecommonGv;
 
     // 淘寶相關信息
+    private AlibcShowParams alibcShowParams;//页面打开方式，默认，H5，Native
     private Map<String, String> exParams;
     //实例化URL打开page
     AlibcBasePage detailPage;
@@ -91,12 +98,22 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        //当系统版本为4.4或者4.4以上时可以使用沉浸式状态栏
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            //透明状态栏
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            //透明导航栏
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }*/
         setContentView(R.layout.activity_merchandise_detial);
+        initImmersionBar();
         initView();
         setListener();
         initData();
+    }
+
+    private void initImmersionBar() {
+        ImmersionBar.with(this).titleBar(articalToolbar).init();
     }
 
     public void initView() {
@@ -119,7 +136,9 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         storeRatingTv = (TextView) findViewById(R.id.merchandise_detial_store_ratings);
         sellerRateTv = (TextView) findViewById(R.id.merchandise_detial_seller_rating);
         shopProvcitytV = (TextView) findViewById(R.id.merchandise_detial_seller_shop_provcity);
-        itemDetialTv = (TextView) findViewById(R.id.merchandise_detial);
+        //getCouponTv = (TextView) findViewById(R.id.merchandise_get_coupon);
+        itemDetialIv = (RelativeLayout) findViewById(R.id.merchandise_detial_detial_title_rl);
+        shopRL = (RelativeLayout) findViewById(R.id.merchandise_detial_shop_rl);
         mStoreRecommonGv = (NoScrollGridView) findViewById(R.id.merchandise_store_recommended);
         mItemRecommonGv = (NoScrollGridView) findViewById(R.id.merchandise_item_recommended);
 
@@ -131,22 +150,43 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         shoppingCartLL.setOnClickListener(this);
         storeLL.setOnClickListener(this);
         couponRedemptionTv.setOnClickListener(this);
-        itemDetialTv.setOnClickListener(this);
+        itemDetialIv.setOnClickListener(this);
+        //getCouponTv.setOnClickListener(this);
+        shopRL.setOnClickListener(this);
+        mStoreRecommonGv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                openH5Url(sellerModelList.get(position).getShopUrl());
+            }
+        });
+        mItemRecommonGv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(MerchandiseDetialActivity.this, MerchandiseDetialActivity.class);
+                intent.putExtra("MerchandiseModel", JSON.toJSONString(mItemRecommendModelList.get(position)));
+                startActivity(intent);
+            }
+        });
     }
 
     public void initData() {
-        // 獲取帖文資料
+        // 獲取產品資料
         Intent intent = getIntent();
         mFavoriteItemModel = JSON.parseObject(intent.getStringExtra("MerchandiseModel"), FavoriteItemOutModel.DataBean.FavoriteItemModel.class);
 
         // 初始化阿里百川
         //提供给三方传递配置参数
         exParams = new HashMap<>();
-        exParams.put(AlibcConstants.ISV_CODE, "appisvcode");
+        exParams.put("alibaba", "appisvcode");
 
         // toolbar
+        /*setSupportActionBar(articalToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);*/
         setSupportActionBar(articalToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         //  設置標題
         mCollapsingToolbarLayout.setTitle("商品詳情");//设置标题的名字
         /*mCollapsingToolbarLayout.setCollapsedTitleGravity(Gravity.CENTER);//设置收缩后标题的位置
@@ -157,17 +197,35 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         callNetGetItemInfo(mFavoriteItemModel.getNumIid());
 
         // 設置標題及內容
-        merchandiseTitleTv.setText(mFavoriteItemModel.getTitle());
-        afterPriceTv.setText(String.valueOf(mFavoriteItemModel.getZkFinalPrice()));
-        beforePriceTv.setText("原價¥" + mFavoriteItemModel.getReservePrice());
-        inSaleTv.setText("月銷量：" + String.valueOf(mFavoriteItemModel.getVolume()));
-        if (mFavoriteItemModel.getUserType() == 0) {
-            merchantsTypeTv.setText("淘寶：包郵");
+        if (mFavoriteItemModel.getCouponInfo() != null) {
+            couponValueTv.setText(String.valueOf(mFavoriteItemModel.getCouponInfo()));
+            couponRemainCountTv.setText("剩餘數量：" + String.valueOf(mFavoriteItemModel.getCouponRemainCount()));
+            beforePriceTv.setText("原價¥" + mFavoriteItemModel.getZkFinalPrice());
+            // 按指定模式在字符串查找
+            Pattern p=Pattern.compile("\\d+");
+            Matcher m=p.matcher(mFavoriteItemModel.getCouponInfo());
+            while(m.find()) {
+                if (Double.parseDouble(mFavoriteItemModel.getZkFinalPrice()) >= Double.parseDouble(m.group())) {
+                    if (m.find()) {
+                        afterPriceTv.setText("¥" + String.format("%.2f", (Double.parseDouble(mFavoriteItemModel.getZkFinalPrice()) - Double.parseDouble(m.group()))));
+                    }
+
+                    break;
+                }
+            }
         } else {
-            merchantsTypeTv.setText("天貓：包郵");
+            beforePriceTv.setVisibility(View.GONE);
+            couponValueTv.setVisibility(View.GONE);
+            couponRemainCountTv.setVisibility(View.GONE);
+            afterPriceTv.setText(String.valueOf(mFavoriteItemModel.getZkFinalPrice()));
         }
-        couponValueTv.setText(String.valueOf(mFavoriteItemModel.getCouponInfo()));
-        couponRemainCountTv.setText("剩餘數量：" + String.valueOf(mFavoriteItemModel.getCouponRemainCount()));
+        merchandiseTitleTv.setText(mFavoriteItemModel.getTitle());
+        inSaleTv.setText("售" + String.valueOf(mFavoriteItemModel.getVolume()) + "件");
+        if (mFavoriteItemModel.getUserType() == 0) {
+            merchantsTypeTv.setText("淘寶包郵");
+        } else {
+            merchantsTypeTv.setText("天貓包郵");
+        }
 
         // 商家资料
         shopProvcitytV.setText(mFavoriteItemModel.getProvcity());
@@ -378,61 +436,126 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.merchandise_detial_store:
-                //设置页面打开方式
-                AlibcShowParams showParamsStore = new AlibcShowParams(OpenType.H5, false);;
-                //实例化URL打开page
-                detailPage = new AlibcShopPage(String.valueOf(mFavoriteItemModel.getSellerId()));
-                //使用百川sdk提供默认的Activity打开detail
-                AlibcTrade.show(this, detailPage, showParamsStore, null, exParams , new AlibcTradeCallback() {
-                    @Override
-                    public void onTradeSuccess(TradeResult tradeResult) {
-                        //打开电商组件，用户操作中成功信息回调。tradeResult：成功信息（结果类型：加购，支付；支付结果）
-                    }
-
-                    @Override
-                    public void onFailure(int code, String msg) {
-                        //打开电商组件，用户操作中错误信息回调。code：错误码；msg：错误信息
-                    }
-                });
+                if (mSellerModel != null) {
+                    openH5Url(String.valueOf(mSellerModel.getShopUrl()));
+                }
                 break;
             case R.id.merchandise_detial_shopping_cart:
                 //设置页面打开方式
-                AlibcShowParams showParamsCart = new AlibcShowParams(OpenType.H5, false);;
-                //实例化我的订单打开page
-                detailPage = new AlibcMyCartsPage();
-                //使用百川sdk提供默认的Activity打开detail
-                AlibcTrade.show(this, detailPage, showParamsCart, null, exParams , new AlibcTradeCallback() {
-                    @Override
-                    public void onTradeSuccess(TradeResult tradeResult) {
-                        //打开电商组件，用户操作中成功信息回调。tradeResult：成功信息（结果类型：加购，支付；支付结果）
-                    }
-
-                    @Override
-                    public void onFailure(int code, String msg) {
-                        //打开电商组件，用户操作中错误信息回调。code：错误码；msg：错误信息
-                    }
-                });
+//                AlibcShowParams showParamsCart = new AlibcShowParams(OpenType.H5, false);;
+//                //实例化我的订单打开page
+//                detailPage = new AlibcMyCartsPage();
+//                //使用百川sdk提供默认的Activity打开detail
+//                AlibcTrade.show(this, detailPage, showParamsCart, null, exParams , new AlibcTradeCallback() {
+//                    @Override
+//                    public void onTradeSuccess(TradeResult tradeResult) {
+//                        //打开电商组件，用户操作中成功信息回调。tradeResult：成功信息（结果类型：加购，支付；支付结果）
+//                    }
+//
+//                    @Override
+//                    public void onFailure(int code, String msg) {
+//                        //打开电商组件，用户操作中错误信息回调。code：错误码；msg：错误信息
+//                    }
+//                });
                 break;
             case R.id.merchandise_detial_coupon_redemption:
                 //设置页面打开方式
-                AlibcShowParams showParamsCouponRedemption = new AlibcShowParams(OpenType.Native, false);;
+                /*AlibcShowParams showParamsCouponRedemption = new AlibcShowParams(OpenType.Native, false);;
                 //实例化URL打开page
-                detailPage = new AlibcPage(mFavoriteItemModel.getCouponClickUrl());
+                detailPage = new AlibcTrade(mFavoriteItemModel.getCouponClickUrl());
                 //使用百川sdk提供默认的Activity打开detail
                 AlibcTrade.show(this, detailPage, showParamsCouponRedemption, null, exParams , new AlibcTradeCallback() {
                     @Override
                     public void onTradeSuccess(TradeResult tradeResult) {
                         //打开电商组件，用户操作中成功信息回调。tradeResult：成功信息（结果类型：加购，支付；支付结果）
+                        Log.d("TAG", "onTradeSuccess: ");
                     }
 
                     @Override
                     public void onFailure(int code, String msg) {
                         //打开电商组件，用户操作中错误信息回调。code：错误码；msg：错误信息
+                        Log.d("TAG", "onFailure: ");
                     }
-                });
+                });*/
+
+                //展示参数配置
+                AlibcTaokeParams taokeParams = new AlibcTaokeParams("", "", "");
+                taokeParams.setPid("mm_132021823_45408225_571244745");
+                //taokeParams.setAdzoneid("29932014");
+                //adzoneid是需要taokeAppkey参数才可以转链成功&店铺页面需要卖家id（sellerId），具体设置方式如下：
+                taokeParams.extraParams = new HashMap<>();
+                taokeParams.extraParams.put("taokeAppkey", "24882815");
+                //自定义参数
+                Map<String, String> trackParams = new HashMap<>();
+                trackParams.put("isv_code", "appisvcode");
+                trackParams.put("alibaba", "阿里巴巴");//自定义参数部分，可任意增删改
+
+                alibcShowParams = new AlibcShowParams(OpenType.Native);
+                // 以显示传入url的方式打开页面（第二个参数是套件名称）
+                AlibcTrade.openByUrl(MerchandiseDetialActivity.this, "", mFavoriteItemModel.getCouponClickUrl(), null,
+                        new WebViewClient(), new WebChromeClient(), alibcShowParams,
+                        taokeParams, trackParams, new AlibcTradeCallback() {
+                            @Override
+                            public void onTradeSuccess(AlibcTradeResult tradeResult) {
+                                AlibcLogger.i(TAG, "request success");
+                            }
+                            @Override
+                            public void onFailure(int code, String msg) {
+                                AlibcLogger.e(TAG, "code=" + code + ", msg=" + msg);
+                                if (code == -1) {
+                                    Toast.makeText(MerchandiseDetialActivity.this, msg, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                 break;
-            case R.id.merchandise_detial:
+            case R.id.merchandise_detial_detial_title_rl:
+//                //设置页面打开方式
+//                AlibcShowParams showParamsItemDetial = new AlibcShowParams(OpenType.Native, false);;
+//                //实例化URL打开page
+//                detailPage = new AlibcDetailPage(String.valueOf(mFavoriteItemModel.getNumIid()));
+//                //使用百川sdk提供默认的Activity打开detail
+//                AlibcTrade.show(this, detailPage, showParamsItemDetial, null, exParams , new AlibcTradeCallback() {
+//                    @Override
+//                    public void onTradeSuccess(TradeResult tradeResult) {
+//                        //打开电商组件，用户操作中成功信息回调。tradeResult：成功信息（结果类型：加购，支付；支付结果）
+//                        Log.d("TAG", "onTradeSuccess: ");
+//                    }
+//
+//                    @Override
+//                    public void onFailure(int code, String msg) {
+//                        //打开电商组件，用户操作中错误信息回调。code：错误码；msg：错误信息
+//                        Log.d("TAG", "onFailure: ");
+//                    }
+//                });
+                break;
+            case R.id.merchandise_get_coupon:
+                break;
+            case R.id.merchandise_detial_shop_rl:
+                if (mSellerModel != null) {
+                    openH5Url(String.valueOf(mSellerModel.getShopUrl()));
+                }
                 break;
         }
+    }
+
+    /**
+     * 设置页面打开方式
+     */
+    private void openH5Url(String url) {
+//        AlibcShowParams showParamsStore = new AlibcShowParams(OpenType.H5, false);;
+//        //实例化URL打开page
+//        detailPage = new AlibcPage(url);
+//        //使用百川sdk提供默认的Activity打开detail
+//        AlibcTrade.show(this, detailPage, showParamsStore, null, exParams , new AlibcTradeCallback() {
+//            @Override
+//            public void onTradeSuccess(TradeResult tradeResult) {
+//                //打开电商组件，用户操作中成功信息回调。tradeResult：成功信息（结果类型：加购，支付；支付结果）
+//            }
+//
+//            @Override
+//            public void onFailure(int code, String msg) {
+//                //打开电商组件，用户操作中错误信息回调。code：错误码；msg：错误信息
+//            }
+//        });
     }
 }

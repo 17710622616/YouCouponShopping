@@ -1,40 +1,40 @@
 package com.youcoupon.john_li.youcouponshopping;
 
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ali.auth.third.core.callback.LoginCallback;
-import com.ali.auth.third.core.model.Session;
-import com.ali.auth.third.login.LoginService;
-import com.ali.auth.third.login.callback.LogoutCallback;
-import com.alibaba.baichuan.android.trade.AlibcTrade;
-import com.alibaba.baichuan.android.trade.AlibcTradeSDK;
-import com.alibaba.baichuan.android.trade.adapter.login.AlibcLogin;
-import com.alibaba.baichuan.android.trade.callback.AlibcLoginCallback;
-import com.alibaba.baichuan.android.trade.callback.AlibcTradeCallback;
 import com.alibaba.baichuan.android.trade.model.AlibcShowParams;
-import com.alibaba.baichuan.android.trade.model.OpenType;
-import com.alibaba.baichuan.android.trade.model.TradeResult;
-import com.alibaba.baichuan.android.trade.page.AlibcPage;
 import com.alibaba.fastjson.JSON;
+import com.gyf.immersionbar.BarHide;
+import com.gyf.immersionbar.ImmersionBar;
+import com.gyf.immersionbar.OnKeyboardListener;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
-import com.youcoupon.john_li.youcouponshopping.YouActivity.MineActivity;
 import com.youcoupon.john_li.youcouponshopping.YouFragment.MainFragment;
 import com.youcoupon.john_li.youcouponshopping.YouFragment.MineFragment;
-import com.youcoupon.john_li.youcouponshopping.YouFragment.RecommendFragment;
+import com.youcoupon.john_li.youcouponshopping.YouFragment.ShopCartFragment;
+import com.youcoupon.john_li.youcouponshopping.YouModel.SearchOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
+
+import org.xutils.common.Callback;
+import org.xutils.http.RequestParams;
+import org.xutils.x;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -53,12 +53,12 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //当系统版本为4.4或者4.4以上时可以使用沉浸式状态栏
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            //透明状态栏
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            //透明导航栏
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            //透明状态栏
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//            //透明导航栏
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+//        }
         initView();
         setListener();
         initData();
@@ -112,25 +112,114 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         traslation.commit();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData data = cm.getPrimaryClip();
+        if(data != null) {
+            ClipData.Item item = data.getItemAt(0);
+            if(item != null) {
+                CharSequence content = item.getText();
+                if (content != null) {
+                    //对剪贴板文字的操作
+                    callNetSearchItem(content.toString());
+                }
+            }
+        }
+
+
+    }
+
+    /**
+     * 请求网络查询
+     * @param str
+     */
+    private void callNetSearchItem(String str) {
+        Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("pageno", String.valueOf(1));
+        paramsMap.put("pagesize", String.valueOf(1));
+        paramsMap.put("q", str);
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.COUPON_SEARCH_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
+        params.setConnectTimeout(30 * 1000);
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                final SearchOutModel model = JSON.parseObject(result, SearchOutModel.class);
+                if (model.getStatus() == 0) {
+                    if (model.getData().getResults().size() > 0) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setTitle("检查到您正在寻找");
+                        builder.setMessage(model.getData().getResults().get(0).getTitle());
+                        builder.setIcon(R.mipmap.ic_launcher_round);
+                        //点击对话框以外的区域是否让对话框消失
+                        builder.setCancelable(true);
+                        //设置正面按钮
+                        builder.setPositiveButton("去看看", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(MainActivity.this, MerchandiseDetialActivity.class);
+                                intent.putExtra("MerchandiseModel", JSON.toJSONString(model.getData().getResults().get(0)));
+                                startActivity(intent);
+                                dialog.dismiss();
+                            }
+                        });
+                        //设置反面按钮
+                        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Toast.makeText(MainActivity.this, "你点击了不是", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        //显示对话框
+                        dialog.show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "暂未找到查询列表！", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
+    }
+
 
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
         switch (i){
             case R.id.bottom_main:
                 park_rb.setTextColor(getResources().getColor(R.color.colorPrimary));
-                forum_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
-                mine_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
+                forum_rb.setTextColor(getResources().getColor(R.color.colorFottor));
+                mine_rb.setTextColor(getResources().getColor(R.color.colorFottor));
                 switchPages(MainFragment.class,MainFragment.TAG);
                 break;
             case R.id.bottom_main_recommend:
-                park_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
+                park_rb.setTextColor(getResources().getColor(R.color.colorFottor));
                 forum_rb.setTextColor(getResources().getColor(R.color.colorPrimary));
-                mine_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
-                switchPages(RecommendFragment.class,RecommendFragment.TAG);
+                mine_rb.setTextColor(getResources().getColor(R.color.colorFottor));
+                switchPages(ShopCartFragment.class, ShopCartFragment.TAG);
                 break;
             case R.id.bottom_main_mine:
-                park_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
-                forum_rb.setTextColor(getResources().getColor(R.color.colorDrakGray));
+                park_rb.setTextColor(getResources().getColor(R.color.colorFottor));
+                forum_rb.setTextColor(getResources().getColor(R.color.colorFottor));
                 mine_rb.setTextColor(getResources().getColor(R.color.colorPrimary));
                 switchPages(MineFragment.class,MineFragment.TAG);
                 break;

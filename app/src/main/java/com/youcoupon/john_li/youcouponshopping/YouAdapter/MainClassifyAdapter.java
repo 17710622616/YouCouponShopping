@@ -67,11 +67,12 @@ public class MainClassifyAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        if (iconArr.length - 1 < position) {
+        /*if (iconArr.length - 1 < position) {
             holder.item_main_classify_iv.setImageResource(R.mipmap.loading);
         } else {
             holder.item_main_classify_iv.setImageResource(iconArr[position]);
-        }
+        }*/
+        x.image().bind(holder.item_main_classify_iv, list.get(position).getImg_url(), options);
         holder.item_main_classify_tv.setText(list.get(position).getFavorites_title());
         return convertView;
     }

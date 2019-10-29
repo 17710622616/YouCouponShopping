@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FE2C2D</color>
-    <color name="colorPrimaryDark">#FE2C2D</color>
-    <!--<color name="colorAccent">#FF4081</color>-->
-    <color name="colorAccent">#FE2C2D</color>
+    <color name="colorPrimary">#ff8db7</color>
+    <color name="colorPrimaryDark">#ff8db7</color>
+    <color name="colorFottor">#E3DDDF</color>
+    <color name="colorAccent">#ff8db7</color>
     <color name="colorSkyBlue">#0286FF</color>
     <color name="colorWhite">#FFFFFF</color>
-    <color name="colorMineGray">#F5F5F5</color>
+    <color name="colorMinelittleGray">#fdfdfd</color>
+    <color name="colorMineGray">#fcfcfc</color>
     <color name="colorCommentGray">#F4F4F4</color>
     <color name="colorLightGray">#fdfdfd</color>
     <color name="colorLineGray">#c9c9c9</color>

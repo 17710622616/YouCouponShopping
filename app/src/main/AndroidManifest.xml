@@ -2,14 +2,27 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.youcoupon.john_li.youcouponshopping">
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-feature
+        android:name="android.hardware.usb.host"
+        android:required="true" />
+
     <application
         android:name=".YouUtils.YouApplication"
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:resizeableActivity="true"
+        android:maxAspectRatio="2.4">
         <activity android:name=".SplashActivity"
             android:theme="@style/AppTheme.FullScreen">
             <intent-filter>
@@ -20,6 +33,20 @@
         <activity android:name=".MainActivity"/>
         <activity android:name=".YouActivity.MineActivity"/>
         <activity android:name=".MerchandiseDetialActivity"/>
+        <activity android:name=".YouActivity.CategoryListingsActivity"/>
+        <activity android:name=".YouActivity.SearchActivity"/>
+
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.4" />
+        <!--适配华为（huawei）刘海屏-->
+        <meta-data
+            android:name="android.notch_support"
+            android:value="true"/>
+        <!--适配小米（xiaomi）刘海屏-->
+        <meta-data
+            android:name="notch.config"
+            android:value="portrait|landscape" />
     </application>
 
 </manifest>

@@ -76,22 +76,12 @@ public class SellerOutModel {
              * ShopUrl : http://store.taobao.com/shop/view_shop.htm?user_number_id=2231111757
              * UserId : 2231111757
              */
-
-            private String ClickUrl;
             private String PictUrl;
             private String SellerNick;
             private String ShopTitle;
             private String ShopType;
             private String ShopUrl;
             private long UserId;
-
-            public String getClickUrl() {
-                return ClickUrl;
-            }
-
-            public void setClickUrl(String ClickUrl) {
-                this.ClickUrl = ClickUrl;
-            }
 
             public String getPictUrl() {
                 return PictUrl;

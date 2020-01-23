@@ -1,8 +1,9 @@
 package com.youcoupon.john_li.youcouponshopping.YouActivity;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,8 +23,8 @@ import java.util.Map;
 
 public class MineActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView nickTv;
-    private ImageView headIv;
-    private LinearLayout userInfoLL, obligationLL, toBeSendLL, waitForReceivingLL, toEvaluateLL, allOrderLL, shoppingCartLL;
+    private ImageView headIv;//userInfoLL
+    private LinearLayout obligationLL, toBeSendLL, waitForReceivingLL, toEvaluateLL, allOrderLL, shoppingCartLL;
     private AlibcShowParams alibcShowParams;//页面打开方式，默认，H5，Native
     private Map<String, String> exParams;//yhhpass参数
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.head_boy).setFailureDrawableId(R.mipmap.head_boy).build();
@@ -39,23 +40,23 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
     public void initView() {
         nickTv = (TextView) findViewById(R.id.user_nick_name);
         headIv = (ImageView) findViewById(R.id.user_head);
-        userInfoLL = (LinearLayout) findViewById(R.id.user_info);
-        allOrderLL = (LinearLayout) findViewById(R.id.mine_all_order);
+        //userInfoLL = (LinearLayout) findViewById(R.id.user_info);
+        /*allOrderLL = (LinearLayout) findViewById(R.id.mine_all_order);
         obligationLL = (LinearLayout) findViewById(R.id.mine_obligation);
         toBeSendLL = (LinearLayout) findViewById(R.id.mine_to_be_send);
         waitForReceivingLL = (LinearLayout) findViewById(R.id.mine_wait_for_receiving);
         toEvaluateLL = (LinearLayout) findViewById(R.id.mine_to_evaluate);
-        shoppingCartLL = (LinearLayout) findViewById(R.id.mine_shopping_cart);
+        shoppingCartLL = (LinearLayout) findViewById(R.id.mine_shopping_cart);*/
     }
 
     public void setListener() {
-        userInfoLL.setOnClickListener(this);
-        allOrderLL.setOnClickListener(this);
+        //userInfoLL.setOnClickListener(this);
+        /*allOrderLL.setOnClickListener(this);
         obligationLL.setOnClickListener(this);
         toBeSendLL.setOnClickListener(this);
         waitForReceivingLL.setOnClickListener(this);
         toEvaluateLL.setOnClickListener(this);
-        shoppingCartLL.setOnClickListener(this);
+        shoppingCartLL.setOnClickListener(this);*/
     }
 
     public void initData() {
@@ -79,12 +80,12 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.user_info:
+            /*case R.id.user_info:
 //                if (JSON.toJSONString(AlibcLogin.getInstance().getSession()).equals("{}")) {
 //                    login();
 //                }
-                break;
-            case R.id.mine_all_order:
+                break;*/
+            /*case R.id.mine_all_order:
                 showAllOrder(0);
                 break;
             case R.id.mine_obligation:
@@ -101,7 +102,7 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.mine_shopping_cart:
                 showMyShoppingCart();
-                break;
+                break;*/
         }
     }
 

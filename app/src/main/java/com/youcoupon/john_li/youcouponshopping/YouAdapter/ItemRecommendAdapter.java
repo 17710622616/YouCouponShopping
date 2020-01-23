@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.youcoupon.john_li.youcouponshopping.R;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteItemOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.ItemRecommondOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.MaterialClassifyItemOutModel;
 
 import org.xutils.image.ImageOptions;
 import org.xutils.x;
@@ -23,12 +24,12 @@ import java.util.List;
  */
 
 public class ItemRecommendAdapter extends BaseAdapter {
-    private List<ItemRecommondOutModel.DataBean.ItemRecommendModel> list;
+    private List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> list;
     private Context mContext;
     private LayoutInflater mInflater;
 
-    private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
-    public ItemRecommendAdapter(List<ItemRecommondOutModel.DataBean.ItemRecommendModel> list, Context context) {
+    private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setImageScaleType(ImageView.ScaleType.FIT_XY).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
+    public ItemRecommendAdapter(List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> list, Context context) {
         this.list = list;
         mContext = context;
         mInflater = LayoutInflater.from(context);
@@ -67,7 +68,7 @@ public class ItemRecommendAdapter extends BaseAdapter {
         }
 
 
-        x.image().bind(holder.merchandise_iv, list.get(position).getPictUrl(), options);
+        x.image().bind(holder.merchandise_iv, list.get(position).getPictUrl().contains("http") ? list.get(position).getPictUrl() : "http://" + list.get(position).getPictUrl(), options);
         holder.merchandise_title.setText(list.get(position).getTitle());
         holder.merchandise_original_price.setText("原價：¥" + list.get(position).getReservePrice());
         holder.merchandise_after_discoun.setText("券后:");

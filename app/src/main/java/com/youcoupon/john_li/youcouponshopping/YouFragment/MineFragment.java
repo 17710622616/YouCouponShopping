@@ -1,11 +1,14 @@
 package com.youcoupon.john_li.youcouponshopping.YouFragment;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,8 +26,25 @@ import com.alibaba.baichuan.trade.biz.login.AlibcLogin;
 import com.alibaba.baichuan.trade.biz.login.AlibcLoginCallback;
 import com.alibaba.baichuan.trade.common.utils.AlibcLogger;
 import com.alibaba.fastjson.JSON;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
+import com.youcoupon.john_li.youcouponshopping.LoginActivity;
 import com.youcoupon.john_li.youcouponshopping.R;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.BussinesActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.ServiceActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.SuggestActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.TutorialActivity;
+import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.xutils.common.Callback;
+import org.xutils.http.HttpMethod;
+import org.xutils.http.RequestParams;
 import org.xutils.image.ImageOptions;
 import org.xutils.x;
 
@@ -37,12 +57,23 @@ import java.util.Map;
 
 public class MineFragment extends LazyLoadFragment implements View.OnClickListener{
     public static String TAG = MineFragment.class.getName();
-    private TextView nickTv;
-    private ImageView headIv;
-    private LinearLayout userInfoLL, obligationLL, toBeSendLL, waitForReceivingLL, toEvaluateLL, allOrderLL, shoppingCartLL, loginOutLL;
+    private TextView nickTv, invitationCodeTv,taobaoAuthTv, performanceThisMonthTv, performanceLastMonthTv, integralTv;
+    private ImageView headIv;//userInfoLL
+    private RelativeLayout userInfoRl;
+    private RefreshLayout mRefreshLayout;
+    private LinearLayout taobaoLL,courseLL,suggestLL, shareLL, serviceLL, bussinessLL, loginOutLL;
+
     private AlibcShowParams alibcShowParams;//页面打开方式，默认，H5，Native
     private Map<String, String> exParams;//yhhpass参数
-    private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.head_boy).setFailureDrawableId(R.mipmap.head_boy).build();
+    private UserInfoOutsideModel.DataBean mUserInfoModel;
+    private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.head_iimg).setFailureDrawableId(R.mipmap.head_iimg).build();
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
     @Override
     protected void onCreateViewLazy(Bundle savedInstanceState) {
         super.onCreateViewLazy(savedInstanceState);
@@ -53,29 +84,50 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     }
 
     public void initView() {
+        mRefreshLayout = (RefreshLayout) findViewById(R.id.mine_srl);
         nickTv = (TextView) findViewById(R.id.user_nick_name);
+        invitationCodeTv = (TextView) findViewById(R.id.user_invitation_code);
+        taobaoAuthTv = (TextView) findViewById(R.id.mine_taobao_auth);
         headIv = (ImageView) findViewById(R.id.user_head);
-        userInfoLL = (LinearLayout) findViewById(R.id.user_info);
-        allOrderLL = (LinearLayout) findViewById(R.id.mine_all_order);
-        obligationLL = (LinearLayout) findViewById(R.id.mine_obligation);
-        toBeSendLL = (LinearLayout) findViewById(R.id.mine_to_be_send);
-        waitForReceivingLL = (LinearLayout) findViewById(R.id.mine_wait_for_receiving);
-        toEvaluateLL = (LinearLayout) findViewById(R.id.mine_to_evaluate);
-        shoppingCartLL = (LinearLayout) findViewById(R.id.mine_shopping_cart);
-        loginOutLL = (LinearLayout) findViewById(R.id.mine_setting);
+        performanceThisMonthTv = (TextView) findViewById(R.id.mine_performance_this_month);
+        performanceLastMonthTv = (TextView) findViewById(R.id.mine_performance_last_month);
+        integralTv = (TextView) findViewById(R.id.mine_integral);
+        //userInfoLL = (LinearLayout) findViewById(R.id.user_info);
+        taobaoLL = (LinearLayout) findViewById(R.id.mine_taobao_ll);
+        courseLL = (LinearLayout) findViewById(R.id.mine_course);
+        suggestLL = (LinearLayout) findViewById(R.id.mine_suggest);
+        shareLL = (LinearLayout) findViewById(R.id.mine_share);
+        serviceLL = (LinearLayout) findViewById(R.id.mine_service);
+        bussinessLL = (LinearLayout) findViewById(R.id.mine_bussiness);
+        loginOutLL = (LinearLayout) findViewById(R.id.mine_login_out);
+        userInfoRl = (RelativeLayout) findViewById(R.id.user_info_rl);
+
+        mRefreshLayout.setEnableAutoLoadmore(false);//是否启用列表惯性滑动到底部时自动加载更多
+        mRefreshLayout.setDisableContentWhenRefresh(true);//是否在刷新的时候禁止列表的操作
+        mRefreshLayout.setDisableContentWhenLoading(true);//是否在加载的时候禁止列表的操作
+        // 设置header的高度
+        mRefreshLayout.setHeaderHeightPx((int)(YouCommonUtils.getDeviceWitdh(getActivity()) / 4.05));//Header标准高度（显示下拉高度>=标准高度 触发刷新）
     }
 
     public void setListener() {
-        userInfoLL.setOnClickListener(this);
-        allOrderLL.setOnClickListener(this);
-        obligationLL.setOnClickListener(this);
-        toBeSendLL.setOnClickListener(this);
-        waitForReceivingLL.setOnClickListener(this);
-        toEvaluateLL.setOnClickListener(this);
-        shoppingCartLL.setOnClickListener(this);
+        performanceThisMonthTv.setOnClickListener(this);
+        performanceLastMonthTv.setOnClickListener(this);
+        integralTv.setOnClickListener(this);
+        userInfoRl.setOnClickListener(this);
+        taobaoLL.setOnClickListener(this);
+        courseLL.setOnClickListener(this);
+        suggestLL.setOnClickListener(this);
+        shareLL.setOnClickListener(this);
+        serviceLL.setOnClickListener(this);
+        bussinessLL.setOnClickListener(this);
         loginOutLL.setOnClickListener(this);
+        mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshlayout) {
+                refreshUI();
+            }
+        });
     }
-
     public void initData() {
         alibcShowParams = new AlibcShowParams();
 
@@ -83,57 +135,418 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         exParams.put("isv_code", "appisvcode");
         exParams.put("alibaba", "阿里巴巴");//自定义参数部分，可任意增删改
 
-        //获取淘宝用户信息
-        String nick = AlibcLogin.getInstance().getSession().nick;
-        String avatarUrl = AlibcLogin.getInstance().getSession().avatarUrl;
-        if (nick != null && avatarUrl != null) {
-            if (!nick.equals("") && !avatarUrl.equals("")) {
-                x.image().bind(headIv, avatarUrl, options);
-                nickTv.setText(nick);
-            } else {
-                nickTv.setText("请先登录！");
-            }
-        } else {
-            nickTv.setText("请先登录！");
+        String userToken = (String) SPUtils.get(getActivity(), "UserToken", "");
+        if (userToken != null) {
+            mRefreshLayout.autoRefresh();
         }
+        // 获取阿里百川授权信息
+        taobaoAuth();
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.user_info:
-                String nick = AlibcLogin.getInstance().getSession().nick;
-                String avatarUrl = AlibcLogin.getInstance().getSession().avatarUrl;
-                if (nick == null || avatarUrl == null) {
-                    login();
+            case R.id.mine_taobao_ll:
+                taobaoLogin();
+                break;
+            case R.id.mine_performance_this_month:
+
+                break;
+            case R.id.mine_performance_last_month:
+
+                break;
+            case R.id.mine_integral:
+                Toast.makeText(getApplicationContext(), "入口暂未开放，敬请期待！", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.mine_course:
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    startActivity(new Intent(getActivity(), TutorialActivity.class));
                 } else {
-                    if (nick.equals("") || avatarUrl.equals("")) {
-                        login();
-                    }
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                 }
                 break;
-            case R.id.mine_all_order:
-                showAllOrder(0);
+            case R.id.mine_suggest:
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    startActivity(new Intent(getActivity(), SuggestActivity.class));
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
                 break;
-            case R.id.mine_obligation:
-                showAllOrder(1);
-                break;
-            case R.id.mine_to_be_send:
-                showAllOrder(2);
-                break;
-            case R.id.mine_wait_for_receiving:
-                showAllOrder(3);
-                break;
-            case R.id.mine_to_evaluate:
-                showAllOrder(4);
-                break;
-            case R.id.mine_shopping_cart:
-                showMyShoppingCart();
-                break;
-            case R.id.mine_setting:
+            case R.id.mine_share:
                 loginOut();
                 break;
+            case R.id.mine_service:
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    startActivity(new Intent(getActivity(), ServiceActivity.class));
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
+                break;
+            case R.id.mine_bussiness:
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    startActivity(new Intent(getActivity(), BussinesActivity.class));
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
+                break;
+            case R.id.mine_login_out:
+                loginOut();
+                taobaoAuth();
+                break;
+            case R.id.user_info_rl:
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    startActivity(new Intent());
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
+                break;
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onEvent(String msg){
+        if (msg.equals("LOGIN")) {
+            mRefreshLayout.autoRefresh();
+        } else {
+            mRefreshLayout.autoRefresh();
+        }
+    }
+    /**
+     * 刷新界面
+     */
+    private void refreshUI() {
+        String userToken = (String) SPUtils.get(getActivity(), "UserToken", "");
+        String userInfoJson = (String) SPUtils.get(getActivity(), "UserInfo", "");
+        if (!userToken.equals("")){
+            // 获取本月绩效
+            callNetGetPerformanceThisMonth(userToken);
+            // 获取上月绩效
+            callNetGetPerformanceLastMonth(userToken);
+            getUserInfo(userToken);
+            getHasPayPw(userToken);
+        } else {
+            x.image().bind(headIv, "", options);
+            nickTv.setText("立即登录");
+            invitationCodeTv.setVisibility(View.INVISIBLE);
+            Toast.makeText(getActivity(), "您暂未等，请先登录！", Toast.LENGTH_SHORT).show();
+        }
+
+        mRefreshLayout.finishRefresh(1000);
+    }
+
+    /**
+     * 获取淘宝授权信息
+     */
+    private void taobaoAuth() {
+        try {
+            //获取淘宝用户信息
+            String nick = AlibcLogin.getInstance().getSession().nick;
+            String avatarUrl = AlibcLogin.getInstance().getSession().avatarUrl;
+            if (nick != null && avatarUrl != null) {
+                if (!nick.equals("") && !avatarUrl.equals("")) {
+                    taobaoAuthTv.setText(nick);
+                } else {
+                    taobaoAuthTv.setText("点我授权");
+                }
+            } else {
+                taobaoAuthTv.setText("点我授权");
+            }
+        } catch (Exception e) {
+            taobaoAuthTv.setText("点我授权");
+        }
+    }
+
+    /**
+     * 淘宝授权
+     */
+    public void taobaoLogin() {
+        final AlibcLogin alibcLogin = AlibcLogin.getInstance();
+        alibcLogin.showLogin(new AlibcLoginCallback() {
+            @Override
+            public void onSuccess(int loginResult, String openId, String userNick) {
+                // 参数说明：
+                // loginResult(0--登录初始化成功；1--登录初始化完成；2--登录成功)
+                // openId：用户id
+                // userNick: 用户昵称
+                Toast.makeText(getActivity(), "授权成功 " + AlibcLogin.getInstance().getSession(), Toast.LENGTH_LONG).show();
+                taobaoAuth();
+
+                // 成为合作者
+                String userInfoJson = (String) SPUtils.get(getActivity(), "UserInfo", "");
+                UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
+                if (userInfoModel != null) {
+                    if (userInfoModel.getRelationId() == 0) {
+                        callNetBecomePartner();
+                    }
+                } else {
+                    callNetBecomePartner();
+                }
+            }
+
+            @Override
+            public void onFailure(int code, String msg) {
+                // code：错误码  msg： 错误信息
+                Toast.makeText(getActivity(), "授权失败，" + msg + ":" + code, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    /**
+     * 取消淘宝授权
+     */
+    private void loginOut() {
+        AlibcLogin alibcLogin = AlibcLogin.getInstance();
+        alibcLogin.logout(new AlibcLoginCallback() {
+            @Override
+            public void onSuccess(int loginResult, String openId, String userNick) {
+                // 参数说明：
+                // loginResult(3--登出成功)
+                // openId：用户id
+                // userNick: 用户昵称
+                Toast.makeText(getActivity(), "退出登录成功", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int code, String msg) {
+                // code：错误码  msg： 错误信息
+                Toast.makeText(getActivity(), "退出登录失败 " + msg + code, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * 成为合作者
+     */
+    private void callNetBecomePartner() {
+        try {
+            if (AlibcLogin.getInstance().getSession() != null) {
+                Map<String, String> paramsMap = new HashMap<>();
+                paramsMap.put("note", AlibcLogin.getInstance().getSession().nick);
+                String sessionKey = AlibcLogin.getInstance().getSession().toString();
+                paramsMap.put("sessionKey", sessionKey);
+                paramsMap.put("onlineScene", "1");
+                paramsMap.put("inviterCode", "WQKIRV");
+                paramsMap.put("token", (String) SPUtils.get(getActivity(), "UserToken", ""));
+                RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.BECOME_PARTNER + YouCommonUtils.createLinkStringByGet(paramsMap));
+                params.setConnectTimeout(30 * 1000);
+                x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
+                    @Override
+                    public void onSuccess(String result) {
+                        CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
+                        if (model.getStatus() == 0) {
+                            String relationId =  model.getData().toString();
+                            UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject((String) SPUtils.get(getActivity(), "UserInfo", ""), UserInfoOutsideModel.DataBean.class);
+                            userInfoModel.setRelationId(Long.parseLong(relationId));
+
+                            String userInfoJson = JSON.toJSONString(model.getData());
+                            SPUtils.put(getActivity(), "UserInfo", userInfoJson);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "申请成为失败，请重新申请成为合作者领取返利！" + model.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    //请求异常后的回调方法
+                    @Override
+                    public void onError(Throwable ex, boolean isOnCallback) {
+                        Toast.makeText(getApplicationContext(), "申请成为异常，请重新申请成为合作者领取返利！", Toast.LENGTH_SHORT).show();
+                    }
+                    //主动调用取消请求的回调方法
+                    @Override
+                    public void onCancelled(CancelledException cex) {
+                    }
+                    @Override
+                    public void onFinished() {
+                    }
+                });
+            }
+        } catch (Exception e) {
+            Log.d("partnerError", e.getMessage());
+        }
+    }
+
+    /**
+     * 獲取用戶信息
+     * @param token
+     */
+    private void getUserInfo(String token) {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_USER_INFO + token);
+        params.setConnectTimeout(30 * 1000);
+        x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                UserInfoOutsideModel model = JSON.parseObject(result.toString(), UserInfoOutsideModel.class);
+                if (model.getStatus() == 0) {
+                    if (model.getData().getNick_name() == null) {
+                        model.getData().setNick_name("用戶");
+                    }
+                    if (model.getData().getAddress() == null) {
+                        model.getData().setAddress("");
+                    }
+                    if (model.getData().getReal_name() == null) {
+                        model.getData().setReal_name("");
+                    }
+                    if (model.getData().getAddress() == null) {
+                        model.getData().setAddress("");
+                    }
+                    if (model.getData().getDescx() == null) {
+                        model.getData().setDescx("");
+                    }
+                    if (model.getData().getHead_img() == null) {
+                        model.getData().setHead_img("");
+                    }
+                    if (model.getData().getBirth_day() == null) {
+                        model.getData().setBirth_day("");
+                    }
+                    if (model.getData().getInviteCode() == null) {
+                        model.getData().setBirth_day("");
+                    }
+                    String userInfoJson = JSON.toJSONString(model.getData());
+                    SPUtils.put(getActivity(), "UserInfo", userInfoJson);
+                    Log.d("getUserURI", "獲取用戶信息成功");
+
+                    if (!userInfoJson.equals("")){
+                        mUserInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
+                        nickTv.setText(mUserInfoModel.getNick_name());
+                        invitationCodeTv.setVisibility(View.VISIBLE);
+                        if (mUserInfoModel.getInviteCode() != null) {
+                            invitationCodeTv.setText("邀请码：" + mUserInfoModel.getInviteCode());
+                        } else {
+                            invitationCodeTv.setText("邀请码：点我获取");
+                        }
+                        //AliyunOSSUtils.downloadImg(mUserInfoModel.getHeadimg(), AliyunOSSUtils.initOSS(getActivity()), headIv, getActivity(), R.mipmap.head_boy);
+                        x.image().bind(headIv, mUserInfoModel.getHead_img(), options);
+                    } else {
+                        mUserInfoModel = new UserInfoOutsideModel.DataBean();
+                        x.image().bind(headIv, "", options);
+                        nickTv.setText("立即登录");
+                        invitationCodeTv.setVisibility(View.INVISIBLE);
+                        Toast.makeText(getActivity(), "您暂未等，请先登录！", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.d("getUserURI", "獲取用戶信息失敗");
+                }
+            }
+            //请求异常后的回调方法
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                if (ex instanceof java.net.SocketTimeoutException) {
+                    Toast.makeText(getActivity(), R.string.get_userinfo_timeout, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), R.string.get_userinfo_fail, Toast.LENGTH_SHORT).show();
+                }
+            }
+            //主动调用取消请求的回调方法
+            @Override
+            public void onCancelled(CancelledException cex) {
+            }
+            @Override
+            public void onFinished() {
+            }
+        });
+    }
+
+    /**
+     * 判断是否有支付密码
+     * @param token
+     */
+    private void getHasPayPw(String token) {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_USER_HAS_PAY_PW + SPUtils.get(getActivity(), "UserToken", ""));
+        params.setConnectTimeout(30 * 1000);
+        x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
+                if (model.getStatus() == 0) {
+                    String hasPayPw =  JSON.toJSONString(model.getData()).toString();
+                    if (hasPayPw.equals("true")) {
+                        SPUtils.put(getActivity(), "HasPayPw", "1");
+                    }
+                }
+            }
+            //请求异常后的回调方法
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+            }
+            //主动调用取消请求的回调方法
+            @Override
+            public void onCancelled(CancelledException cex) {
+            }
+            @Override
+            public void onFinished() {
+            }
+        });
+    }
+
+    /**
+     * 取本月绩效
+     * @param userToken
+     */
+    private void callNetGetPerformanceThisMonth(String userToken) {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_PERFORMANCE_THIS_MONTH + SPUtils.get(getActivity(), "UserToken", ""));
+        params.setConnectTimeout(30 * 1000);
+        x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
+                if (model.getStatus() == 0) {
+                    String performanceThisMonth =  model.getData().toString();
+                    performanceThisMonthTv.setText(performanceThisMonth + "\n本月预估");
+                }
+            }
+
+            //请求异常后的回调方法
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                performanceThisMonthTv.setText("0" + "\n本月预估");
+            }
+            //主动调用取消请求的回调方法
+            @Override
+            public void onCancelled(CancelledException cex) {
+                performanceThisMonthTv.setText("0" + "\n本月预估");
+            }
+            @Override
+            public void onFinished() {
+            }
+        });
+    }
+
+    /**
+     * 取上月绩效
+     * @param userToken
+     */
+    private void callNetGetPerformanceLastMonth(String userToken) {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_PERFORMANCE_LAST_MONTH + SPUtils.get(getActivity(), "UserToken", ""));
+        params.setConnectTimeout(30 * 1000);
+        x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
+                if (model.getStatus() == 0) {
+                    String performanceLastMonth = model.getData().toString();
+                    performanceLastMonthTv.setText(performanceLastMonth + "\n上月预估");
+                }
+            }
+
+            //请求异常后的回调方法
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                performanceLastMonthTv.setText("0" + "\n上月预估");
+            }
+            //主动调用取消请求的回调方法
+            @Override
+            public void onCancelled(CancelledException cex) {
+                performanceLastMonthTv.setText("0" + "\n上月预估");
+            }
+            @Override
+            public void onFinished() {
+            }
+        });
     }
 
     /**
@@ -215,52 +628,6 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                         }
                     }
                 });
-    }
-
-
-    /**
-     * 登录
-     */
-    public void login() {
-        final AlibcLogin alibcLogin = AlibcLogin.getInstance();
-        alibcLogin.showLogin(new AlibcLoginCallback() {
-            @Override
-            public void onSuccess(int loginResult, String openId, String userNick) {
-                // 参数说明：
-                // loginResult(0--登录初始化成功；1--登录初始化完成；2--登录成功)
-                // openId：用户id
-                // userNick: 用户昵称
-                Toast.makeText(getActivity(), "登录成功 " + AlibcLogin.getInstance().getSession(), Toast.LENGTH_LONG).show();
-                reFreshUI();
-            }
-
-            @Override
-            public void onFailure(int code, String msg) {
-                // code：错误码  msg： 错误信息
-                Toast.makeText(getActivity(), "登录失敗，" + msg + ":" + code, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-
-    private void loginOut() {
-        AlibcLogin alibcLogin = AlibcLogin.getInstance();
-        alibcLogin.logout(new AlibcLoginCallback() {
-            @Override
-            public void onSuccess(int loginResult, String openId, String userNick) {
-                // 参数说明：
-                // loginResult(3--登出成功)
-                // openId：用户id
-                // userNick: 用户昵称
-                Toast.makeText(getActivity(), "退出登录成功", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(int code, String msg) {
-                // code：错误码  msg： 错误信息
-                Toast.makeText(getActivity(), "退出登录失败 " + msg + code, Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void reFreshUI() {

@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">YouShopping</string>
+    <string name="login_fail">登录失败</string>
+    <string name="get_userinfo_timeout">獲取用戶信息超时，请重试</string>
+    <string name="get_userinfo_fail">獲取用户信息失败，请重试</string>
+    <string name="callnet_timeout">网络连接超时，请重试</string>
 </resources>

@@ -1,7 +1,7 @@
 package com.youcoupon.john_li.youcouponshopping.YouActivity;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.youcoupon.john_li.youcouponshopping.R;
 

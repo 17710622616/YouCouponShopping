@@ -3,29 +3,29 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
     <ImageView
-        android:layout_width="210dp"
-        android:layout_height="255dp"
+        android:layout_width="150dp"
+        android:layout_height="182dp"
         android:scaleType="fitXY"
         android:src="@mipmap/remai_bg"/>
 
     <LinearLayout
-        android:layout_width="210dp"
-        android:layout_height="255dp"
+        android:layout_width="150dp"
+        android:layout_height="182dp"
         android:orientation="vertical"
         android:gravity="center">
 
         <ImageView
             android:id="@+id/item_hot_iv"
-            android:layout_width="145dp"
-            android:layout_height="145dp"
+            android:layout_width="104dp"
+            android:layout_height="104dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
             android:layout_marginTop="15dp"
             android:scaleType="fitXY"
             android:src="@mipmap/img_loading" />
 
         <LinearLayout
-            android:layout_width="145dp"
+            android:layout_width="104dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
@@ -38,8 +38,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="¥0.00"
-                android:textColor="@color/colorAccent"
-                android:textSize="18sp"
+                android:textColor="@color/colorPrimary"
+                android:textSize="15sp"
                 android:layout_gravity="bottom"/>
 
             <TextView
@@ -65,17 +65,16 @@
 
         <TextView
             android:id="@+id/item_hot_title"
-            android:layout_width="145dp"
+            android:layout_width="104dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="15dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:layout_marginTop="5dp"
             android:gravity="center"
             android:layout_gravity="center_horizontal"
             android:singleLine="true"
             android:text="标题"
             android:textColor="@color/colorBlack"
-            android:textSize="18sp" />
+            android:textSize="14sp" />
     </LinearLayout>
 </FrameLayout>

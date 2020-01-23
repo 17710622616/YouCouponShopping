@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorCommentGray">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:background="@drawable/shape_toolbar_bg"
+        android:paddingTop="25dp">
+        <ImageView
+            android:id="@+id/search_back_iv"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:layout_gravity="center"
+            android:src="@mipmap/back"/>
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_sv"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="8"/>
+
+        <ImageView
+            android:id="@+id/search_search_iv"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginRight="15dp"
+            android:scaleType="fitXY"
+            android:layout_gravity="center"
+            android:src="@mipmap/search" />
+    </LinearLayout>
+
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/search_srl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <pl.droidsonroids.gif.GifImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+            android:src="@mipmap/loading"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <RadioGroup
+                            android:id="@+id/search_keyword"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_weight="1">
+                            <RadioButton
+                                android:id="@+id/search_des"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="降序"
+                                android:button="@null"
+                                android:padding="10dp"
+                                android:gravity="center"
+                                android:drawableBottom="@drawable/selector_search_title"
+                                android:visibility="gone"/>
+
+                            <RadioButton
+                                android:id="@+id/search_asc"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="升序"
+                                android:button="@null"
+                                android:padding="10dp"
+                                android:gravity="center"
+                                android:drawableBottom="@drawable/selector_search_title"
+                                android:visibility="gone"/>
+
+                            <RadioButton
+                                android:id="@+id/search_total_sales"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="销量"
+                                android:button="@null"
+                                android:padding="10dp"
+                                android:gravity="center"
+                                android:drawableBottom="@drawable/selector_search_title"/>
+
+                            <RadioButton
+                                android:id="@+id/search_tk_rate"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="佣金%"
+                                android:button="@null"
+                                android:padding="10dp"
+                                android:gravity="center"
+                                android:drawableBottom="@drawable/selector_search_title"
+                                android:visibility="gone"/>
+
+                            <RadioButton
+                                android:id="@+id/search_tk_total_sales"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="人气"
+                                android:button="@null"
+                                android:padding="10dp"
+                                android:gravity="center"
+                                android:drawableBottom="@drawable/selector_search_title"/>
+
+                            <RadioButton
+                                android:id="@+id/search_price"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="价格"
+                                android:button="@null"
+                                android:padding="10dp"
+                                android:gravity="center"
+                                android:drawableBottom="@drawable/selector_search_title"/>
+                        </RadioGroup>
+
+                        <CheckBox
+                            android:id="@+id/search_hascoupon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="有券"
+                            android:layout_marginRight="5dp"
+                            android:layout_marginLeft="5dp"/>
+                    </LinearLayout>
+                    <com.youcoupon.john_li.youcouponshopping.YouView.NoScrollGridView
+                        android:id="@+id/search_gv"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:numColumns="2"
+                        android:layout_marginLeft="1dp"
+                        android:layout_marginRight="1dp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/search_intro_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:background="@color/colorMineGray">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="三部轻松获得优惠券"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorDrakGray"
+                        android:layout_marginTop="10dp"
+                        android:paddingTop="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingBottom="10dp"
+                        android:background="@color/colorWhite"
+                        android:layout_gravity="center_vertical"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:background="@color/colorWhite"
+                        android:paddingBottom="10dp">
+
+                        <ImageView
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+                            android:src="@mipmap/head_iimg"
+                            android:scaleType="fitXY"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="3dp"
+                            android:layout_gravity="center_vertical"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="1.进入淘宝"
+                            android:textSize="12sp"
+                            android:textColor="@color/colorDrakGray"
+                            android:layout_gravity="center_vertical"/>
+
+
+                        <ImageView
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+                            android:src="@mipmap/head_iimg"
+                            android:scaleType="fitXY"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="3dp"
+                            android:layout_gravity="center_vertical"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="2.长按商品标题复制"
+                            android:textSize="12sp"
+                            android:textColor="@color/colorDrakGray"
+                            android:layout_gravity="center_vertical"/>
+
+
+                        <ImageView
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+                            android:src="@mipmap/head_iimg"
+                            android:scaleType="fitXY"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="3dp"
+                            android:layout_gravity="center_vertical"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="3.点击搜索粘贴查询"
+                            android:textSize="12sp"
+                            android:textColor="@color/colorDrakGray"
+                            android:layout_gravity="center_vertical"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="热门搜索"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorDrakGray"
+                        android:layout_marginTop="10dp"
+                        android:paddingTop="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingBottom="10dp"
+                        android:background="@color/colorWhite"/>
+
+                    <com.youcoupon.john_li.youcouponshopping.YouView.FlowLayout
+                        android:id="@+id/search_flow_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/colorWhite"
+                        app:childSpacing="auto"
+                        app:childSpacingForLastRow="align"
+                        app:rowSpacing="5dp"/>
+                </LinearLayout>
+            </FrameLayout>
+        </ScrollView>
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+</LinearLayout>

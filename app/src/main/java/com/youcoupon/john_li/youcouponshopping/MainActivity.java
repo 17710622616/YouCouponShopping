@@ -8,16 +8,17 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
+import androidx.annotation.IdRes;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.alibaba.baichuan.android.trade.model.AlibcShowParams;
 import com.alibaba.fastjson.JSON;
@@ -116,7 +117,8 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     protected void onResume() {
         super.onResume();
 
-        ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        //获取剪切板
+        /*ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData data = cm.getPrimaryClip();
         if(data != null) {
             ClipData.Item item = data.getItemAt(0);
@@ -127,9 +129,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                     callNetSearchItem(content.toString());
                 }
             }
-        }
-
-
+        }*/
     }
 
     /**
@@ -141,7 +141,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         paramsMap.put("pageno", String.valueOf(1));
         paramsMap.put("pagesize", String.valueOf(1));
         paramsMap.put("q", str);
-        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.COUPON_SEARCH_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.SEARCH_MATERIAL + YouCommonUtils.createLinkStringByGet(paramsMap));
         params.setConnectTimeout(30 * 1000);
         x.http().get(params, new Callback.CommonCallback<String>() {
             @Override

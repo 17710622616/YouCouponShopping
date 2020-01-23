@@ -1,15 +1,15 @@
 package com.youcoupon.john_li.youcouponshopping.YouActivity;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
 
 import com.alibaba.fastjson.JSON;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
@@ -17,10 +17,8 @@ import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.youcoupon.john_li.youcouponshopping.MerchandiseDetialActivity;
 import com.youcoupon.john_li.youcouponshopping.R;
-import com.youcoupon.john_li.youcouponshopping.YouAdapter.FavoritesItemAdapter;
-import com.youcoupon.john_li.youcouponshopping.YouAdapter.MainClassifyAdapter;
-import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteItemOutModel;
-import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouAdapter.MaterialItemAdapter;
+import com.youcoupon.john_li.youcouponshopping.YouModel.MaterialClassifyItemOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
 import com.youcoupon.john_li.youcouponshopping.YouView.YouHeadView;
@@ -40,16 +38,16 @@ import java.util.Map;
 
 public class CategoryListingsActivity extends BaseActivity implements View.OnClickListener{
     private YouHeadView headView;
-    private RadioGroup mRg;
+    //private RadioGroup mRg;
     private GridView mGv;
     private RefreshLayout mRefreshLayout;
 
     private String favoriteId;
-    private long totalCount = 20;
+    private String isDefault = "true";
     private long pageNo = 1;
     private long pageSize = 10;
-    private List<FavoriteItemOutModel.DataBean.FavoriteItemModel> mFavoriteItemModelList;
-    private FavoritesItemAdapter mFavoritesItemAdapter;
+    private List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> mMaterialItemModelList;
+    private MaterialItemAdapter mMetrialItemAdapter;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +60,7 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
     @Override
     public void initView() {
         headView = findViewById(R.id.category_listing_head);
-        mRg = findViewById(R.id.category_listing_rg);
+        //mRg = findViewById(R.id.category_listing_rg);
         mGv = findViewById(R.id.category_listing_gv);
         mRefreshLayout = findViewById(R.id.category_listing_srl);
 
@@ -80,7 +78,7 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
             @Override
             public void onLoadmore(RefreshLayout refreshlayout) {
                 //和最大的数据比较
-                if (pageSize * (pageNo + 1) > totalCount){
+                if (isDefault.equals("true")){
                     Toast.makeText(CategoryListingsActivity.this, "没有更多数据了~", Toast.LENGTH_SHORT).show();
                     mRefreshLayout.finishRefresh();
                     mRefreshLayout.finishLoadmore();
@@ -94,7 +92,7 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
                 pageNo = 1;
-                mFavoriteItemModelList.clear();
+                mMaterialItemModelList.clear();
                 callNetGetFavorites();
             }
         });
@@ -102,7 +100,7 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(CategoryListingsActivity.this, MerchandiseDetialActivity.class);
-                intent.putExtra("MerchandiseModel", JSON.toJSONString(mFavoriteItemModelList.get(position)));
+                intent.putExtra("MerchandiseModel", JSON.toJSONString(mMaterialItemModelList.get(position)));
                 startActivity(intent);
             }
         });
@@ -115,9 +113,9 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
         headView.setTitle(intent.getStringExtra("FavoriteName"));
         headView.setLeft(this);
 
-        mFavoriteItemModelList = new ArrayList<>();
-        mFavoritesItemAdapter = new FavoritesItemAdapter(mFavoriteItemModelList, this);
-        mGv.setAdapter(mFavoritesItemAdapter);
+        mMaterialItemModelList = new ArrayList<>();
+        mMetrialItemAdapter = new MaterialItemAdapter(mMaterialItemModelList, this);
+        mGv.setAdapter(mMetrialItemAdapter);
         mRefreshLayout.autoRefresh();
     }
 
@@ -125,18 +123,17 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("pageno", String.valueOf(pageNo));
         paramsMap.put("pagesize", String.valueOf(pageSize));
-        paramsMap.put("favoritesid", favoriteId);
-        paramsMap.put("orderby", "1");
-        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.FAVORITES_ITEM_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
+        paramsMap.put("materialId", favoriteId);
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.MATERIAL_CLASSIFY_ITEM + YouCommonUtils.createLinkStringByGet(paramsMap));
         params.setConnectTimeout(30 * 1000);
         x.http().get(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
-                FavoriteItemOutModel model = JSON.parseObject(result, FavoriteItemOutModel.class);
+                MaterialClassifyItemOutModel model = JSON.parseObject(result, MaterialClassifyItemOutModel.class);
                 if (model.getStatus() == 0) {
-                    totalCount = model.getData().getTotal_results();
-                    mFavoriteItemModelList.addAll(model.getData().getResults());
-                    mFavoritesItemAdapter.notifyDataSetChanged();
+                    isDefault = model.getData().getIs_default();
+                    mMaterialItemModelList.addAll(model.getData().getMap_data());
+                    mMetrialItemAdapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(getApplicationContext(), "獲取数据失敗！", Toast.LENGTH_SHORT).show();
                 }

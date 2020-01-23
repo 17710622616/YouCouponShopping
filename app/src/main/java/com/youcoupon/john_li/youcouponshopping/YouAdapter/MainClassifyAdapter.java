@@ -28,7 +28,7 @@ public class MainClassifyAdapter extends BaseAdapter {
     private Context mContext;
     private LayoutInflater mInflater;
 
-    private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
+    private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setImageScaleType(ImageView.ScaleType.FIT_XY).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
     public MainClassifyAdapter(List<FavoriteOutModel.DataBean.Favorites> list, Context context) {
         this.list = list;
         mContext = context;
@@ -37,8 +37,8 @@ public class MainClassifyAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if (list.size() > 10) {
-            return 10;
+        if (list.size() > 5) {
+            return 5;
         }
 
         return list.size();

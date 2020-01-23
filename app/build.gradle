@@ -5,8 +5,8 @@ def releaseTime() {
 }
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.0"
     defaultConfig {
         applicationId "com.youcoupon.john_li.youcouponshopping"
         minSdkVersion 17
@@ -14,17 +14,17 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        jackOptions {
-            enabled true
-        }
     }
+    useLibrary 'org.apache.http.legacy'
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+    sourceSets {
+        main.jniLibs.srcDirs = ['libs']
+    }
     android {
         lintOptions {
             abortOnError false
@@ -38,7 +38,7 @@ repositories {
     }
 }
 
-android.applicationVariants.all { variant ->
+/*android.applicationVariants.all { variant ->
     variant.outputs.each { output ->
         def outputFile = output.outputFile
         if (outputFile != null && outputFile.name.endsWith('.apk')) {
@@ -46,79 +46,76 @@ android.applicationVariants.all { variant ->
             output.outputFile = new File(outputFile.parent, fileName)
         }
     }
-}
+}*/
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    /*compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    compile 'com.android.support:appcompat-v7:26.+'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:design:26.0.0-alpha1'
-    compile 'org.xutils:xutils:3.5.0'
-    compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.3'
-    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
-    compile 'com.android.support:leanback-v17:26.0.0-alpha1'// 基础依赖包，必须要依赖
-    compile 'com.gyf.immersionbar:immersionbar:3.0.0'
-    //支付宝
-    //    compile 'com.alipay.android.app.cashier:standardcashier-single:15.6.5@aar'
-    //    compileOnly 'com.alipay.mobile.android.securitysdk:apsecuritysdk-all:3.3.0'
+    })*/
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.core:core-ktx:1.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'org.xutils:xutils:3.5.0'
+    implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.3'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'org.greenrobot:eventbus:3.0.0'
+    // 基础依赖包，必须要依赖
+        implementation 'com.gyf.immersionbar:immersionbar:3.0.0'
+    // fragment快速实现（可选）
+        implementation 'com.gyf.immersionbar:immersionbar-components:3.0.0'
+    // kotlin扩展（可选）
+        implementation 'com.gyf.immersionbar:immersionbar-ktx:3.0.0'
+
+
+    // 百川组件
+    //支付宝（可选）
+    implementation 'com.alipay.android.app.cashier:standardcashier-single:15.6.5@aar'
+    compileOnly 'com.alipay.mobile.android.securitysdk:apsecuritysdk-all:3.3.0'
     //登陆
-    //    compile(name:'alibabauth_core-2.0.0.6', ext:'aar')
-    //    compile(name:'alibabauth_ui-2.0.0.6', ext:'aar')
-    //    compile(name:'alibabauth_ext-2.0.0.6', ext:'aar')
-    compile 'com.ali.auth.sdk:alibabauth_core:2.0.0.6@aar'
-    compile 'com.ali.auth.sdk:alibabauth_ui:2.0.0.6@aar'
-    compile 'com.ali.auth.sdk:alibabauth_ext:2.0.0.6@aar'
+    implementation 'com.ali.auth.sdk:alibabauth_core:2.0.0.6@aar'
+    implementation 'com.ali.auth.sdk:alibabauth_ui:2.0.0.6@aar'
+    implementation 'com.ali.auth.sdk:alibabauth_ext:2.0.0.6@aar'
     //安全组件
-    //    compile(name:'securityguardaar3-5.4.11776953-preInstall-20190812.024439-1', ext:'aar')
-    //    compile(name:'securitybodyaar3-5.4.95-preInstall-20190725.115618-1', ext:'aar')
-    //    compile(name:'avmpaar3-5.4.11773689-preInstall-20190812.024446-1', ext:'aar')
-    //    compile(name:'sgmiddletieraartest-6.4.999-NOFC-external-preinstall-20190819.071646-1', ext:'aar')
-    compile 'com.taobao.android:securityguardaar3:5.4.171@aar'
-    compile 'com.taobao.android:securitybodyaar3:5.4.99@aar'
-    compile 'com.taobao.android:avmpaar3:5.4.36@aar'
-    compile 'com.taobao.android:sgmiddletieraar3:5.4.9@aar'
-    //Mtop（jar包远端依赖）
-    compile 'com.taobao.android:mtopsdk_allinone_open:3.1.2.5@jar'
+    implementation 'com.taobao.android:securityguardaar3:5.4.171@aar'
+    implementation 'com.taobao.android:securitybodyaar3:5.4.99@aar'
+    implementation 'com.taobao.android:avmpaar3:5.4.36@aar'
+    implementation 'com.taobao.android:sgmiddletieraar3:5.4.9@aar'
+    //Mtop
+    implementation 'com.taobao.android:mtopsdk_allinone_open:3.1.2.5@jar'
     //applink
-    //    compile(name:'alibc_link_partner-4.1.6', ext:'aar')
-    compile 'com.alibaba.sdk.android:alibc_link_partner:4.1.10@aar'
-    //ut（jar包远端依赖）
-    compile 'com.taobao.android:utdid4all:1.1.5.3_proguard'
-    compile 'com.alibaba.mtl:app-monitor-sdk:2.6.4.5_for_bc'
+    implementation 'com.alibaba.sdk.android:alibc_link_partner:4.1.15@aar'
+    //ut
+    implementation 'com.taobao.android:utdid4all:1.5.2'
+    implementation 'com.alibaba.mtl:app-monitor-sdk:2.6.4.5_for_bc'
     // 电商基础组件
-    //    compile(name:'AlibcTradeCommon-3.1.1.243', ext:'aar')
-    //    compile(name:'AlibcTradeBiz-3.1.1.243', ext:'aar')
-    //    compile(name:'nb_trade-3.1.1.243', ext:'aar')
-    compile 'com.alibaba.sdk.android:AlibcTradeCommon:4.0.0.2@aar'
-    compile 'com.alibaba.sdk.android:AlibcTradeBiz:4.0.0.2@aar'
-    compile 'com.alibaba.sdk.android:nb_trade:4.0.0.2@aar'
-    compile 'com.alibaba:fastjson:1.2.41'
-    //    3.1.19
-    //    //fastjson
-    //    compile 'com.alibaba:fastjson:1.2.9'
-    //    //支付
-    //    compile 'com.alibaba.alipay:alipaySingle:20160825@jar'
-    //    //登陆
-    //    compile 'com.ali.auth.sdk:alibabauth_core:1.1.4@jar'
-    //    compile 'com.ali.auth.sdk:alibabauth_ui:1.1.4@aar'
-    //    compile 'com.ali.auth.sdk:alibabauth_ext:1.1.4@jar'
-    //    //【可选】仅供特殊合作伙伴使用
-    //    compile 'com.ali.auth.sdk:alibabauth_accountlink:1.1.4@jar'
-    //    //安全基础
-    //    compile 'com.taobao.android:securityguardaar3:5.1.81@aar'
-    //    //【可选】安全高级，如使用了发放红包、优惠券高级功能，则必须引入
-    //    compile 'com.taobao.android:securitybodyaar3:5.1.25@aar'
-    //    //Mtop网关
-    //    compile 'com.taobao.android:mtopsdk_allinone_open:1.2.2.4@jar'
-    //    //applink
-    //    compile 'com.taobao.android:alibc_applink:2.0.0.9@jar'
-    //    //UT
-    //    compile 'com.taobao.android:utdid4all:1.1.5.3_proguard@jar'
-    //    compile 'com.alibaba.mtl:app-monitor-sdk:2.5.1.3_for_bc_proguard@jar'
-    //    //电商SDK
-    //    compile 'com.alibaba.sdk.android:alibc_trade_sdk:3.1.1.11@aar'
-    compile files('libs/gprintersdkv1.jar')
+    implementation 'com.alibaba.sdk.android:AlibcTradeCommon:4.0.0.8@aar'
+    implementation 'com.alibaba.sdk.android:AlibcTradeBiz:4.0.0.8@aar'
+    implementation 'com.alibaba.sdk.android:nb_trade:4.0.0.8@aar'
+    implementation 'com.alibaba:fastjson:1.2.41'
+    //基础电商组件（必选）
+    implementation 'com.alibaba.sdk.android:AlibcTradeCommon:4.0.0.8@aar'
+    implementation 'com.alibaba.sdk.android:AlibcTradeBiz:4.0.0.8@aar'
+    implementation 'com.alibaba.sdk.android:nb_trade:4.0.0.8@aar'
+    //appLink（必选）
+    implementation 'com.alibaba.sdk.android:alibc_link_partner:4.1.15@aar'
+    //登录授权（必选）
+    implementation 'com.ali.auth.sdk:alibabauth_core:2.0.0.6@aar'
+    implementation 'com.ali.auth.sdk:alibabauth_ui:2.0.0.6@aar'
+    implementation 'com.ali.auth.sdk:alibabauth_ext:2.0.0.6@aar'
+    //mtop（必选）
+    implementation 'com.taobao.android:mtopsdk_allinone_open:3.1.2.5@jar'
+    //基础安全组件（必选）
+    implementation  'com.taobao.android:securityguardaar3:5.4.171@aar'
+    implementation 'com.taobao.android:securitybodyaar3:5.4.99@aar'
+    implementation 'com.taobao.android:avmpaar3:5.4.36@aar'
+    implementation 'com.taobao.android:sgmiddletieraar3:5.4.9@aar'
+
 }

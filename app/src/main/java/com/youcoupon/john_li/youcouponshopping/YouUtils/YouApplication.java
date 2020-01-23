@@ -6,6 +6,7 @@ import android.widget.Toast;
 import com.alibaba.baichuan.android.trade.AlibcTradeSDK;
 import com.alibaba.baichuan.android.trade.callback.AlibcTradeInitCallback;
 
+import org.greenrobot.eventbus.EventBus;
 import org.xutils.x;
 
 /**

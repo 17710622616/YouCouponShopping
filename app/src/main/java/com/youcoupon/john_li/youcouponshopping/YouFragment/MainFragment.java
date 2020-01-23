@@ -1,47 +1,51 @@
 package com.youcoupon.john_li.youcouponshopping.YouFragment;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.HorizontalGridView;
-import android.support.v17.leanback.widget.ItemBridgeAdapter;
-import android.support.v17.leanback.widget.OnChildViewHolderSelectedListener;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.alibaba.fastjson.JSON;
 import com.gyf.immersionbar.ImmersionBar;
+import com.gyf.immersionbar.OnNavigationBarListener;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.youcoupon.john_li.youcouponshopping.MerchandiseDetialActivity;
 import com.youcoupon.john_li.youcouponshopping.R;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.CategoryListingsActivity;
-import com.youcoupon.john_li.youcouponshopping.YouActivity.SearchActivity;
-import com.youcoupon.john_li.youcouponshopping.YouAdapter.FavoritesItemAdapter;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.SearchResultActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.WebH5Activity;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.MainClassifyAdapter;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.MainHotRefreshAdapter;
+import com.youcoupon.john_li.youcouponshopping.YouAdapter.MaterialItemAdapter;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteItemOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.MainActivityOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.MaterialClassifyItemOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
 import com.youcoupon.john_li.youcouponshopping.YouView.NoScrollGridView;
 
 import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
+import org.xutils.image.ImageOptions;
 import org.xutils.x;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static android.widget.GridLayout.HORIZONTAL;
 
 /**
  * 首页碎片
@@ -55,16 +59,23 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     private NoScrollGridView mGridView;
     private RefreshLayout mRefreshLayout;
     private Toolbar mToolbar;
+    private ImageView activity01Iv, activity02Iv;
+    private LinearLayout searchLL;
 
-    private long totalCount = 20;
+    // 是否抄底
+    private String isDefault = "true";
+    //
+    private long totalCount;
     private long pageNo = 1;
     private long pageSize = 10;
     private List<FavoriteOutModel.DataBean.Favorites> favoritesList;
     private List<FavoriteItemOutModel.DataBean.FavoriteItemModel> mainHotItemModelList;
-    private List<FavoriteItemOutModel.DataBean.FavoriteItemModel> mFavoriteItemModelList;
+    private List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> mMapGuessLikeList;
+    private List<MainActivityOutModel.DataBean.ActivityListBean> mActivityList;
     private MainHotRefreshAdapter mMainHotRefreshAdapter;
     private MainClassifyAdapter mMainClassifyAdapter;
-    private FavoritesItemAdapter mFavoritesItemAdapter;
+    private MaterialItemAdapter mMaterialItemAdapter;
+    private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setImageScaleType(ImageView.ScaleType.FIT_XY).setLoadingDrawableId(R.mipmap.activity_bg01).setFailureDrawableId(R.mipmap.activity_bg01).build();
 
     @Override
     protected void onCreateViewLazy(Bundle savedInstanceState) {
@@ -77,10 +88,13 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     }
 
     private void initBar() {
-        ImmersionBar.with(this).titleBar(mToolbar)
-                .setOnNavigationBarListener(show -> {
-                    //initView();
-                    Toast.makeText(getApplicationContext(), "导航栏" + (show ? "显示了" : "隐藏了"), Toast.LENGTH_SHORT).show();
+        ImmersionBar.with(getActivity()).titleBar(mToolbar)
+                .setOnNavigationBarListener(new OnNavigationBarListener() {
+                    @Override
+                    public void onNavigationBarChange(boolean show) {
+                        //initView();
+                        Toast.makeText(MainFragment.this.getApplicationContext(), "导航栏" + (show ? "显示了" : "隐藏了"), Toast.LENGTH_SHORT).show();
+                    }
                 }).init();
     }
 
@@ -90,8 +104,11 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         mHotListView = (RecyclerView) findViewById(R.id.main_hot_lv);
         mHotListView.setHasFixedSize(true);
 
+        activity01Iv = (ImageView) findViewById(R.id.main_activity_01);
+        activity02Iv = (ImageView) findViewById(R.id.main_activity_02);
         mListView = (NoScrollGridView) findViewById(R.id.main_lv);
         mGridView = (NoScrollGridView) findViewById(R.id.main_classify);
+        searchLL = (LinearLayout) findViewById(R.id.main_search_ll);
 
         mRefreshLayout.setEnableAutoLoadmore(false);//是否启用列表惯性滑动到底部时自动加载更多
         mRefreshLayout.setDisableContentWhenRefresh(true);//是否在刷新的时候禁止列表的操作
@@ -101,11 +118,12 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     }
 
     private void setListener() {
+        searchLL.setOnClickListener(this);
         mRefreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
             @Override
             public void onLoadmore(RefreshLayout refreshlayout) {
                 //和最大的数据比较
-                if (pageSize * (pageNo + 1) > totalCount){
+                if (isDefault.equals("true")){
                     Toast.makeText(getActivity(), "没有更多数据了~", Toast.LENGTH_SHORT).show();
                     mRefreshLayout.finishRefresh();
                     mRefreshLayout.finishLoadmore();
@@ -119,7 +137,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
                 pageNo = 1;
-                mFavoriteItemModelList.clear();
+                mMapGuessLikeList.clear();
                 callNetGetMerchandiseList();
             }
         });
@@ -136,7 +154,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), MerchandiseDetialActivity.class);
-                intent.putExtra("MerchandiseModel", JSON.toJSONString(mFavoriteItemModelList.get(position)));
+                intent.putExtra("MerchandiseModel", JSON.toJSONString(mMapGuessLikeList.get(position)));
                 startActivity(intent);
             }
         });
@@ -145,16 +163,18 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
 
     private void initData() {
         favoritesList = new ArrayList<>();
-        mFavoriteItemModelList = new ArrayList<>();
+        mMapGuessLikeList = new ArrayList<>();
+        mActivityList = new ArrayList<>();
+
         mMainClassifyAdapter = new MainClassifyAdapter(favoritesList, getActivity());
         mGridView.setAdapter(mMainClassifyAdapter);
-        mFavoritesItemAdapter = new FavoritesItemAdapter(mFavoriteItemModelList, getActivity());
-        mListView.setAdapter(mFavoritesItemAdapter);
+        mMaterialItemAdapter = new MaterialItemAdapter(mMapGuessLikeList, getActivity());
+        mListView.setAdapter(mMaterialItemAdapter);
 
         int spanCount = 1; // 只显示一行
         mainHotItemModelList = new ArrayList<>();
         mMainHotRefreshAdapter = new MainHotRefreshAdapter(getActivity(), mainHotItemModelList);
-        RecyclerView.LayoutManager layoutManager = new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.HORIZONTAL);
+        RecyclerView.LayoutManager layoutManager = new StaggeredGridLayoutManager(spanCount, HORIZONTAL);
         mHotListView.setLayoutManager(layoutManager);
         mHotListView.setAdapter(mMainHotRefreshAdapter);
 
@@ -169,20 +189,25 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
 
         callNetGetTitleList();
         callNetGetHotMerchandiseList();
+        callNetGetActivitList();
         mRefreshLayout.autoRefresh();
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.main_search_ll:
+                startActivity(new Intent(getActivity(), SearchResultActivity.class));
+                break;
         }
     }
 
+    /**
+     * 分类标题
+     */
     private void callNetGetTitleList() {
         Map<String, String> paramsMap = new HashMap<>();
-        paramsMap.put("pageno", "1");
-        paramsMap.put("pagesize", "5");
-        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.FAVORITES_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.MATERIAL_CLASSIFY );
         params.setConnectTimeout(30 * 1000);
         x.http().get(params, new Callback.CommonCallback<String>() {
             @Override
@@ -215,30 +240,31 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         });
     }
 
+    /**
+     * 猜你喜欢
+     */
     private void callNetGetMerchandiseList() {
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("pageno", String.valueOf(pageNo));
         paramsMap.put("pagesize", String.valueOf(pageSize));
-        paramsMap.put("favoritesid", "17481407");
-        paramsMap.put("orderby", "1");
-        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.FAVORITES_ITEM_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GUESS_LIKE_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
         params.setConnectTimeout(30 * 1000);
         x.http().get(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
-                FavoriteItemOutModel model = JSON.parseObject(result, FavoriteItemOutModel.class);
+                MaterialClassifyItemOutModel model = JSON.parseObject(result, MaterialClassifyItemOutModel.class);
                 if (model.getStatus() == 0) {
-                    totalCount = model.getData().getTotal_results();
-                    mFavoriteItemModelList.addAll(model.getData().getResults());
-                    mFavoritesItemAdapter.notifyDataSetChanged();
+                    isDefault = model.getData().getIs_default();
+                    mMapGuessLikeList.addAll(model.getData().getMap_data());
+                    mMaterialItemAdapter.notifyDataSetChanged();
                 } else {
-                    Toast.makeText(getApplicationContext(), "獲取每日上新数据失敗！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "获取猜你喜欢数据失败！", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
-                Toast.makeText(getApplicationContext(), "獲取每日上新数据失敗！", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "获取猜你喜欢数据失败！", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -254,6 +280,9 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         });
     }
 
+    /**
+     * 热卖
+     */
     private void callNetGetHotMerchandiseList() {
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("pageno", String.valueOf(pageNo));
@@ -291,5 +320,85 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
                 mRefreshLayout.finishLoadmore();
             }
         });
+    }
+
+    /**
+     * 获取页面的
+     */
+    private void callNetGetActivitList() {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.ACTIVITY_LIST );
+        params.setConnectTimeout(30 * 1000);
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                MainActivityOutModel model = JSON.parseObject(result, MainActivityOutModel.class);
+                if (model.getStatus() == 0) {
+                    //totalActivityCount = model.getData().getResultCout();
+                    mActivityList.addAll(model.getData().getActivityList());
+                    for (int i = 0; i < mActivityList.size(); i++) {
+                        switch (i) {
+                            case 0:
+                                x.image().bind(activity01Iv, mActivityList.get(0).getImgUrl(), options);
+                                activity01Iv.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(), WebH5Activity.class);
+                                        intent.putExtra("title",mActivityList.get(0).getBannerName());
+                                        intent.putExtra("webUrl",mActivityList.get(0).getActivityLink());
+                                        startActivity(intent);
+                                    }
+                                });
+                                break;
+                            case 1:
+                                x.image().bind(activity02Iv, mActivityList.get(1).getImgUrl(), options);
+                                activity02Iv.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(getActivity(), WebH5Activity.class);
+                                        intent.putExtra("title",mActivityList.get(1).getBannerName());
+                                        intent.putExtra("webUrl",mActivityList.get(1).getActivityLink());
+                                        startActivity(intent);
+                                    }
+                                });
+                                break;
+                        }
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "获取活动列表失敗！", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(getApplicationContext(), "获取活动列表失敗！", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+            }
+        });
+    }
+
+    /**
+     * 打开H5页面
+     * @param url
+     */
+    private void openH5(String url) {
+        // 打开网址 这个是通过打开android自带的浏览器进行的打开网址
+        Uri uri = Uri.parse(url);
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+            // 网址正确 跳转成功
+            startActivity(intent);
+        } else {
+            //网址不正确 跳转失败 提示错误
+            Toast.makeText(getActivity(), "网址输入错误，请重新输入！", Toast.LENGTH_SHORT).show();
+
+        }
     }
 }

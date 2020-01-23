@@ -3,9 +3,10 @@ package com.youcoupon.john_li.youcouponshopping;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
+
+import androidx.annotation.Nullable;
 
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
 

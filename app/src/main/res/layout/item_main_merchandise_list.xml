@@ -3,7 +3,7 @@
     xmlns:roundiv="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="255dp"
+    android:layout_height="295dp"
     android:background="@color/colorAlpha">
 
     <LinearLayout
@@ -18,7 +18,7 @@
         <com.youcoupon.john_li.youcouponshopping.YouView.RoundRectImageView
             android:id="@+id/item_main_merchandise_iv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="185dp"
             android:scaleType="fitXY"
             android:src="@mipmap/img_loading"
             android:background="@color/colorWhite"
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/item_main_merchandise_original_price"
                 android:text="0.0"
-                android:textColor="@color/colorAccent"
+                android:textColor="@color/colorPrimary"
                 android:textSize="18sp" />
 
             <TextView
@@ -100,6 +100,21 @@
                 android:text="券50"
                 android:textColor="@color/colorWhite"
                 android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/item_main_merchandise_rebate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="预计返利0.0"
+                android:textColor="@color/colorWhite"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:padding="5dp"
+                android:background="@drawable/shape_item_detial_bg"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_below="@id/item_main_merchandise_after_discount"/>
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

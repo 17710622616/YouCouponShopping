@@ -326,7 +326,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
      * 获取页面的
      */
     private void callNetGetActivitList() {
-        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.ACTIVITY_LIST );
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.ACTIVITY_LIST);
         params.setConnectTimeout(30 * 1000);
         x.http().get(params, new Callback.CommonCallback<String>() {
             @Override

@@ -249,7 +249,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
             ImageView iv = new ImageView(this);
             iv.setBackgroundColor(getResources().getColor(R.color.colorMineGray));
             iv.setImageResource(R.mipmap.img_loading);
-            x.image().bind(iv, imgUrl.contains("http") ? imgUrl : "http://" + imgUrl, options);
+            x.image().bind(iv, imgUrl.contains("http") ? imgUrl : "http:" + imgUrl, options);
             imgList.add(iv);
         }
 

@@ -75,7 +75,7 @@ public class MaterialItemAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        String imgUrl = list.get(position).getPictUrl().contains("http") ? list.get(position).getPictUrl() : "http://" + list.get(position).getPictUrl();
+        String imgUrl = list.get(position).getPictUrl().contains("http") ? list.get(position).getPictUrl() : "http:" + list.get(position).getPictUrl();
         x.image().bind(holder.merchandise_iv, imgUrl, options);
         if (list.get(position).getShortTitle() != null) {
             holder.merchandise_title.setText(list.get(position).getShortTitle());

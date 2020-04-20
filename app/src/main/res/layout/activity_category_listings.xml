@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -66,18 +67,35 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorCommentGray">
-    <pl.droidsonroids.gif.GifImageView
+        <pl.droidsonroids.gif.GifImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scaleType="centerInside"
         android:src="@mipmap/loading"/>
 
-        <GridView
-            android:id="@+id/category_listing_gv"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:numColumns="2"
-            android:layout_marginLeft="1dp"
-            android:layout_marginRight="1dp"/>
+            android:orientation="vertical">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab_layout"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:tabMode="scrollable"
+                app:tabTextColor="@color/colorLineGray"
+                app:tabIndicatorHeight="2dp"
+                app:tabSelectedTextColor="@color/colorDrakGray"
+                app:tabIndicatorColor="@color/colorPrimaryDark"
+                android:background="@color/colorWhite"/>
+
+            <GridView
+                android:id="@+id/category_listing_gv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:numColumns="2"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"/>
+        </LinearLayout>
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 </LinearLayout>

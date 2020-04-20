@@ -62,6 +62,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     private RelativeLayout userInfoRl;
     private RefreshLayout mRefreshLayout;
     private LinearLayout taobaoLL,courseLL,suggestLL, shareLL, serviceLL, bussinessLL, loginOutLL;
+    private LinearLayout incomeLL, teamLL, orderLL;
 
     private AlibcShowParams alibcShowParams;//页面打开方式，默认，H5，Native
     private Map<String, String> exParams;//yhhpass参数
@@ -93,6 +94,9 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         performanceLastMonthTv = (TextView) findViewById(R.id.mine_performance_last_month);
         integralTv = (TextView) findViewById(R.id.mine_integral);
         //userInfoLL = (LinearLayout) findViewById(R.id.user_info);
+        incomeLL = (LinearLayout) findViewById(R.id.mine_income);
+        teamLL = (LinearLayout) findViewById(R.id.mine_team);
+        orderLL = (LinearLayout) findViewById(R.id.mine_order);
         taobaoLL = (LinearLayout) findViewById(R.id.mine_taobao_ll);
         courseLL = (LinearLayout) findViewById(R.id.mine_course);
         suggestLL = (LinearLayout) findViewById(R.id.mine_suggest);
@@ -114,6 +118,9 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         performanceLastMonthTv.setOnClickListener(this);
         integralTv.setOnClickListener(this);
         userInfoRl.setOnClickListener(this);
+        incomeLL.setOnClickListener(this);
+        teamLL.setOnClickListener(this);
+        orderLL.setOnClickListener(this);
         taobaoLL.setOnClickListener(this);
         courseLL.setOnClickListener(this);
         suggestLL.setOnClickListener(this);
@@ -157,6 +164,15 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 break;
             case R.id.mine_integral:
                 Toast.makeText(getApplicationContext(), "入口暂未开放，敬请期待！", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.mine_income:
+
+                break;
+            case R.id.mine_team:
+
+                break;
+            case R.id.mine_order:
+
                 break;
             case R.id.mine_course:
                 if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {

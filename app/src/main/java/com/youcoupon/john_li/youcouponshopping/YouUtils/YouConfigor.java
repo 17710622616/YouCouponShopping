@@ -17,6 +17,8 @@ public class YouConfigor {
     public static final String FAVORITES_LIST = "api/Uatm/GetFavorites?";
     // 選品庫宝贝详情API
     public static final String FAVORITES_ITEM_LIST = "api/Uatm/GetFavoritesItem?";
+    // 熱賣API
+    public static final String HOT_MERCHANDISE_LIST = "api/Material/materialHotItemList?";
     // 分类API
     public static final String MATERIAL_CLASSIFY = "api/Material/materialClassify?";
     // 分类列表API
@@ -33,6 +35,8 @@ public class YouConfigor {
     public static final String ITEM_RECOMMEND_LIST = "api/Material/materialRecommend?";
     // 查询API
     public static final String SEARCH_MATERIAL = "api/Material/searchMaterial?";
+    // 熱門關鍵詞
+    public static final String SEARCH_HOT_WORD = "api/Item/getHotQueryWord?";
     // 活动列表
     public static final String ACTIVITY_LIST = "api/Activity/getActivityList?";
     // 用户登录

@@ -12,12 +12,14 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import com.alibaba.fastjson.JSON;
+import com.google.android.material.tabs.TabLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.youcoupon.john_li.youcouponshopping.MerchandiseDetialActivity;
 import com.youcoupon.john_li.youcouponshopping.R;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.MaterialItemAdapter;
+import com.youcoupon.john_li.youcouponshopping.YouModel.MainClassifyOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.MaterialClassifyItemOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
@@ -41,13 +43,17 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
     //private RadioGroup mRg;
     private GridView mGv;
     private RefreshLayout mRefreshLayout;
+    private TabLayout mTabLayout;
 
-    private String favoriteId;
+    //private String favoriteId;
+    private MainClassifyOutModel.DataBean.ResultsBean mClassifyTitleModel;
     private String isDefault = "true";
     private long pageNo = 1;
     private long pageSize = 10;
     private List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> mMaterialItemModelList;
     private MaterialItemAdapter mMetrialItemAdapter;
+    private boolean isFirst = true;
+    private int position;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +69,7 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
         //mRg = findViewById(R.id.category_listing_rg);
         mGv = findViewById(R.id.category_listing_gv);
         mRefreshLayout = findViewById(R.id.category_listing_srl);
+        mTabLayout = findViewById(R.id.tab_layout);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             headView.setHeadHight();
@@ -84,7 +91,7 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
                     mRefreshLayout.finishLoadmore();
                 } else {
                     pageNo ++;
-                    callNetGetFavorites();
+                    callNetGetItemList();
                 }
             }
         });
@@ -93,7 +100,7 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
             public void onRefresh(RefreshLayout refreshlayout) {
                 pageNo = 1;
                 mMaterialItemModelList.clear();
-                callNetGetFavorites();
+                callNetGetItemList();
             }
         });
         mGv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -104,26 +111,82 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
                 startActivity(intent);
             }
         });
+
+        mTabLayout.setOnTabSelectedListener(new TabLayout.BaseOnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (isFirst) {
+                    isFirst = false;
+                } else {
+                    position = tab.getPosition();
+                }
+                if (mMaterialItemModelList != null) {
+                    mMaterialItemModelList.clear();
+                }
+                callNetGetItemList();
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
     }
 
     @Override
     public void initData() {
         Intent intent = getIntent();
-        favoriteId = intent.getStringExtra("FavoriteId");
-        headView.setTitle(intent.getStringExtra("FavoriteName"));
+        mClassifyTitleModel = JSON.parseObject(intent.getStringExtra("ClassifyModel"), MainClassifyOutModel.DataBean.ResultsBean.class);
+        if (mClassifyTitleModel != null) {
+            headView.setTitle(String.valueOf(mClassifyTitleModel.getActivity_title()));
+        }
         headView.setLeft(this);
 
         mMaterialItemModelList = new ArrayList<>();
         mMetrialItemAdapter = new MaterialItemAdapter(mMaterialItemModelList, this);
         mGv.setAdapter(mMetrialItemAdapter);
         mRefreshLayout.autoRefresh();
+
+
+        /**动态添加值**/
+        for (int i = 0; i < mClassifyTitleModel.getChildItem().size(); i++) {
+            mTabLayout.addTab(mTabLayout.newTab());
+            TabLayout.Tab tab = mTabLayout.getTabAt(i);
+            tab.setText(mClassifyTitleModel.getChildItem().get(i).getChild_activity_title());
+            /*if (i == 0) {
+                tab.setIcon(R.mipmap.clothing);
+            } else {
+                tab.setIcon(R.mipmap.furniture);
+            }*/
+            /*if (tab != null) {
+                tab.setCustomView(R.layout.tab_wash_type);
+                View view = tab.getCustomView();
+                TextView textView = (TextView) view.findViewById(R.id.tab_wash_type_tv);
+                ImageView imageView = (ImageView) view.findViewById(R.id.tab_wash_type_iv);
+                textView.setText(mWashingCategoryList.get(i).getName());
+                String imgUrl = mWashingCategoryList.get(i).getImg();
+                if (!mWashingCategoryList.get(i).getImg().contains("https")) {
+                    imgUrl = mWashingCategoryList.get(i).getImg().replace("http", "https");
+                }
+                Glide.with(this).load(imgUrl).apply(options).into(imageView);
+                //tab.setIcon(R.mipmap.ic_launcher);
+            }*/
+        }
+
+        mTabLayout.getTabAt(position).select();
+
+        if (mClassifyTitleModel.getChildItem().size() == 1) {
+            mTabLayout.setVisibility(View.GONE);
+        }
     }
 
-    private void callNetGetFavorites() {
+    private void callNetGetItemList() {
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("pageno", String.valueOf(pageNo));
         paramsMap.put("pagesize", String.valueOf(pageSize));
-        paramsMap.put("materialId", favoriteId);
+        paramsMap.put("materialId", String.valueOf(mClassifyTitleModel.getChildItem().get(position).getChild_activity_id()));
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.MATERIAL_CLASSIFY_ITEM + YouCommonUtils.createLinkStringByGet(paramsMap));
         params.setConnectTimeout(30 * 1000);
         x.http().get(params, new Callback.CommonCallback<String>() {

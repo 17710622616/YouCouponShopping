@@ -241,8 +241,8 @@ public class SearchResultActivity extends AppCompatActivity {
     }
 
     /**
-     * 请求网络查询
-     * @param str
+     * 请求网络查询商品
+     *  @param str
      */
     private void callNetSearchItem(String str) {
         Map<String, String> paramsMap = new HashMap<>();
@@ -272,6 +272,43 @@ public class SearchResultActivity extends AppCompatActivity {
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
                 Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+                mRefreshLayout.finishRefresh();
+                mRefreshLayout.finishLoadmore();
+            }
+        });
+    }
+
+
+    /**
+     * 獲取熱門關鍵詞
+     */
+    private void callGetHotWord() {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.SEARCH_HOT_WORD);
+        params.setConnectTimeout(30 * 1000);
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                MaterialClassifyItemOutModel model = JSON.parseObject(result, MaterialClassifyItemOutModel.class);
+                if (model.getStatus() == 0) {
+                    searchModelList.addAll(model.getData().getMap_data());
+                    mMaterialItemAdapter.notifyDataSetChanged();
+                } else {
+                    //Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                //Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
             }
 
             @Override

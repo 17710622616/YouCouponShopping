@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.youcoupon.john_li.youcouponshopping.R;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.MainClassifyOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.MerchandiseOutModel;
 
 import org.xutils.image.ImageOptions;
@@ -23,13 +24,13 @@ import java.util.List;
  */
 
 public class MainClassifyAdapter extends BaseAdapter {
-    private List<FavoriteOutModel.DataBean.Favorites> list;
+    private List<MainClassifyOutModel.DataBean.ResultsBean> list;
     private int[] iconArr = {R.mipmap.exemption_from_postage99,R.mipmap.time_limit,R.mipmap.boutique,R.mipmap.guide,R.mipmap.head_boy};
     private Context mContext;
     private LayoutInflater mInflater;
 
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setImageScaleType(ImageView.ScaleType.FIT_XY).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
-    public MainClassifyAdapter(List<FavoriteOutModel.DataBean.Favorites> list, Context context) {
+    public MainClassifyAdapter(List<MainClassifyOutModel.DataBean.ResultsBean> list, Context context) {
         this.list = list;
         mContext = context;
         mInflater = LayoutInflater.from(context);
@@ -73,7 +74,7 @@ public class MainClassifyAdapter extends BaseAdapter {
             holder.item_main_classify_iv.setImageResource(iconArr[position]);
         }*/
         x.image().bind(holder.item_main_classify_iv, list.get(position).getImg_url(), options);
-        holder.item_main_classify_tv.setText(list.get(position).getFavorites_title());
+        holder.item_main_classify_tv.setText(list.get(position).getActivity_title());
         return convertView;
     }
 

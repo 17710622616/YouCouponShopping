@@ -30,7 +30,9 @@ import com.youcoupon.john_li.youcouponshopping.YouAdapter.MaterialItemAdapter;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteItemOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.MainActivityOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.MainClassifyOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.MaterialClassifyItemOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.MerchandiseOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
 import com.youcoupon.john_li.youcouponshopping.YouView.NoScrollGridView;
@@ -62,15 +64,20 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     private ImageView activity01Iv, activity02Iv;
     private LinearLayout searchLL;
 
-    // 是否抄底
+    // 猜你喜歡商品列表是否為最後一頁
     private String isDefault = "true";
+    // 熱賣商品列表是否為最後一頁
+    private String isHotDefault = "true";
     //
     private long totalCount;
     private long pageNo = 1;
     private long pageSize = 10;
-    private List<FavoriteOutModel.DataBean.Favorites> favoritesList;
-    private List<FavoriteItemOutModel.DataBean.FavoriteItemModel> mainHotItemModelList;
+    // 定向活動標題列表
+    private List<MainClassifyOutModel.DataBean.ResultsBean> mainClassifyList;
+    private List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> mainHotItemModelList;
+    // 為您推薦列表
     private List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> mMapGuessLikeList;
+    // 活動
     private List<MainActivityOutModel.DataBean.ActivityListBean> mActivityList;
     private MainHotRefreshAdapter mMainHotRefreshAdapter;
     private MainClassifyAdapter mMainClassifyAdapter;
@@ -145,8 +152,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), CategoryListingsActivity.class);
-                intent.putExtra("FavoriteId", String.valueOf(favoritesList.get(position).getFavorites_id()));
-                intent.putExtra("FavoriteName", favoritesList.get(position).getFavorites_title());
+                intent.putExtra("ClassifyModel", JSON.toJSONString(mainClassifyList.get(position)));
                 startActivity(intent);
             }
         });
@@ -162,11 +168,11 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
 
 
     private void initData() {
-        favoritesList = new ArrayList<>();
+        mainClassifyList = new ArrayList<>();
         mMapGuessLikeList = new ArrayList<>();
         mActivityList = new ArrayList<>();
 
-        mMainClassifyAdapter = new MainClassifyAdapter(favoritesList, getActivity());
+        mMainClassifyAdapter = new MainClassifyAdapter(mainClassifyList, getActivity());
         mGridView.setAdapter(mMainClassifyAdapter);
         mMaterialItemAdapter = new MaterialItemAdapter(mMapGuessLikeList, getActivity());
         mListView.setAdapter(mMaterialItemAdapter);
@@ -212,20 +218,18 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         x.http().get(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
-                FavoriteOutModel model = JSON.parseObject(result, FavoriteOutModel.class);
+                MainClassifyOutModel model = JSON.parseObject(result, MainClassifyOutModel.class);
                 if (model.getStatus() == 0) {
-                    for (int i = 0; i < model.getData().getResults().size(); i++) {
-                        favoritesList.add(model.getData().getResults().get(i));
-                        mMainClassifyAdapter.notifyDataSetChanged();
-                    }
+                    mainClassifyList.addAll(model.getData().getResults());
+                    mMainClassifyAdapter.notifyDataSetChanged();
                 } else {
-                    Toast.makeText(getApplicationContext(), "獲取產品標題列表失敗！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "獲取定向活動標題列表失敗！", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
-                Toast.makeText(getApplicationContext(), "獲取產品標題列表失敗！", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "獲取定向活動標題列表失敗！", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -287,26 +291,24 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("pageno", String.valueOf(pageNo));
         paramsMap.put("pagesize", String.valueOf(pageSize));
-        paramsMap.put("favoritesid", "17487441");
-        paramsMap.put("orderby", "1");
-        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.FAVORITES_ITEM_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.HOT_MERCHANDISE_LIST + YouCommonUtils.createLinkStringByGet(paramsMap));
         params.setConnectTimeout(30 * 1000);
         x.http().get(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
-                FavoriteItemOutModel model = JSON.parseObject(result, FavoriteItemOutModel.class);
+                MaterialClassifyItemOutModel model = JSON.parseObject(result, MaterialClassifyItemOutModel.class);
                 if (model.getStatus() == 0) {
-                    totalCount = model.getData().getTotal_results();
-                    mainHotItemModelList.addAll(model.getData().getResults());
+                    isHotDefault = model.getData().getIs_default();
+                    mainHotItemModelList.addAll(model.getData().getMap_data());
                     mMainHotRefreshAdapter.notifyDataSetChanged();
                 } else {
-                    Toast.makeText(getApplicationContext(), "獲取每日上新数据失敗！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "獲取熱賣数据失敗！", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
-                Toast.makeText(getApplicationContext(), "獲取每日上新数据失敗！", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "獲取熱賣数据失敗！", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -323,7 +325,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     }
 
     /**
-     * 获取页面的
+     * 获取活動
      */
     private void callNetGetActivitList() {
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.ACTIVITY_LIST);

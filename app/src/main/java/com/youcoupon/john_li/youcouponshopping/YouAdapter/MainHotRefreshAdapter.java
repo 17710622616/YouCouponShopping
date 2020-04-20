@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.youcoupon.john_li.youcouponshopping.R;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteItemOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.MaterialClassifyItemOutModel;
 
 import org.xutils.cache.LruCache;
 import org.xutils.image.ImageOptions;
@@ -28,13 +29,13 @@ import java.util.regex.Pattern;
  */
 
 public class MainHotRefreshAdapter extends RecyclerView.Adapter<MainHotRefreshAdapter.SmartRefreshViewHolder> implements OnClickListener {
-    private List<FavoriteItemOutModel.DataBean.FavoriteItemModel> list;
+    private List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> list;
     private final Context mContext;
     private LayoutInflater mInflater;
     private LruCache<String ,BitmapDrawable> mMemoryCache;
     private OnItemClickListener mOnitemClickListener = null;
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
-    public MainHotRefreshAdapter(Context context, List<FavoriteItemOutModel.DataBean.FavoriteItemModel> list) {
+    public MainHotRefreshAdapter(Context context, List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> list) {
         this.list = list;
         mContext = context;
         mInflater = LayoutInflater.from(context);
@@ -64,7 +65,8 @@ public class MainHotRefreshAdapter extends RecyclerView.Adapter<MainHotRefreshAd
 
     @Override
     public void onBindViewHolder(SmartRefreshViewHolder holder, int position) {
-        x.image().bind(holder.item_hot_iv, list.get(position).getPictUrl(), options);
+        String imgUrl = list.get(position).getPictUrl().contains("http") ? list.get(position).getPictUrl() : "http:" + list.get(position).getPictUrl();
+        x.image().bind(holder.item_hot_iv, imgUrl, options);
         //holder.item_hot_coupon_value.setText(list.get(position).getCouponInfo());
         if (list.get(position).getCouponInfo() != null) {
             holder.item_hot_price_after_discount.setText(list.get(position).getCouponInfo());
@@ -82,10 +84,10 @@ public class MainHotRefreshAdapter extends RecyclerView.Adapter<MainHotRefreshAd
                 }
             }
         } else {
-            holder.item_hot_price_after_discount.setText("¥" + list.get(position).getZkFinalPriceWap());
+            holder.item_hot_price_after_discount.setText("¥" + list.get(position).getZkFinalPrice());
             holder.item_hot_original_price.setVisibility(View.GONE);
         }
-        holder.item_hot_original_price.setText("¥" + list.get(position).getZkFinalPriceWap());
+        holder.item_hot_original_price.setText("¥" + list.get(position).getZkFinalPrice());
         holder.item_hot_original_price.getPaint().setFlags(Paint. STRIKE_THRU_TEXT_FLAG); //中划线
         holder.item_hot_title.setText(list.get(position).getTitle());
         holder.itemView.setTag(position);
@@ -123,7 +125,7 @@ public class MainHotRefreshAdapter extends RecyclerView.Adapter<MainHotRefreshAd
         }
     }
 
-    public void refreshListView(List<FavoriteItemOutModel.DataBean.FavoriteItemModel> newList) {
+    public void refreshListView(List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> newList) {
         list = newList;
         notifyDataSetChanged();
     }

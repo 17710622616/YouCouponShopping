@@ -143,15 +143,14 @@
                     </LinearLayout>
                 </RelativeLayout>
 
-
-                <!--<LinearLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:padding="20dp"
+                    android:paddingTop="20dp"
                     android:background="@color/colorWhite">
                     <LinearLayout
-                        android:id="@+id/mine_obligation"
+                        android:id="@+id/mine_income"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -165,10 +164,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="5dp"
-                            android:text="待付款"/>
+                            android:text="收入"/>
                     </LinearLayout>
                     <LinearLayout
-                        android:id="@+id/mine_to_be_send"
+                        android:id="@+id/mine_team"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -182,10 +181,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="5dp"
-                            android:text="代發貨"/>
+                            android:text="團隊成員"/>
                     </LinearLayout>
                     <LinearLayout
-                        android:id="@+id/mine_wait_for_receiving"
+                        android:id="@+id/mine_order"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -199,27 +198,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="5dp"
-                            android:text="待收貨"/>
+                            android:text="訂單"/>
                     </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/mine_to_evaluate"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@mipmap/mine_to_evaluate"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:text="待評價"/>
-                    </LinearLayout>
-                </LinearLayout>-->
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/mine_taobao_ll"

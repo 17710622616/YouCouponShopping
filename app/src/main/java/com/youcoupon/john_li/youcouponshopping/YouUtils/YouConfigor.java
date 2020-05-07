@@ -49,6 +49,6 @@ public class YouConfigor {
     public static final String GET_PERFORMANCE_THIS_MONTH = "/api/Performance/GetThisMonthPerformance?token=";
     //獲取用戶上月收益
     public static final String GET_PERFORMANCE_LAST_MONTH = "/api/Performance/GetLastMonthPerformance?token=";
-    //獲取用戶上月收益
-    public static final String BECOME_PARTNER = "/api/User/becomePartnerByApi?";
+    //检查是否是合作者(通过H5方式时)
+    public static final String CHECK_IS_PARTNER = "/api/User/becomePartnerByH5?";
 }

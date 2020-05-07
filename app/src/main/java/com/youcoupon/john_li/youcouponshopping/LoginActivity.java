@@ -1,11 +1,13 @@
 package com.youcoupon.john_li.youcouponshopping;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ali.auth.third.core.model.User;
@@ -13,6 +15,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.support.spring.annotation.FastJsonView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.RegisterActivity;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
@@ -36,6 +39,7 @@ import java.util.Map;
  */
 
 public class LoginActivity extends BaseActivity {
+    private TextView registerTv, forgetTv;
     private Button loginBtn;
     private EditText phoneEt, pwEt;
     private ProgressDialog dialog;
@@ -56,6 +60,8 @@ public class LoginActivity extends BaseActivity {
     @Override
     public void initView() {
         loginBtn = findViewById(R.id.btn_login);
+        registerTv = findViewById(R.id.tv_register);
+        forgetTv = findViewById(R.id.tv_forget_password);
         phoneEt = findViewById(R.id.login_et_phone);
         pwEt = findViewById(R.id.login_et_password);
     }
@@ -72,6 +78,19 @@ public class LoginActivity extends BaseActivity {
                 } else {
                     Toast.makeText(LoginActivity.this, "请填写账户密码！", Toast.LENGTH_LONG).show();
                 }
+            }
+        });
+
+        registerTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(LoginActivity.this, RegisterActivity.class), 10001);
+            }
+        });
+
+        forgetTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
             }
         });
     }
@@ -103,8 +122,8 @@ public class LoginActivity extends BaseActivity {
                     // 註冊極光別名
                     //String alias = "user" + username;
                     //给极光推送设置标签和别名
-                    //JPushInterface.setAlias(LoginActivity.this, alias, tagAliasCallback);
-                    //Toast.makeText(LoginActivity.this, getString(R.string.login_success), Toast.LENGTH_SHORT).show();
+                    //JPushInterface.setAlias(RegisterActivity.this, alias, tagAliasCallback);
+                    //Toast.makeText(RegisterActivity.this, getString(R.string.login_success), Toast.LENGTH_SHORT).show();
                     //setResult(YouConfigor.LOGIN_FOR_RESULT);
                     EventBus.getDefault().post("LOGIN");
                     dialog.dismiss();

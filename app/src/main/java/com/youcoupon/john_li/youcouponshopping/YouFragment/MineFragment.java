@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ali.auth.third.login.LoginService;
 import com.ali.auth.third.login.callback.LogoutCallback;
 import com.alibaba.baichuan.android.trade.AlibcTrade;
 import com.alibaba.baichuan.android.trade.callback.AlibcTradeCallback;
@@ -26,6 +27,7 @@ import com.alibaba.baichuan.trade.biz.login.AlibcLogin;
 import com.alibaba.baichuan.trade.biz.login.AlibcLoginCallback;
 import com.alibaba.baichuan.trade.common.utils.AlibcLogger;
 import com.alibaba.fastjson.JSON;
+import com.alipay.sdk.tid.Tid;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.youcoupon.john_li.youcouponshopping.LoginActivity;
@@ -165,7 +167,8 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             case R.id.mine_integral:
                 Toast.makeText(getApplicationContext(), "入口暂未开放，敬请期待！", Toast.LENGTH_LONG).show();
                 break;
-            case R.id.mine_income:
+            case R.id
+                    .mine_income:
 
                 break;
             case R.id.mine_team:
@@ -344,12 +347,15 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             if (AlibcLogin.getInstance().getSession() != null) {
                 Map<String, String> paramsMap = new HashMap<>();
                 paramsMap.put("note", AlibcLogin.getInstance().getSession().nick);
-                String sessionKey = AlibcLogin.getInstance().getSession().toString();
+                String sessionKey = AlibcLogin.getInstance().getSession().ssoToken;
+                String havanaSsoToken = AlibcLogin.getInstance().getSession().havanaSsoToken;
+                String topAccessToken = AlibcLogin.getInstance().getSession().topAccessToken;
+                Toast.makeText(getActivity(), "sessionKey=" + String.valueOf(sessionKey) + ",havanaSsoToken=" + String.valueOf(havanaSsoToken) + ",topAccessToken="+ String.valueOf(topAccessToken), Toast.LENGTH_LONG).show();
                 paramsMap.put("sessionKey", sessionKey);
                 paramsMap.put("onlineScene", "1");
                 paramsMap.put("inviterCode", "WQKIRV");
                 paramsMap.put("token", (String) SPUtils.get(getActivity(), "UserToken", ""));
-                RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.BECOME_PARTNER + YouCommonUtils.createLinkStringByGet(paramsMap));
+                RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.CHECK_IS_PARTNER + YouCommonUtils.createLinkStringByGet(paramsMap));
                 params.setConnectTimeout(30 * 1000);
                 x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
                     @Override

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.youcoupon.john_li.youcouponshopping.YouView.YouHeadView
+        android:id="@+id/about_us_head"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <ProgressBar
+        android:id="@+id/about_us_pb"
+        android:layout_width="match_parent"
+        android:layout_height="5px"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:progressDrawable="@drawable/progress_style"
+        android:visibility="gone"/>
+    <WebView
+        android:id="@+id/about_us_wb"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <!--<ExpandableListView
+        android:id="@+id/sys_operation_lv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>-->
+    <!--<ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+            android:id="@+id/about_us_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"/>
+    </ScrollView>-->
+</LinearLayout>

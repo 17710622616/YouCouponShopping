@@ -48,6 +48,7 @@
         <activity android:name=".YouActivity.TutorialActivity" android:screenOrientation="portrait"/>
         <activity android:name=".YouActivity.BecomePartnerActivity" android:screenOrientation="portrait"/>
         <activity android:name=".YouActivity.RegisterActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".YouActivity.UserInfoActivity" android:screenOrientation="portrait"/>
 
         <meta-data
             android:name="android.max_aspect"

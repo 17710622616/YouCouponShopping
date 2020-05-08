@@ -119,15 +119,7 @@ public class LoginActivity extends BaseActivity {
                 CommonModel model = JSON.parseObject(result, CommonModel.class);
                 if (model.getStatus() == 0) {
                     SPUtils.put(LoginActivity.this, "UserToken", model.getData().toString());
-                    // 註冊極光別名
-                    //String alias = "user" + username;
-                    //给极光推送设置标签和别名
-                    //JPushInterface.setAlias(RegisterActivity.this, alias, tagAliasCallback);
-                    //Toast.makeText(RegisterActivity.this, getString(R.string.login_success), Toast.LENGTH_SHORT).show();
-                    //setResult(YouConfigor.LOGIN_FOR_RESULT);
-                    EventBus.getDefault().post("LOGIN");
-                    dialog.dismiss();
-                    finish();
+                    getUserInfo(model.getData().toString());
                 } else {
                     Toast.makeText(LoginActivity.this, getString(R.string.login_fail) + String.valueOf(model.getMessage()), Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
@@ -153,4 +145,76 @@ public class LoginActivity extends BaseActivity {
         });
     }
 
+
+    /**
+     * 獲取用戶信息
+     * @param token
+     */
+    private void getUserInfo(String token) {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_USER_INFO + token);
+        params.setConnectTimeout(30 * 1000);
+        x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                UserInfoOutsideModel model = JSON.parseObject(result.toString(), UserInfoOutsideModel.class);
+                if (model.getStatus() == 0) {
+                    if (model.getData().getNick_name() == null) {
+                        model.getData().setNick_name("用戶");
+                    }
+                    if (model.getData().getAddress() == null) {
+                        model.getData().setAddress("");
+                    }
+                    if (model.getData().getReal_name() == null) {
+                        model.getData().setReal_name("");
+                    }
+                    if (model.getData().getAddress() == null) {
+                        model.getData().setAddress("");
+                    }
+                    if (model.getData().getDescx() == null) {
+                        model.getData().setDescx("");
+                    }
+                    if (model.getData().getHead_img() == null) {
+                        model.getData().setHead_img("");
+                    }
+                    if (model.getData().getBirth_day() == null) {
+                        model.getData().setBirth_day("");
+                    }
+                    if (model.getData().getInviteCode() == null) {
+                        model.getData().setBirth_day("");
+                    }
+                    String userInfoJson = JSON.toJSONString(model.getData());
+                    SPUtils.put(LoginActivity.this, "UserInfo", userInfoJson);
+                    Log.d("getUserURI", "獲取用戶信息成功");
+
+                    // 註冊極光別名
+                    //String alias = "user" + username;
+                    //给极光推送设置标签和别名
+                    //JPushInterface.setAlias(RegisterActivity.this, alias, tagAliasCallback);
+                    //Toast.makeText(RegisterActivity.this, getString(R.string.login_success), Toast.LENGTH_SHORT).show();
+                    //setResult(YouConfigor.LOGIN_FOR_RESULT);
+                    EventBus.getDefault().post("LOGIN");
+                    finish();
+                } else {
+                    Log.d("getUserURI", "獲取用戶信息失敗");
+                }
+            }
+            //请求异常后的回调方法
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                if (ex instanceof java.net.SocketTimeoutException) {
+                    Toast.makeText(LoginActivity.this, R.string.get_userinfo_timeout, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(LoginActivity.this, R.string.get_userinfo_fail, Toast.LENGTH_SHORT).show();
+                }
+            }
+            //主动调用取消请求的回调方法
+            @Override
+            public void onCancelled(CancelledException cex) {
+            }
+            @Override
+            public void onFinished() {
+                dialog.dismiss();
+            }
+        });
+    }
 }

@@ -1,5 +1,7 @@
 package com.youcoupon.john_li.youcouponshopping.YouFragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
 
 import com.ali.auth.third.login.LoginService;
 import com.ali.auth.third.login.callback.LogoutCallback;
@@ -32,10 +36,12 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.youcoupon.john_li.youcouponshopping.LoginActivity;
 import com.youcoupon.john_li.youcouponshopping.R;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.BecomePartnerActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BussinesActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.ServiceActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.SuggestActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.TutorialActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.UserInfoActivity;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
@@ -148,15 +154,25 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         if (userToken != null) {
             mRefreshLayout.autoRefresh();
         }
+
         // 获取阿里百川授权信息
-        taobaoAuth();
+        //taobaoAuth();
+
+        // 显示用户信息
+        showUserInfo();
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.mine_taobao_ll:
-                taobaoLogin();
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    //taobaoLogin();
+                    // 检查是否为合作者
+                    checkIsPartner();
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
                 break;
             case R.id.mine_performance_this_month:
 
@@ -167,8 +183,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             case R.id.mine_integral:
                 Toast.makeText(getApplicationContext(), "入口暂未开放，敬请期待！", Toast.LENGTH_LONG).show();
                 break;
-            case R.id
-                    .mine_income:
+            case R.id.mine_income:
 
                 break;
             case R.id.mine_team:
@@ -210,11 +225,11 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 break;
             case R.id.mine_login_out:
                 loginOut();
-                taobaoAuth();
+                //taobaoAuth();
                 break;
             case R.id.user_info_rl:
                 if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
-                    startActivity(new Intent());
+                    startActivityForResult(new Intent(getActivity(), UserInfoActivity.class), 10002);
                 } else {
                     startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                 }
@@ -236,6 +251,82 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             mRefreshLayout.autoRefresh();
         }
     }
+
+    /**
+     * 显示用戶信息
+     */
+    private void showUserInfo() {
+        String userInfoJson =  (String) SPUtils.get(getActivity(), "UserInfo", "");
+        if (!userInfoJson.equals("")){
+            mUserInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
+            nickTv.setText(mUserInfoModel.getNick_name());
+            invitationCodeTv.setVisibility(View.VISIBLE);
+            if (mUserInfoModel.getInviteCode() != null) {
+                invitationCodeTv.setText("邀请码：" + mUserInfoModel.getInviteCode());
+            } else {
+                invitationCodeTv.setText("邀请码：点我获取");
+            }
+            //AliyunOSSUtils.downloadImg(mUserInfoModel.getHeadimg(), AliyunOSSUtils.initOSS(getActivity()), headIv, getActivity(), R.mipmap.head_boy);
+            x.image().bind(headIv, mUserInfoModel.getHead_img(), options);
+
+            // 检查是否为合作者
+            checkIsPartner();
+        } else {
+            mUserInfoModel = new UserInfoOutsideModel.DataBean();
+            x.image().bind(headIv, "", options);
+            nickTv.setText("立即登录");
+            invitationCodeTv.setVisibility(View.INVISIBLE);
+            Toast.makeText(getActivity(), "您暂未等，请先登录！", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * 检查是否为合作者
+     */
+    private void checkIsPartner() {
+        if (mUserInfoModel.getRelationId() == 0) {
+            //当非合作者提示成为合作者
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("请完成淘宝登录");
+            builder.setMessage("淘宝授权后下单或分享产品可以获得收益哦");
+            builder.setIcon(R.mipmap.logo);
+            //点击对话框以外的区域是否让对话框消失
+            builder.setCancelable(true);
+            //设置正面按钮
+            builder.setPositiveButton("去授权", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String userInfoJson = (String) SPUtils.get(getActivity(), "UserInfo", "");
+                    UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
+                    Intent intent = new Intent(getActivity(), BecomePartnerActivity.class);
+                    intent.putExtra("rtag", userInfoModel.getMobile() + userInfoModel.getNick_name());
+                    startActivityForResult(intent, 10001);
+                    dialog.dismiss();
+                }
+            });
+            //设置反面按钮
+            builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            //设置反面按钮
+            builder.setNeutralButton("联系客服", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    startActivity(new Intent(getActivity(), ServiceActivity.class));
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            //显示对话框
+            dialog.show();
+        } else {
+            taobaoAuthTv.setText("点我授权，购物可拿返现金");
+        }
+    }
+
     /**
      * 刷新界面
      */
@@ -247,7 +338,8 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             callNetGetPerformanceThisMonth(userToken);
             // 获取上月绩效
             callNetGetPerformanceLastMonth(userToken);
-            getUserInfo(userToken);
+            // 显示用户信息
+            showUserInfo();
             getHasPayPw(userToken);
         } else {
             x.image().bind(headIv, "", options);
@@ -257,220 +349,6 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         }
 
         mRefreshLayout.finishRefresh(1000);
-    }
-
-    /**
-     * 获取淘宝授权信息
-     */
-    private void taobaoAuth() {
-        try {
-            //获取淘宝用户信息
-            String nick = AlibcLogin.getInstance().getSession().nick;
-            String avatarUrl = AlibcLogin.getInstance().getSession().avatarUrl;
-            if (nick != null && avatarUrl != null) {
-                if (!nick.equals("") && !avatarUrl.equals("")) {
-                    taobaoAuthTv.setText(nick);
-                } else {
-                    taobaoAuthTv.setText("点我授权");
-                }
-            } else {
-                taobaoAuthTv.setText("点我授权");
-            }
-        } catch (Exception e) {
-            taobaoAuthTv.setText("点我授权");
-        }
-    }
-
-    /**
-     * 淘宝授权
-     */
-    public void taobaoLogin() {
-        final AlibcLogin alibcLogin = AlibcLogin.getInstance();
-        alibcLogin.showLogin(new AlibcLoginCallback() {
-            @Override
-            public void onSuccess(int loginResult, String openId, String userNick) {
-                // 参数说明：
-                // loginResult(0--登录初始化成功；1--登录初始化完成；2--登录成功)
-                // openId：用户id
-                // userNick: 用户昵称
-                Toast.makeText(getActivity(), "授权成功 " + AlibcLogin.getInstance().getSession(), Toast.LENGTH_LONG).show();
-                taobaoAuth();
-
-                // 成为合作者
-                String userInfoJson = (String) SPUtils.get(getActivity(), "UserInfo", "");
-                UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
-                if (userInfoModel != null) {
-                    if (userInfoModel.getRelationId() == 0) {
-                        callNetBecomePartner();
-                    }
-                } else {
-                    callNetBecomePartner();
-                }
-            }
-
-            @Override
-            public void onFailure(int code, String msg) {
-                // code：错误码  msg： 错误信息
-                Toast.makeText(getActivity(), "授权失败，" + msg + ":" + code, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    /**
-     * 取消淘宝授权
-     */
-    private void loginOut() {
-        AlibcLogin alibcLogin = AlibcLogin.getInstance();
-        alibcLogin.logout(new AlibcLoginCallback() {
-            @Override
-            public void onSuccess(int loginResult, String openId, String userNick) {
-                // 参数说明：
-                // loginResult(3--登出成功)
-                // openId：用户id
-                // userNick: 用户昵称
-                Toast.makeText(getActivity(), "退出登录成功", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(int code, String msg) {
-                // code：错误码  msg： 错误信息
-                Toast.makeText(getActivity(), "退出登录失败 " + msg + code, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    /**
-     * 成为合作者
-     */
-    private void callNetBecomePartner() {
-        try {
-            if (AlibcLogin.getInstance().getSession() != null) {
-                Map<String, String> paramsMap = new HashMap<>();
-                paramsMap.put("note", AlibcLogin.getInstance().getSession().nick);
-                String sessionKey = AlibcLogin.getInstance().getSession().ssoToken;
-                String havanaSsoToken = AlibcLogin.getInstance().getSession().havanaSsoToken;
-                String topAccessToken = AlibcLogin.getInstance().getSession().topAccessToken;
-                Toast.makeText(getActivity(), "sessionKey=" + String.valueOf(sessionKey) + ",havanaSsoToken=" + String.valueOf(havanaSsoToken) + ",topAccessToken="+ String.valueOf(topAccessToken), Toast.LENGTH_LONG).show();
-                paramsMap.put("sessionKey", sessionKey);
-                paramsMap.put("onlineScene", "1");
-                paramsMap.put("inviterCode", "WQKIRV");
-                paramsMap.put("token", (String) SPUtils.get(getActivity(), "UserToken", ""));
-                RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.CHECK_IS_PARTNER + YouCommonUtils.createLinkStringByGet(paramsMap));
-                params.setConnectTimeout(30 * 1000);
-                x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
-                    @Override
-                    public void onSuccess(String result) {
-                        CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
-                        if (model.getStatus() == 0) {
-                            String relationId =  model.getData().toString();
-                            UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject((String) SPUtils.get(getActivity(), "UserInfo", ""), UserInfoOutsideModel.DataBean.class);
-                            userInfoModel.setRelationId(Long.parseLong(relationId));
-
-                            String userInfoJson = JSON.toJSONString(model.getData());
-                            SPUtils.put(getActivity(), "UserInfo", userInfoJson);
-                        } else {
-                            Toast.makeText(getApplicationContext(), "申请成为失败，请重新申请成为合作者领取返利！" + model.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    //请求异常后的回调方法
-                    @Override
-                    public void onError(Throwable ex, boolean isOnCallback) {
-                        Toast.makeText(getApplicationContext(), "申请成为异常，请重新申请成为合作者领取返利！", Toast.LENGTH_SHORT).show();
-                    }
-                    //主动调用取消请求的回调方法
-                    @Override
-                    public void onCancelled(CancelledException cex) {
-                    }
-                    @Override
-                    public void onFinished() {
-                    }
-                });
-            }
-        } catch (Exception e) {
-            Log.d("partnerError", e.getMessage());
-        }
-    }
-
-    /**
-     * 獲取用戶信息
-     * @param token
-     */
-    private void getUserInfo(String token) {
-        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_USER_INFO + token);
-        params.setConnectTimeout(30 * 1000);
-        x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                UserInfoOutsideModel model = JSON.parseObject(result.toString(), UserInfoOutsideModel.class);
-                if (model.getStatus() == 0) {
-                    if (model.getData().getNick_name() == null) {
-                        model.getData().setNick_name("用戶");
-                    }
-                    if (model.getData().getAddress() == null) {
-                        model.getData().setAddress("");
-                    }
-                    if (model.getData().getReal_name() == null) {
-                        model.getData().setReal_name("");
-                    }
-                    if (model.getData().getAddress() == null) {
-                        model.getData().setAddress("");
-                    }
-                    if (model.getData().getDescx() == null) {
-                        model.getData().setDescx("");
-                    }
-                    if (model.getData().getHead_img() == null) {
-                        model.getData().setHead_img("");
-                    }
-                    if (model.getData().getBirth_day() == null) {
-                        model.getData().setBirth_day("");
-                    }
-                    if (model.getData().getInviteCode() == null) {
-                        model.getData().setBirth_day("");
-                    }
-                    String userInfoJson = JSON.toJSONString(model.getData());
-                    SPUtils.put(getActivity(), "UserInfo", userInfoJson);
-                    Log.d("getUserURI", "獲取用戶信息成功");
-
-                    if (!userInfoJson.equals("")){
-                        mUserInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
-                        nickTv.setText(mUserInfoModel.getNick_name());
-                        invitationCodeTv.setVisibility(View.VISIBLE);
-                        if (mUserInfoModel.getInviteCode() != null) {
-                            invitationCodeTv.setText("邀请码：" + mUserInfoModel.getInviteCode());
-                        } else {
-                            invitationCodeTv.setText("邀请码：点我获取");
-                        }
-                        //AliyunOSSUtils.downloadImg(mUserInfoModel.getHeadimg(), AliyunOSSUtils.initOSS(getActivity()), headIv, getActivity(), R.mipmap.head_boy);
-                        x.image().bind(headIv, mUserInfoModel.getHead_img(), options);
-                    } else {
-                        mUserInfoModel = new UserInfoOutsideModel.DataBean();
-                        x.image().bind(headIv, "", options);
-                        nickTv.setText("立即登录");
-                        invitationCodeTv.setVisibility(View.INVISIBLE);
-                        Toast.makeText(getActivity(), "您暂未等，请先登录！", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Log.d("getUserURI", "獲取用戶信息失敗");
-                }
-            }
-            //请求异常后的回调方法
-            @Override
-            public void onError(Throwable ex, boolean isOnCallback) {
-                if (ex instanceof java.net.SocketTimeoutException) {
-                    Toast.makeText(getActivity(), R.string.get_userinfo_timeout, Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getActivity(), R.string.get_userinfo_fail, Toast.LENGTH_SHORT).show();
-                }
-            }
-            //主动调用取消请求的回调方法
-            @Override
-            public void onCancelled(CancelledException cex) {
-            }
-            @Override
-            public void onFinished() {
-            }
-        });
     }
 
     /**
@@ -571,6 +449,188 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         });
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == getActivity().RESULT_OK) {
+            if (requestCode == 10001) {
+                callNetchechIsPartner();
+            } else if (requestCode == 10002) {
+
+            }
+        }
+    }
+
+    /**
+     * 检查是否成为合作者
+     */
+    private void callNetchechIsPartner() {
+        String userInfoJson = (String) SPUtils.get(getActivity(), "UserInfo", "");
+        UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
+        Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("sessionKey", "610082335d0674b2ae78f3e2a7785821ad848d0632c478e2298128659");
+        paramsMap.put("rtag", userInfoModel.getMobile() + userInfoModel.getNick_name());
+        paramsMap.put("token", (String) SPUtils.get(getActivity(), "UserToken", ""));
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.CHECK_IS_PARTNER + YouCommonUtils.createLinkStringByGet(paramsMap));
+        params.setConnectTimeout(30 * 1000);
+        x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
+                if (model.getStatus() == 0) {
+                    String relationId =  model.getData().toString();
+                    // 修改用户信息中的relationId
+                    UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject((String) SPUtils.get(getActivity(), "UserInfo", ""), UserInfoOutsideModel.DataBean.class);
+                    userInfoModel.setRelationId(Long.parseLong(relationId));
+
+                    String userInfoJson = JSON.toJSONString(model.getData());
+                    SPUtils.put(getActivity(), "UserInfo", userInfoJson);
+
+                    // 刷新合作者界面
+                    taobaoAuthTv.setText("尊敬的合作者，快去分享或者购买吧！");
+                    Toast.makeText(getApplicationContext(), "申请成为合作者成功，快去分享或者购买吧！" + model.getMessage(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "申请成为合作者失败，请重新申请成为合作者领取返利！" + model.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            //请求异常后的回调方法
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(getApplicationContext(), "申请成为合作者异常，请重新申请成为合作者领取返利！", Toast.LENGTH_SHORT).show();
+            }
+            //主动调用取消请求的回调方法
+            @Override
+            public void onCancelled(CancelledException cex) {
+            }
+            @Override
+            public void onFinished() {
+            }
+        });
+    }
+
+    private void reFreshUI() {
+        //获取淘宝用户信息
+        String userSession = JSON.toJSONString(AlibcLogin.getInstance().getSession());
+        if (!userSession.equals("{}")) {
+            String nick = AlibcLogin.getInstance().getSession().nick;
+            String avatarUrl = AlibcLogin.getInstance().getSession().avatarUrl;
+            x.image().bind(headIv, avatarUrl, options);
+            nickTv.setText(nick);
+        } else {
+            nickTv.setText("请先登录！");
+        }
+    }
+
+    /**
+     * 淘宝授权
+     */
+    public void taobaoLogin() {
+        final AlibcLogin alibcLogin = AlibcLogin.getInstance();
+        alibcLogin.showLogin(new AlibcLoginCallback() {
+            @Override
+            public void onSuccess(int loginResult, String openId, String userNick) {
+                // 参数说明：
+                // loginResult(0--登录初始化成功；1--登录初始化完成；2--登录成功)
+                // openId：用户id
+                // userNick: 用户昵称
+                Toast.makeText(getActivity(), "授权成功 " + AlibcLogin.getInstance().getSession(), Toast.LENGTH_LONG).show();
+                // 刷新界面淘宝信息
+                taobaoAuth();
+                // 查看是否为合作者
+                String userInfoJson = (String) SPUtils.get(getActivity(), "UserInfo", "");
+                UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
+                if (userInfoModel != null) {
+                    if (userInfoModel.getRelationId() == 0) {
+                        //当非合作者提示成为合作者
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setTitle("请完成淘宝登录");
+                        builder.setMessage("淘宝授权后下单或分享产品可以获得收益哦");
+                        builder.setIcon(R.mipmap.ic_launcher_round);
+                        //点击对话框以外的区域是否让对话框消失
+                        builder.setCancelable(true);
+                        //设置正面按钮
+                        builder.setPositiveButton("去授权", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String userInfoJson = (String) SPUtils.get(getActivity(), "UserInfo", "");
+                                UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
+                                Intent intent = new Intent(getActivity(), BecomePartnerActivity.class);
+                                intent.putExtra("rtag", userInfoModel.getMobile() + userInfoModel.getNick_name());
+                                startActivityForResult(intent, 10001);
+                                dialog.dismiss();
+                            }
+                        });
+                        //设置反面按钮
+                        builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        //显示对话框
+                        dialog.show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(int code, String msg) {
+                // code：错误码  msg： 错误信息
+                Toast.makeText(getActivity(), "授权失败，" + msg + ":" + code, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    /**
+     * 显示淘宝授权信息
+     */
+    private void taobaoAuth() {
+        try {
+            //获取淘宝用户信息
+            String nick = AlibcLogin.getInstance().getSession().nick;
+            String avatarUrl = AlibcLogin.getInstance().getSession().avatarUrl;
+            if (nick != null && avatarUrl != null) {
+                if (!nick.equals("") && !avatarUrl.equals("")) {
+                    taobaoAuthTv.setText(nick);
+                } else {
+                    taobaoAuthTv.setText("点我授权，购物可拿返现金");
+                }
+            } else {
+                taobaoAuthTv.setText("点我授权，购物可拿返现金");
+            }
+        } catch (Exception e) {
+            taobaoAuthTv.setText("点我授权，购物可拿返现金");
+        }
+    }
+
+    /**
+     * 取消淘宝授权
+     */
+    private void loginOut() {
+        SPUtils.put(getActivity(), "UserToken", "");
+        SPUtils.put(getActivity(), "UserInfo", "");
+        showUserInfo();
+        /*AlibcLogin alibcLogin = AlibcLogin.getInstance();
+        alibcLogin.logout(new AlibcLoginCallback() {
+            @Override
+            public void onSuccess(int loginResult, String openId, String userNick) {
+                // 参数说明：
+                // loginResult(3--登出成功)
+                // openId：用户id
+                // userNick: 用户昵称
+                Toast.makeText(getActivity(), "退出登录成功", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int code, String msg) {
+                // code：错误码  msg： 错误信息
+                Toast.makeText(getActivity(), "退出登录失败 " + msg + code, Toast.LENGTH_SHORT).show();
+            }
+        });*/
+    }
+
     /**
      *  顯示我的所有訂單
      * @param orderType 0：全部；1：待付款；2：待发货；3：待收货；4：待评价
@@ -650,18 +710,5 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                         }
                     }
                 });
-    }
-
-    private void reFreshUI() {
-        //获取淘宝用户信息
-        String userSession = JSON.toJSONString(AlibcLogin.getInstance().getSession());
-        if (!userSession.equals("{}")) {
-            String nick = AlibcLogin.getInstance().getSession().nick;
-            String avatarUrl = AlibcLogin.getInstance().getSession().avatarUrl;
-            x.image().bind(headIv, avatarUrl, options);
-            nickTv.setText(nick);
-        } else {
-            nickTv.setText("请先登录！");
-        }
     }
 }

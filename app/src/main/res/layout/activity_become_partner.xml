@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.youcoupon.john_li.youcouponshopping.YouView.YouHeadView
+    <!--<com.youcoupon.john_li.youcouponshopping.YouView.YouHeadView
         android:id="@+id/about_us_head"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"/>-->
 
     <ProgressBar
         android:id="@+id/about_us_pb"
@@ -34,4 +34,12 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"/>
     </ScrollView>-->
-</LinearLayout>
+
+    <ImageView
+        android:id="@+id/become_partner_left"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:scaleType="fitXY"
+        android:src="@mipmap/back"
+        android:layout_margin="25dp"/>
+</FrameLayout>

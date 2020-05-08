@@ -47,6 +47,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.gyf.immersionbar.ImmersionBar;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BecomePartnerActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.ServiceActivity;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.CollapsingAdapter;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.ItemRecommendAdapter;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.MaterialItemAdapter;
@@ -461,13 +462,18 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                 if (!((String) SPUtils.get(MerchandiseDetialActivity.this, "UserToken", "")).equals("")) {
                     // 判断relationId是否为0
                     String userInfoJson = (String) SPUtils.get(MerchandiseDetialActivity.this, "UserInfo", "");
-                    UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
-                    if (userInfoModel.getRelationId() != 0) {
-                        // 拼接relationId打开领券链接
-                        openTBKUrl(userInfoModel.getRelationId());
+                    if(!userInfoJson.equals("")) {
+                        UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
+                        if (userInfoModel.getRelationId() != 0) {
+                            // 拼接relationId打开领券链接
+                            openTBKUrl(userInfoModel.getRelationId());
+                        } else {
+                            // 打开提示成为合作者视窗
+                            showTBAuthDialog();
+                        }
                     } else {
-                        // 打开提示成为合作者视窗
-                        showTBAuthDialog();
+                        Toast.makeText(MerchandiseDetialActivity.this, "登录信息异常！请重新登录", Toast.LENGTH_SHORT).show();
+                        startActivityForResult(new Intent(MerchandiseDetialActivity.this, LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                     }
                 } else {
                     startActivityForResult(new Intent(MerchandiseDetialActivity.this, LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
@@ -570,7 +576,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("请完成淘宝登录");
         builder.setMessage("淘宝授权后下单或分享产品可以获得收益哦");
-        builder.setIcon(R.mipmap.ic_launcher_round);
+        builder.setIcon(R.mipmap.logo);
         //点击对话框以外的区域是否让对话框消失
         builder.setCancelable(true);
         //设置正面按钮
@@ -592,6 +598,13 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                 dialog.dismiss();
             }
         });
+        builder.setNeutralButton("联系客服", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                startActivity(new Intent(MerchandiseDetialActivity.this, ServiceActivity.class));
+                dialog.dismiss();
+            }
+        });
         AlertDialog dialog = builder.create();
         //显示对话框
         dialog.show();
@@ -605,7 +618,9 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("sessionKey", "610082335d0674b2ae78f3e2a7785821ad848d0632c478e2298128659");
-        paramsMap.put("rtag", userInfoModel.getMobile() + userInfoModel.getNick_name());
+        String rtag = userInfoModel.getMobile() + userInfoModel.getNick_name();
+        //String rtag = AlibcLogin.getInstance().getSession().nick;
+        paramsMap.put("rtag", rtag);
         paramsMap.put("token", (String) SPUtils.get(MerchandiseDetialActivity.this, "UserToken", ""));
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.CHECK_IS_PARTNER + YouCommonUtils.createLinkStringByGet(paramsMap));
         params.setConnectTimeout(30 * 1000);

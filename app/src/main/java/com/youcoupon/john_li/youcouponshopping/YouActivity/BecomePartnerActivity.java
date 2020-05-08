@@ -30,8 +30,9 @@ import org.xutils.x;
 import java.io.File;
 
 public class BecomePartnerActivity extends BaseActivity implements View.OnClickListener {
-    private YouHeadView headView;
+    //private YouHeadView headView;
     //private SubsamplingScaleImageView mIv;
+    private ImageView backImg;
     private WebView mWebView;
     ProgressBar progressBar;
     private String rtag;
@@ -47,24 +48,24 @@ public class BecomePartnerActivity extends BaseActivity implements View.OnClickL
 
     @Override
     public void initView() {
-        headView = findViewById(R.id.about_us_head);
+        //headView = findViewById(R.id.about_us_head);
         mWebView = findViewById(R.id.about_us_wb);
         progressBar = findViewById(R.id.about_us_pb);
-        /*mIv = findViewById(R.id.about_us_tv);
-        mIv.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_CUSTOM);
+        backImg = findViewById(R.id.become_partner_left);
+        /*mIv.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_CUSTOM);
         mIv.setMinScale(1.0F);*/
     }
 
     @Override
     public void setListener() {
-
+        backImg.setOnClickListener(this);
     }
 
     @Override
     public void initData() {
         //callNetGetVerCode();
-        headView.setLeft(this);
-        headView.setTitle("成为合作者");
+        //headView.setLeft(this);
+        //headView.setTitle("成为合作者");
 
         rtag = getIntent().getStringExtra("rtag");
         WebSettings settings = mWebView.getSettings();
@@ -100,7 +101,7 @@ public class BecomePartnerActivity extends BaseActivity implements View.OnClickL
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.head_left:
+            case R.id.become_partner_left:
                 setResult(RESULT_OK);
                 finish();
                 break;

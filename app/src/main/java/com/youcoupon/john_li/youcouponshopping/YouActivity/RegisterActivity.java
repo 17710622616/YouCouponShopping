@@ -2,7 +2,10 @@ package com.youcoupon.john_li.youcouponshopping.YouActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +19,7 @@ import com.alibaba.fastjson.JSON;
 import com.youcoupon.john_li.youcouponshopping.LoginActivity;
 import com.youcoupon.john_li.youcouponshopping.R;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.SmsOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.CountDownButtonHelper;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
@@ -36,11 +40,13 @@ import java.util.Map;
  */
 
 public class RegisterActivity extends BaseActivity {
-    private TextView registerTv, codeTv;
+    private TextView loginTv, codeTv;
     private Button registerBtn;
     private EditText phoneEt, pwEt,verificaEt,visitorTv;
     private ProgressDialog dialog;
     private CountDownButtonHelper helper;
+
+    private SmsOutModel.SmsModel mSmsModel;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +59,7 @@ public class RegisterActivity extends BaseActivity {
     @Override
     public void initView() {
         registerBtn = findViewById(R.id.btn_register);
-        registerTv = findViewById(R.id.tv_register);
+        loginTv = findViewById(R.id.tv_login);
         codeTv = findViewById(R.id.register_verifica_tv);
         phoneEt = findViewById(R.id.register_et_phone);
         pwEt = findViewById(R.id.register_et_password);
@@ -73,17 +79,26 @@ public class RegisterActivity extends BaseActivity {
                 String pw = pwEt.getText().toString();
                 String verifica = verificaEt.getText().toString();
                 if (phone != null && verifica != null&& pw != null) {
-                    callNetRegister(phone, pw);
+                    if (!YouCommonUtils.compareTwoTimes(mSmsModel.getOverTime())) {
+                        if (verifica.equals(mSmsModel.getCode())) {
+                            callNetRegister(phone, pw);
+                        } else {
+                            Toast.makeText(RegisterActivity.this, "验证码错误！", Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(RegisterActivity.this, "验证码已超时！", Toast.LENGTH_LONG).show();
+                    }
                 } else {
                     Toast.makeText(RegisterActivity.this, "请填写账户密码或验证码！", Toast.LENGTH_LONG).show();
                 }
             }
         });
 
-        registerTv.setOnClickListener(new View.OnClickListener() {
+        loginTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(RegisterActivity.this, LoginActivity.class), 10001);
+                finish();
+                //startActivityForResult(new Intent(RegisterActivity.this, LoginActivity.class), 10001);
             }
         });
         codeTv.setOnClickListener(new View.OnClickListener() {
@@ -100,6 +115,26 @@ public class RegisterActivity extends BaseActivity {
                 callNetGetVerCode();
             }
         });
+        phoneEt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (phoneEt.getText().toString().length() >= 8) {
+                    codeTv.setEnabled(true);
+                    codeTv.setTextColor(Color.BLACK);
+                } else {
+                    codeTv.setEnabled(false);
+                    codeTv.setTextColor(Color.WHITE);
+                }
+            }
+        });
     }
 
     @Override
@@ -107,16 +142,21 @@ public class RegisterActivity extends BaseActivity {
         helper = new CountDownButtonHelper(codeTv, "倒計時", 60,1);
     }
 
-    private void callNetRegister(String phone, String pw) {
+    /**
+     * 注册
+     * @param phone
+     * @param pw
+     */
+    private void callNetRegister(final String phone, final String pw) {
         dialog = new ProgressDialog(this);
         dialog.setTitle("提示");
         dialog.setMessage("正在注册中......");
         dialog.setCancelable(false);
         dialog.show();
         Map<String, String> paramsMap = new HashMap<>();
-        paramsMap.put("userName", phone);
+        paramsMap.put("mobile", phone);
         paramsMap.put("passWord", pw);
-        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.USER_LOGIN + YouCommonUtils.createLinkStringByGet(paramsMap));
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.USER_REGISTER + YouCommonUtils.createLinkStringByGet(paramsMap));
         params.setAsJsonContent(true);
         String uri = params.getUri();
         params.setConnectTimeout(30 * 1000);
@@ -125,15 +165,19 @@ public class RegisterActivity extends BaseActivity {
             public void onSuccess(String result) {
                 CommonModel model = JSON.parseObject(result, CommonModel.class);
                 if (model.getStatus() == 0) {
+                    Toast.makeText(RegisterActivity.this, "注册成功" + String.valueOf(model.getMessage()), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent();
+                    intent.putExtra("userName", phone);
+                    intent.putExtra("passWord", pw);
+                    setResult(RESULT_OK, intent);
+                    finish();
                 } else {
                     Toast.makeText(RegisterActivity.this, "注册失败" + String.valueOf(model.getMessage()), Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
                 }
             }
             //请求异常后的回调方法
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
-                dialog.dismiss();
                 if (ex instanceof java.net.SocketTimeoutException) {
                     Toast.makeText(RegisterActivity.this, R.string.callnet_timeout, Toast.LENGTH_SHORT).show();
                 } else {
@@ -146,35 +190,36 @@ public class RegisterActivity extends BaseActivity {
             }
             @Override
             public void onFinished() {
+                dialog.dismiss();
             }
         });
     }
-
 
     /**
      * 獲取验证码
      */
     private void callNetGetVerCode() {
-        /*RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_VERIFICATION_CODE);
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_VERIFICATION_CODE);
         params.addQueryStringParameter("mobile", phoneEt.getText().toString());
         String uri = params.getUri();
         params.setConnectTimeout(30 * 1000);
         x.http().get(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
-                CommonModel model = JSON.parseObject(result.toString(), CommonModel.class);
-                if (model.getStatus() == 200) {
-                    Toast.makeText(RegisterActivity.this, "", Toast.LENGTH_SHORT).show();
+                SmsOutModel model = JSON.parseObject(result.toString(), SmsOutModel.class);
+                if (model.getStatus() == 0) {
+                    mSmsModel = model.getData();
+                    Toast.makeText(RegisterActivity.this, "验证码已发送", Toast.LENGTH_SHORT).show();
                 } else {
-                    helper.finishTimer(getString(R.string.get_verification));
-                    Toast.makeText(RegisterActivity.this, getString(R.string.get_verification_code_fail), Toast.LENGTH_SHORT).show();
+                    helper.finishTimer("获取验证码");
+                    Toast.makeText(RegisterActivity.this, "获取验证码失败", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
-                helper.finishTimer(getString(R.string.get_verification));
-                Toast.makeText(RegisterActivity.this, getString(R.string.get_verification_code_fail), Toast.LENGTH_SHORT).show();
+                helper.finishTimer("获取验证码");
+                Toast.makeText(RegisterActivity.this, "获取验证码失败", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -186,7 +231,7 @@ public class RegisterActivity extends BaseActivity {
             public void onFinished() {
 
             }
-        });*/
+        });
     }
 }
 

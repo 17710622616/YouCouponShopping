@@ -1,12 +1,15 @@
 package com.youcoupon.john_li.youcouponshopping.YouUtils;
 
 import android.content.Context;
+import android.provider.ContactsContract;
 import android.util.DisplayMetrics;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -58,5 +61,45 @@ public class YouCommonUtils {
      */
     public static int getScreenWidth(Context context) {
         return context.getResources().getDisplayMetrics().widthPixels;
+    }
+
+    /**
+     * 獲取今日時間
+     * @return
+     */
+    public static String getTimeToday() {
+        Date now = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(now);
+    }
+
+    /**
+     * 獲取今日時間
+     * @return
+     */
+    public static String getTimeNow() {
+        Date now = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return dateFormat.format(now);
+    }
+
+    /**
+     * 比较两个时间大小
+     */
+    public static boolean compareTwoTimes(String overTimeString) {
+        boolean compareResult = true;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        try {
+            Date timeNow = new Date();
+            Date overTime = format.parse(overTimeString);
+            int compareTo = timeNow.compareTo(overTime);
+            if (compareTo != 1) {
+                compareResult = false;
+            }
+        } catch (Exception e) {
+            compareResult = true;
+        }
+
+        return compareResult;
     }
 }

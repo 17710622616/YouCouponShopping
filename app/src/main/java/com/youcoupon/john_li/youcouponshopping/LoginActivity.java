@@ -217,4 +217,16 @@ public class LoginActivity extends BaseActivity {
             }
         });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 10001) {
+                String userName = data.getStringExtra("userName");
+                String passWord = data.getStringExtra("passWord");
+                callNetLogin(userName, passWord);
+            }
+        }
+    }
 }

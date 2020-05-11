@@ -51,4 +51,8 @@ public class YouConfigor {
     public static final String GET_PERFORMANCE_LAST_MONTH = "/api/Performance/GetLastMonthPerformance?token=";
     //检查是否是合作者(通过H5方式时)
     public static final String CHECK_IS_PARTNER = "/api/User/becomePartnerByH5?";
+    // 获取验证码
+    public static final String GET_VERIFICATION_CODE = "/api/Register/getVerifyCode?";
+    // 用户注册
+    public static final String USER_REGISTER = "/api/Register/userRegister?";
 }

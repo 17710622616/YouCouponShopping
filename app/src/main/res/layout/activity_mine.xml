@@ -247,6 +247,25 @@
                 <View style="@style/underLine"/>
 
                 <LinearLayout
+                    android:id="@+id/mine_update_pwd"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    style="@style/mineLinearLayout">
+                    <ImageView
+                        style="@style/MineItemImageView"
+                        android:src="@mipmap/course"/>
+
+                    <TextView
+                        style="@style/MineItemTextView"
+                        android:text="修改密码"/>
+
+                    <ImageView
+                        style="@style/MineItemImageNext"/>
+                </LinearLayout>
+
+                <View style="@style/underLine"/>
+
+                <LinearLayout
                     android:id="@+id/mine_suggest"
                     android:orientation="horizontal"
                     style="@style/mineLinearLayout">

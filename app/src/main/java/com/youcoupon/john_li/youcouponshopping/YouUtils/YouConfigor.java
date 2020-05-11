@@ -55,4 +55,6 @@ public class YouConfigor {
     public static final String GET_VERIFICATION_CODE = "/api/Register/getVerifyCode?";
     // 用户注册
     public static final String USER_REGISTER = "/api/Register/userRegister?";
+    // 修改密码
+    public static final String CHG_PWD = "/api/Register/chgPwd?";
 }

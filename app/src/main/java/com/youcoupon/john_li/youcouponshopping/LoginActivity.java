@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.support.spring.annotation.FastJsonView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.ForgetPwdActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.RegisterActivity;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
@@ -91,6 +92,7 @@ public class LoginActivity extends BaseActivity {
         forgetTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                startActivityForResult(new Intent(LoginActivity.this, ForgetPwdActivity.class), 10002);
             }
         });
     }
@@ -223,6 +225,10 @@ public class LoginActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == 10001) {
+                String userName = data.getStringExtra("userName");
+                String passWord = data.getStringExtra("passWord");
+                callNetLogin(userName, passWord);
+            } else if (requestCode == 10002) {
                 String userName = data.getStringExtra("userName");
                 String passWord = data.getStringExtra("passWord");
                 callNetLogin(userName, passWord);

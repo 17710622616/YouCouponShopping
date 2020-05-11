@@ -1,6 +1,7 @@
 package com.youcoupon.john_li.youcouponshopping.YouFragment;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ import com.youcoupon.john_li.youcouponshopping.LoginActivity;
 import com.youcoupon.john_li.youcouponshopping.R;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BecomePartnerActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BussinesActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.ChangePwdActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.ServiceActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.SuggestActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.TutorialActivity;
@@ -69,8 +71,9 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     private ImageView headIv;//userInfoLL
     private RelativeLayout userInfoRl;
     private RefreshLayout mRefreshLayout;
-    private LinearLayout taobaoLL,courseLL,suggestLL, shareLL, serviceLL, bussinessLL, loginOutLL;
+    private LinearLayout taobaoLL,courseLL,changePwdLL, suggestLL, shareLL, serviceLL, bussinessLL, loginOutLL;
     private LinearLayout incomeLL, teamLL, orderLL;
+    private ProgressDialog dialog;
 
     private AlibcShowParams alibcShowParams;//页面打开方式，默认，H5，Native
     private Map<String, String> exParams;//yhhpass参数
@@ -107,6 +110,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         orderLL = (LinearLayout) findViewById(R.id.mine_order);
         taobaoLL = (LinearLayout) findViewById(R.id.mine_taobao_ll);
         courseLL = (LinearLayout) findViewById(R.id.mine_course);
+        changePwdLL = (LinearLayout) findViewById(R.id.mine_update_pwd);
         suggestLL = (LinearLayout) findViewById(R.id.mine_suggest);
         shareLL = (LinearLayout) findViewById(R.id.mine_share);
         serviceLL = (LinearLayout) findViewById(R.id.mine_service);
@@ -131,6 +135,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         orderLL.setOnClickListener(this);
         taobaoLL.setOnClickListener(this);
         courseLL.setOnClickListener(this);
+        changePwdLL.setOnClickListener(this);
         suggestLL.setOnClickListener(this);
         shareLL.setOnClickListener(this);
         serviceLL.setOnClickListener(this);
@@ -199,6 +204,13 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                     startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                 }
                 break;
+            case R.id.mine_update_pwd:
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    startActivityForResult(new Intent(getActivity(), ChangePwdActivity.class), 10003);
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
+                break;
             case R.id.mine_suggest:
                 if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
                     startActivity(new Intent(getActivity(), SuggestActivity.class));
@@ -229,7 +241,12 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 break;
             case R.id.user_info_rl:
                 if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
-                    startActivityForResult(new Intent(getActivity(), UserInfoActivity.class), 10002);
+                    if (!((String) SPUtils.get(getActivity(), "UserInfo", "")).equals("")) {
+                        startActivityForResult(new Intent(getActivity(), UserInfoActivity.class), 10002);
+                    } else {
+                        startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                        Toast.makeText(getActivity(), "登录信息错误，请重新登录", Toast.LENGTH_LONG).show();
+                    }
                 } else {
                     startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                 }
@@ -323,7 +340,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             //显示对话框
             dialog.show();
         } else {
-            taobaoAuthTv.setText("点我授权，购物可拿返现金");
+            taobaoAuthTv.setText("尊贵的合作者，快去购物可拿返现金吧！");
         }
     }
 
@@ -457,6 +474,10 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 callNetchechIsPartner();
             } else if (requestCode == 10002) {
 
+            } else if (requestCode == 10003) {
+                String userName = data.getStringExtra("userName");
+                String passWord = data.getStringExtra("passWord");
+                callNetLogin(userName, passWord);
             }
         }
     }
@@ -505,6 +526,55 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             }
             @Override
             public void onFinished() {
+            }
+        });
+    }
+
+    /**
+     * 刷新登录token
+     * @param phone
+     * @param pw
+     */
+    private void callNetLogin(String phone, String pw) {
+        dialog = new ProgressDialog(getActivity());
+        dialog.setTitle("提示");
+        dialog.setMessage("刷新登錄中......");
+        dialog.setCancelable(false);
+        dialog.show();
+        Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("userName", phone);
+        paramsMap.put("passWord", pw);
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.USER_LOGIN + YouCommonUtils.createLinkStringByGet(paramsMap));
+        params.setAsJsonContent(true);
+        String uri = params.getUri();
+        params.setConnectTimeout(30 * 1000);
+        x.http().request(HttpMethod.POST ,params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                CommonModel model = JSON.parseObject(result, CommonModel.class);
+                if (model.getStatus() == 0) {
+                    SPUtils.put(getActivity(), "UserToken", model.getData().toString());
+                    Toast.makeText(getActivity(), "刷新登录信息成功", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.login_fail) + String.valueOf(model.getMessage()), Toast.LENGTH_SHORT).show();
+                }
+            }
+            //请求异常后的回调方法
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                if (ex instanceof java.net.SocketTimeoutException) {
+                    Toast.makeText(getActivity(), R.string.callnet_timeout, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), R.string.login_fail, Toast.LENGTH_SHORT).show();
+                }
+            }
+            //主动调用取消请求的回调方法
+            @Override
+            public void onCancelled(CancelledException cex) {
+            }
+            @Override
+            public void onFinished() {
+                dialog.dismiss();
             }
         });
     }

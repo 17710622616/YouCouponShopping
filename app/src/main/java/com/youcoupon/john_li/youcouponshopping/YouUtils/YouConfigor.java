@@ -57,4 +57,8 @@ public class YouConfigor {
     public static final String USER_REGISTER = "/api/Register/userRegister?";
     // 修改密码
     public static final String CHG_PWD = "/api/Register/chgPwd?";
+    // 修改头像
+    public static final String UPDATE_HEAD_IMG = "/api/User/chgHeadImg?";
+    // 修改用户信息
+    public static final String UPDATE_USER_INFO = "";
 }

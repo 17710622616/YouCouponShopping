@@ -4,4 +4,6 @@
     <string name="get_userinfo_timeout">獲取用戶信息超时，请重试</string>
     <string name="get_userinfo_fail">獲取用户信息失败，请重试</string>
     <string name="callnet_timeout">网络连接超时，请重试</string>
+    <string name="network_error">网络异常</string>
+    <string name="request_error">请求异常</string>
 </resources>

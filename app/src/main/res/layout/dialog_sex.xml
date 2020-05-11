@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        android:text="性别"
+        android:textColor="@color/colorWhite"
+        android:textSize="18sp"
+        android:background="@color/colorPrimary"/>
+
+    <RadioGroup
+        android:id="@+id/dialog_sex_rg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/dialog_man_rb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="男"
+            android:textSize="12sp"
+            android:layout_margin="5dp"
+            android:textColor="@color/colorBlack"/>
+        <RadioButton
+            android:id="@+id/dialog_woman_rb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="女"
+            android:textSize="12sp"
+            android:layout_margin="5dp"
+            android:textColor="@color/colorBlack"/>
+        <RadioButton
+            android:id="@+id/dialog_secrecy_rb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="保密"
+            android:textSize="12sp"
+            android:layout_margin="5dp"
+            android:textColor="@color/colorBlack"/>
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/dialog_sex_yes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="是"
+        android:textSize="20sp"
+        android:textColor="@color/colorWhite"
+        android:background="@color/colorPrimary"
+        android:layout_margin="15dp"
+        android:padding="12dp"
+        android:gravity="center"/>
+</LinearLayout>

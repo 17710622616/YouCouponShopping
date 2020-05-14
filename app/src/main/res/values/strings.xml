@@ -6,4 +6,5 @@
     <string name="callnet_timeout">网络连接超时，请重试</string>
     <string name="network_error">网络异常</string>
     <string name="request_error">请求异常</string>
+    <string name="no_more_data">暂无更多数据！</string>
 </resources>

@@ -61,4 +61,12 @@ public class YouConfigor {
     public static final String UPDATE_HEAD_IMG = "/api/User/chgHeadImg?";
     // 修改用户信息
     public static final String UPDATE_USER_INFO = "";
+    // 提交邀请码
+    public static final String SUBMIT_INVITATION_CODE = "/api/User/submitInvitationCode?";
+    // 订单列表
+    public static final String GET_ORDER_LIST = "/api/Order/getOwnOrderList?";
+    // 获取一级下线订单
+    public static final String GET_FIRST_LEVEL_ORDER_LIST = "/api/Order/getFirstLevelOrderList?";
+    // 获取二级下线订单
+    public static final String GET_SECONDE_LEVEL_ORDER_LIST = "/api/Order/getSecondLevelOrderList?";
 }

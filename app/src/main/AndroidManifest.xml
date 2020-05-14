@@ -51,6 +51,7 @@
         <activity android:name=".YouActivity.UserInfoActivity" android:screenOrientation="portrait"/>
         <activity android:name=".YouActivity.ForgetPwdActivity" android:screenOrientation="portrait"/>
         <activity android:name=".YouActivity.ChangePwdActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".YouActivity.OrderListActivity" android:screenOrientation="portrait"/>
 
         <meta-data
             android:name="android.max_aspect"

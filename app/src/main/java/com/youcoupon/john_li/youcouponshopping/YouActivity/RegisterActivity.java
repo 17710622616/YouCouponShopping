@@ -169,6 +169,7 @@ public class RegisterActivity extends BaseActivity {
                 if (model.getStatus() == 0) {
                     Toast.makeText(RegisterActivity.this, "注册成功" + String.valueOf(model.getMessage()), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent();
+                    intent.putExtra("verifica", verificaEt.getText().toString());
                     intent.putExtra("userName", phone);
                     intent.putExtra("passWord", pw);
                     setResult(RESULT_OK, intent);

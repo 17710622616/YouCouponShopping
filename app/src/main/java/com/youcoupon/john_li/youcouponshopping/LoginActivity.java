@@ -18,6 +18,7 @@ import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.ForgetPwdActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.RegisterActivity;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.SmsOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
@@ -75,7 +76,7 @@ public class LoginActivity extends BaseActivity {
                 String phone = phoneEt.getText().toString();
                 String pw = pwEt.getText().toString();
                 if (phone != null && pw != null) {
-                    callNetLogin(phone, pw);
+                    callNetLogin(phone, pw, "");
                 } else {
                     Toast.makeText(LoginActivity.this, "请填写账户密码！", Toast.LENGTH_LONG).show();
                 }
@@ -102,7 +103,7 @@ public class LoginActivity extends BaseActivity {
 
     }
 
-    private void callNetLogin(String phone, String pw) {
+    private void callNetLogin(String phone, String pw, final String verifica) {
         dialog = new ProgressDialog(this);
         dialog.setTitle("提示");
         dialog.setMessage("正在登錄中......");
@@ -121,7 +122,8 @@ public class LoginActivity extends BaseActivity {
                 CommonModel model = JSON.parseObject(result, CommonModel.class);
                 if (model.getStatus() == 0) {
                     SPUtils.put(LoginActivity.this, "UserToken", model.getData().toString());
-                    getUserInfo(model.getData().toString());
+                    // 获取用户信息
+                    getUserInfo(model.getData().toString(), verifica);
                 } else {
                     Toast.makeText(LoginActivity.this, getString(R.string.login_fail) + String.valueOf(model.getMessage()), Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
@@ -150,9 +152,10 @@ public class LoginActivity extends BaseActivity {
 
     /**
      * 獲取用戶信息
+     * @param verifica
      * @param token
      */
-    private void getUserInfo(String token) {
+    private void getUserInfo(final String verifica, final String token) {
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_USER_INFO + token);
         params.setConnectTimeout(30 * 1000);
         x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
@@ -215,6 +218,46 @@ public class LoginActivity extends BaseActivity {
             }
             @Override
             public void onFinished() {
+                if (!verifica.equals("")) {
+                    // 绑定上下级关系
+                    callSubmitInvitationCode(verifica, token);
+                }
+            }
+        });
+    }
+
+    /**
+     * 绑定上下级关系
+     */
+    private void callSubmitInvitationCode(final String verifica, String token) {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.SUBMIT_INVITATION_CODE);
+        params.addQueryStringParameter("invitationCode", verifica);
+        params.addQueryStringParameter("token", token);
+        String uri = params.getUri();
+        params.setConnectTimeout(30 * 1000);
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                SmsOutModel model = JSON.parseObject(result.toString(), SmsOutModel.class);
+                if (model.getStatus() == 0) {
+                    Toast.makeText(LoginActivity.this, "绑定上下级关系成功！", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(LoginActivity.this, "绑定上下级关系失败，请手动绑定！", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(LoginActivity.this, "绑定上下级关系失败，请手动绑定！", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
                 dialog.dismiss();
             }
         });
@@ -227,11 +270,16 @@ public class LoginActivity extends BaseActivity {
             if (requestCode == 10001) {
                 String userName = data.getStringExtra("userName");
                 String passWord = data.getStringExtra("passWord");
-                callNetLogin(userName, passWord);
+                String verifica = data.getStringExtra("verifica");
+                if (!verifica.equals("")) {
+                    callNetLogin(userName, passWord, verifica);
+                } else {
+                    callNetLogin(userName, passWord, "");
+                }
             } else if (requestCode == 10002) {
                 String userName = data.getStringExtra("userName");
                 String passWord = data.getStringExtra("passWord");
-                callNetLogin(userName, passWord);
+                callNetLogin(userName, passWord, "");
             }
         }
     }

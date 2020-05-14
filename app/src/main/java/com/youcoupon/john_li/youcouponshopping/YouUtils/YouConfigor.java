@@ -69,4 +69,8 @@ public class YouConfigor {
     public static final String GET_FIRST_LEVEL_ORDER_LIST = "/api/Order/getFirstLevelOrderList?";
     // 获取二级下线订单
     public static final String GET_SECONDE_LEVEL_ORDER_LIST = "/api/Order/getSecondLevelOrderList?";
+    // 获取一级下线成员
+    public static final String GET_FIRST_LEVEL_MEMBER_LIST = "/api/Team/getFirstLevelMember?";
+    // 获取e二级下线成员
+    public static final String GET_SECOND_LEVEL_MEMBER_LIST = "/api/Team/getSecondLevelMember?";
 }

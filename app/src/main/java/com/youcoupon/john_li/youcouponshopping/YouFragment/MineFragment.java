@@ -43,6 +43,7 @@ import com.youcoupon.john_li.youcouponshopping.YouActivity.ChangePwdActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.OrderListActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.ServiceActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.SuggestActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.TeamListActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.TutorialActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.UserInfoActivity;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
@@ -193,7 +194,12 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
 
                 break;
             case R.id.mine_team:
-
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    Intent orderIntent = new Intent(getActivity(), TeamListActivity.class);
+                    startActivity(orderIntent);
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
                 break;
             case R.id.mine_order:
                 if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {

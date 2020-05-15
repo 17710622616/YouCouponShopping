@@ -1,12 +1,19 @@
 package com.youcoupon.john_li.youcouponshopping.YouUtils;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
+import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -133,5 +140,80 @@ public class YouCommonUtils {
             }
         }
         return data;
+    }
+
+    /**
+     * 复制到剪切板
+     * @param context
+     * @param str
+     */
+    public static void copyToClipboard(Context context, String str) {
+        //获取剪贴板管理器：
+        ClipboardManager cm = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        // 创建普通字符型ClipData
+        ClipData mClipData = ClipData.newPlainText("Label", str);
+        // 将ClipData内容放到系统剪贴板里。
+        cm.setPrimaryClip(mClipData);
+    }
+
+    /**
+     * 判断是否安装微信
+     * @param context
+     * @return
+     */
+    public static boolean isWeixinAvilible(Context context) {
+        final PackageManager packageManager = context.getPackageManager();// 获取packagemanager
+        List<PackageInfo> pinfo = packageManager.getInstalledPackages(0);// 获取所有已安装程序的包信息
+        if (pinfo != null) {
+            for (int i = 0; i < pinfo.size(); i++) {
+                String pn = pinfo.get(i).packageName;
+                if (pn.equals("com.tencent.mm")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 打开微信
+     */
+    public static void openWechat(Context context) {
+        if (isWeixinAvilible(context)) {
+            Intent intent = new Intent();
+            ComponentName cmp= new ComponentName("com.tencent.mm","com.tencent.mm.ui.LauncherUI");
+            intent.setAction(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setComponent(cmp);
+            context.startActivity(intent);
+        } else {
+            Toast.makeText(context, "您尚未安装Wechat！", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * 打开whatsapp
+     */
+    public static void openWhatsApp(Context context) {
+        String contact = "+00 9876543210"; // use country code with your phone number
+        String url = "https://api.whatsapp.com/send?phone=" + contact;
+        try {
+            PackageManager pm = context.getPackageManager();
+            pm.getPackageInfo("com.whatsapp", PackageManager.GET_ACTIVITIES);
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            context.startActivity(i);
+        } catch (PackageManager.NameNotFoundException e) {
+            Toast.makeText(context, "您尚未安装WhatsApp！", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 打开fb
+     */
+    public static void openFb(Context context) {
+
     }
 }

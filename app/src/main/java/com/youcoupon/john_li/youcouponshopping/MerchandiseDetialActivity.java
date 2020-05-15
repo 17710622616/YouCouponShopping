@@ -1,12 +1,14 @@
 package com.youcoupon.john_li.youcouponshopping;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -16,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -115,6 +118,8 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     private CollapsingAdapter mCollapsingAdapter;
     private SellerRecommondAdapter mSellerRecommondAdapter;
     private MaterialItemAdapter mMaterialItemAdapter;
+    // 淘口令
+    private String mTpwd = "";
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -439,6 +444,59 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         });
     }
 
+    /**
+     * 获取商品淘口令
+     */
+    private void callNetGetTPWD() {
+        Map<String, String> paramsMap = new HashMap<>();
+        String shareUrl = "";
+        String url = mMaterialItemModel.getCouponShareUrl().contains("http") ? mMaterialItemModel.getCouponShareUrl() : "http:" + mMaterialItemModel.getCouponShareUrl();
+        String userInfoJson = (String) SPUtils.get(MerchandiseDetialActivity.this, "UserInfo", "");
+        if(!userInfoJson.equals("")) {
+            UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
+            if (userInfoModel.getRelationId() != 0) {
+                shareUrl = url + "&relaitionId=" + userInfoModel.getRelationId();
+            } else {
+                // 打开提示成为合作者视窗
+                shareUrl = url;
+            }
+        } else {
+            Toast.makeText(MerchandiseDetialActivity.this, "登录信息异常！请重新登录", Toast.LENGTH_SHORT).show();
+            startActivityForResult(new Intent(MerchandiseDetialActivity.this, LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+        }
+        paramsMap.put("shareUrl", shareUrl);
+        paramsMap.put("shareTxt", mMaterialItemModel.getTitle() + "，" + mMaterialItemModel.getCouponInfo());
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.ITEM_GET_TPWD + YouCommonUtils.createLinkStringByGet(paramsMap));
+        params.setConnectTimeout(30 * 1000);
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                CommonModel model = JSON.parseObject(result, CommonModel.class);
+                if (model.getStatus() == 0) {
+                    mTpwd = String.valueOf(model.getData());
+                    openShare();
+                } else {
+                    Toast.makeText(getApplicationContext(), "获取商品淘口令失敗！", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(getApplicationContext(), "获取商品淘口令失敗！", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -453,8 +511,27 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.merchandise_share:
-                if (mSellerModel != null) {
+                /*if (mSellerModel != null) {
                     openH5Url(String.valueOf(mSellerModel.getShopUrl()));
+                }*/
+                // 获取淘口令
+                // 判断是否登录APP账户
+                if (!((String) SPUtils.get(MerchandiseDetialActivity.this, "UserToken", "")).equals("")) {
+                    String userInfoJson1 = (String) SPUtils.get(MerchandiseDetialActivity.this, "UserInfo", "");
+                    if(!userInfoJson1.equals("")) {
+                        UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson1, UserInfoOutsideModel.DataBean.class);
+                        if (userInfoModel.getRelationId() != 0) {
+                            callNetGetTPWD();
+                        } else {
+                            // 打开提示成为合作者视窗
+                            showTBAuthDialog();
+                        }
+                    } else {
+                        Toast.makeText(MerchandiseDetialActivity.this, "登录信息异常！请重新登录", Toast.LENGTH_SHORT).show();
+                        startActivityForResult(new Intent(MerchandiseDetialActivity.this, LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                    }
+                } else {
+                    startActivityForResult(new Intent(MerchandiseDetialActivity.this, LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                 }
                 break;
             case R.id.merchandise_detial_coupon_redemption:
@@ -538,9 +615,9 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                 alibcShowParams.setClientType("taobao");
                 String detialUrl = null;
                 if (mMaterialItemModel.getCouponShareUrl() == null) {
-                    detialUrl = "https:" +  mMaterialItemModel.getItemUrl();
+                    detialUrl = mMaterialItemModel.getItemUrl().contains("http") ? mMaterialItemModel.getItemUrl() : "http:" + mMaterialItemModel.getItemUrl();
                 } else {
-                    detialUrl = "https:" + mMaterialItemModel.getCouponShareUrl();
+                    detialUrl = mMaterialItemModel.getCouponShareUrl().contains("http") ? mMaterialItemModel.getCouponShareUrl() : "http:" + mMaterialItemModel.getCouponShareUrl();
                 }
 
                 // 以显示传入url的方式打开页面（第二个参数是套件名称）
@@ -676,9 +753,9 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         alibcShowParams.setClientType("taobao");
         String couponUrl = null;
         if (mMaterialItemModel.getCouponShareUrl() == null) {
-            couponUrl = "https:" +  mMaterialItemModel.getItemUrl() + "&relaitionId=" + relationId;
+            couponUrl = mMaterialItemModel.getItemUrl().contains("http") ? mMaterialItemModel.getItemUrl() : "http:" + mMaterialItemModel.getItemUrl() + "&relaitionId=" + relationId;
         } else {
-            couponUrl = "https:" + mMaterialItemModel.getCouponShareUrl() + "&relaitionId=" + relationId;
+            couponUrl = mMaterialItemModel.getCouponShareUrl().contains("http") ? mMaterialItemModel.getCouponShareUrl() : "http:" + mMaterialItemModel.getCouponShareUrl() + "&relaitionId=" + relationId;
         }
 
         // 以显示传入url的方式打开页面（第二个参数是套件名称）
@@ -735,6 +812,48 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                         }
                     }
                 });
+    }
+
+    /**
+     * 打开分享提示
+     */
+    private void openShare() {
+        String content = "複至这条消息去桃宝," + mTpwd + ",【" + mMaterialItemModel.getTitle() + "," + mMaterialItemModel.getCouponInfo() + "】";
+        YouCommonUtils.copyToClipboard(this, content);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MerchandiseDetialActivity.this);
+        LayoutInflater inflater = LayoutInflater.from(MerchandiseDetialActivity.this);
+        View v = inflater.inflate(R.layout.dialog_share, null);
+        LinearLayout wechat = (LinearLayout) v.findViewById(R.id.dialog_wechat);
+        LinearLayout whatsapp = (LinearLayout) v.findViewById(R.id.dialog_whatsapp);
+        LinearLayout fb = (LinearLayout) v.findViewById(R.id.dialog_fb);
+        TextView shareTv = (TextView) v.findViewById(R.id.dialog_share_tv);
+        //builer.setView(v);//这里如果使用builer.setView(v)，自定义布局只会覆盖title和button之间的那部分
+        final Dialog dialog = builder.create();
+        dialog.show();
+        dialog.getWindow().setContentView(v);//自定义布局应该在这里添加，要在dialog.show()的后面
+        //dialog.getWindow().setGravity(Gravity.CENTER);//可以设置显示的位置
+        shareTv.setText(content);
+        wechat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                YouCommonUtils.openWechat(MerchandiseDetialActivity.this);
+                dialog.dismiss();
+            }
+        });
+        whatsapp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                YouCommonUtils.openWhatsApp(MerchandiseDetialActivity.this);
+                dialog.dismiss();
+            }
+        });
+        fb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                YouCommonUtils.openFb(MerchandiseDetialActivity.this);
+                dialog.dismiss();
+            }
+        });
     }
 
     @Override

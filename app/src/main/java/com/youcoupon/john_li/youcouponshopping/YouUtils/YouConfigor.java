@@ -71,6 +71,8 @@ public class YouConfigor {
     public static final String GET_SECONDE_LEVEL_ORDER_LIST = "/api/Order/getSecondLevelOrderList?";
     // 获取一级下线成员
     public static final String GET_FIRST_LEVEL_MEMBER_LIST = "/api/Team/getFirstLevelMember?";
-    // 获取e二级下线成员
+    // 获取二级下线成员
     public static final String GET_SECOND_LEVEL_MEMBER_LIST = "/api/Team/getSecondLevelMember?";
+    // 获取淘口令
+    public static final String ITEM_GET_TPWD = "/api/Team/GetItemTPWD?";
 }

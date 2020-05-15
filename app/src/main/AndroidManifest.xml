@@ -27,6 +27,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
+        android:textIsSelectable="true"
         android:theme="@style/AppTheme">
         <activity android:name=".SplashActivity"
             android:theme="@style/AppTheme.FullScreen">

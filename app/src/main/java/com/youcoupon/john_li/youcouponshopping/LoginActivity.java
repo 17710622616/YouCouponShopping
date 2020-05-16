@@ -123,7 +123,7 @@ public class LoginActivity extends BaseActivity {
                 if (model.getStatus() == 0) {
                     SPUtils.put(LoginActivity.this, "UserToken", model.getData().toString());
                     // 获取用户信息
-                    getUserInfo(model.getData().toString(), verifica);
+                    getUserInfo(verifica, model.getData().toString());
                 } else {
                     Toast.makeText(LoginActivity.this, getString(R.string.login_fail) + String.valueOf(model.getMessage()), Toast.LENGTH_SHORT).show();
                     dialog.dismiss();

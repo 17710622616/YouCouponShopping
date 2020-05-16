@@ -455,7 +455,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         if(!userInfoJson.equals("")) {
             UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
             if (userInfoModel.getRelationId() != 0) {
-                shareUrl = url + "&relaitionId=" + userInfoModel.getRelationId();
+                shareUrl = url + "&relationId=" + userInfoModel.getRelationId();
             } else {
                 // 打开提示成为合作者视窗
                 shareUrl = url;
@@ -753,9 +753,9 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         alibcShowParams.setClientType("taobao");
         String couponUrl = null;
         if (mMaterialItemModel.getCouponShareUrl() == null) {
-            couponUrl = mMaterialItemModel.getItemUrl().contains("http") ? mMaterialItemModel.getItemUrl() : "http:" + mMaterialItemModel.getItemUrl() + "&relaitionId=" + relationId;
+            couponUrl = mMaterialItemModel.getItemUrl().contains("https") ? mMaterialItemModel.getItemUrl() : "https:" + mMaterialItemModel.getItemUrl() + "&relationId=" + relationId;
         } else {
-            couponUrl = mMaterialItemModel.getCouponShareUrl().contains("http") ? mMaterialItemModel.getCouponShareUrl() : "http:" + mMaterialItemModel.getCouponShareUrl() + "&relaitionId=" + relationId;
+            couponUrl = mMaterialItemModel.getCouponShareUrl().contains("https") ? mMaterialItemModel.getCouponShareUrl() : "https:" + mMaterialItemModel.getCouponShareUrl() + "&relationId=" + relationId;
         }
 
         // 以显示传入url的方式打开页面（第二个参数是套件名称）

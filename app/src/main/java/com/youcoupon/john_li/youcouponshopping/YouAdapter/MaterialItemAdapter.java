@@ -87,21 +87,29 @@ public class MaterialItemAdapter extends BaseAdapter {
         holder.merchandise_after_discoun.setText("券后價：");
         holder.merchandise_price_after_discount.setText("¥" + list.get(position).getZkFinalPrice());
         if (list.get(position).getCouponInfo() != null) {
-            holder.merchandise_original_coupon_value.setText(list.get(position).getCouponInfo());
-            // 按指定模式在字符串查找
-            Pattern p=Pattern.compile("\\d+");
-            Matcher m=p.matcher(list.get(position).getCouponInfo());
-            double afterCoupon = 0.01;
-            while(m.find()) {
-                if (Double.parseDouble(list.get(position).getZkFinalPrice()) >= Double.parseDouble(m.group())) {
-                    if (m.find()) {
-                        holder.merchandise_price_after_discount.setText("¥" + String.format("%.2f", (Double.parseDouble(list.get(position).getZkFinalPrice()) - Double.parseDouble(m.group()))));
-                        afterCoupon = Double.parseDouble(list.get(position).getZkFinalPrice()) - Double.parseDouble(m.group());
-                    }
+            if(!list.get(position).getCouponInfo().equals("")) {
+                //holder.merchandise_original_coupon_value.setText(list.get(position).getCouponInfo());
+                // 按指定模式在字符串查找
+                Pattern p=Pattern.compile("\\d+");
+                Matcher m=p.matcher(list.get(position).getCouponInfo());
+                double afterCoupon = 0.01;
+                double couponAmount = 0.01;
+                while(m.find()) {
+                    if (Double.parseDouble(list.get(position).getZkFinalPrice()) >= Double.parseDouble(m.group())) {
+                        if (m.find()) {
+                            holder.merchandise_price_after_discount.setText("¥" + String.format("%.2f", (Double.parseDouble(list.get(position).getZkFinalPrice()) - Double.parseDouble(m.group()))));
+                            afterCoupon = Double.parseDouble(list.get(position).getZkFinalPrice()) - Double.parseDouble(m.group());
+                            couponAmount = Double.parseDouble(m.group());
+                        }
 
-                    holder.item_main_merchandise_rebate.setText("预计返利：" + String.format("%.2f", (0.78 * (afterCoupon * Double.parseDouble(list.get(position).getCommissionRate()) * 0.01))));
-                    break;
+                        holder.merchandise_original_coupon_value.setText("减" + couponAmount + "元");
+                        holder.item_main_merchandise_rebate.setText("预计返利：" + String.format("%.2f", (0.78 * (afterCoupon * Double.parseDouble(list.get(position).getCommissionRate()) * 0.01))));
+                        break;
+                    }
                 }
+            } else {
+                holder.merchandise_original_coupon_value.setVisibility(View.GONE);
+                holder.item_main_merchandise_rebate.setText("预计返利：" + String.format("%.2f", (0.78 * (Double.parseDouble(list.get(position).getZkFinalPrice()) * Double.parseDouble(list.get(position).getCommissionRate()) * 0.01))));
             }
         } else {
             holder.merchandise_original_coupon_value.setVisibility(View.GONE);

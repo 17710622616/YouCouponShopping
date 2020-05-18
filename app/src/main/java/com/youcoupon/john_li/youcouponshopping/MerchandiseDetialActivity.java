@@ -467,16 +467,22 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
      */
     private void callNetGetTPWD() {
         Map<String, String> paramsMap = new HashMap<>();
-        String shareUrl = "";
-        String url = mMaterialItemModel.getCouponShareUrl().contains("https") ? mMaterialItemModel.getCouponShareUrl() : "https:" + mMaterialItemModel.getCouponShareUrl();
         String userInfoJson = (String) SPUtils.get(MerchandiseDetialActivity.this, "UserInfo", "");
+        String shareUrl = "";
         if(!userInfoJson.equals("")) {
+            String url = null;
+            if (mMaterialItemModel.getCouponShareUrl() == null) {
+                url = mMaterialItemModel.getItemUrl().contains("https") ? mMaterialItemModel.getItemUrl() : "https:" + mMaterialItemModel.getItemUrl();
+            } else {
+                url = mMaterialItemModel.getCouponShareUrl().contains("https") ? mMaterialItemModel.getCouponShareUrl() : "https:" + mMaterialItemModel.getCouponShareUrl();
+            }
             UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
             if (userInfoModel.getRelationId() != 0) {
                 shareUrl = url + "&relationId=" + userInfoModel.getRelationId();
             } else {
                 // 打开提示成为合作者视窗
-                shareUrl = url;
+                //shareUrl = url;
+                showTBAuthDialog();
             }
         } else {
             Toast.makeText(MerchandiseDetialActivity.this, "登录信息异常！请重新登录", Toast.LENGTH_SHORT).show();

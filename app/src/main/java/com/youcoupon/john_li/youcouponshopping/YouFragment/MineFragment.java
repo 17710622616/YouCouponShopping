@@ -303,13 +303,13 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 invitationCodeTv.setText("邀请码：点我获取");
             }
 
-            //显示余额
-            balanceTv.setText(mUserInfoModel.getBalance() + "\n余额");
             //头像
             x.image().bind(headIv, mUserInfoModel.getHead_img(), options);
 
             // 检查是否为合作者
             checkIsPartner();
+            // 获取余额
+            callNetGetBalance();
         } else {
             mUserInfoModel = new UserInfoOutsideModel.DataBean();
             x.image().bind(headIv, "", options);
@@ -379,11 +379,13 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             callNetGetPerformanceLastMonth(userToken);
             // 显示用户信息
             showUserInfo();
-            getHasPayPw(userToken);
+            getHasPayPw();
         } else {
             x.image().bind(headIv, "", options);
             nickTv.setText("立即登录");
             invitationCodeTv.setVisibility(View.INVISIBLE);
+            performanceThisMonthTv.setText("0.0\n本月预估");
+            performanceLastMonthTv.setText("0.0\n上月预估");
             Toast.makeText(getActivity(), "您暂未等，请先登录！", Toast.LENGTH_SHORT).show();
         }
 
@@ -391,10 +393,75 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     }
 
     /**
-     * 判断是否有支付密码
-     * @param token
+     * 取本月绩效
+     * @param userToken
      */
-    private void getHasPayPw(String token) {
+    private void callNetGetPerformanceThisMonth(String userToken) {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_PERFORMANCE_THIS_MONTH + SPUtils.get(getActivity(), "UserToken", ""));
+        params.setConnectTimeout(30 * 1000);
+        x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
+                if (model.getStatus() == 0) {
+                    String performanceThisMonth =  model.getData().toString();
+                    performanceThisMonthTv.setText(performanceThisMonth + "元\n本月预估");
+                }
+            }
+
+            //请求异常后的回调方法
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                performanceThisMonthTv.setText("0" + "元\n本月预估");
+            }
+            //主动调用取消请求的回调方法
+            @Override
+            public void onCancelled(CancelledException cex) {
+                performanceThisMonthTv.setText("0" + "元\n本月预估");
+            }
+            @Override
+            public void onFinished() {
+            }
+        });
+    }
+
+    /**
+     * 取上月绩效
+     * @param userToken
+     */
+    private void callNetGetPerformanceLastMonth(String userToken) {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_PERFORMANCE_LAST_MONTH + SPUtils.get(getActivity(), "UserToken", ""));
+        params.setConnectTimeout(30 * 1000);
+        x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
+                if (model.getStatus() == 0) {
+                    String performanceLastMonth = model.getData().toString();
+                    performanceLastMonthTv.setText(performanceLastMonth + "元\n上月预估");
+                }
+            }
+
+            //请求异常后的回调方法
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                performanceLastMonthTv.setText("0" + "元\n上月预估");
+            }
+            //主动调用取消请求的回调方法
+            @Override
+            public void onCancelled(CancelledException cex) {
+                performanceLastMonthTv.setText("0" + "元\n上月预估");
+            }
+            @Override
+            public void onFinished() {
+            }
+        });
+    }
+
+    /**
+     * 判断是否有支付密码
+     */
+    private void getHasPayPw() {
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_USER_HAS_PAY_PW + SPUtils.get(getActivity(), "UserToken", ""));
         params.setConnectTimeout(30 * 1000);
         x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
@@ -423,67 +490,41 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     }
 
     /**
-     * 取本月绩效
-     * @param userToken
+     * 获取余额
      */
-    private void callNetGetPerformanceThisMonth(String userToken) {
-        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_PERFORMANCE_THIS_MONTH + SPUtils.get(getActivity(), "UserToken", ""));
+    private void callNetGetBalance() {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_BALANCE);
+        params.addQueryStringParameter("token", String.valueOf(SPUtils.get(getActivity(), "UserToken", "")));
+        String uri = params.getUri();
         params.setConnectTimeout(30 * 1000);
-        x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
+        x.http().get(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
-                CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
+                CommonModel model = JSON.parseObject(result.toString(), CommonModel.class);
                 if (model.getStatus() == 0) {
-                    String performanceThisMonth =  model.getData().toString();
-                    performanceThisMonthTv.setText(performanceThisMonth + "\n本月预估");
+                    balanceTv.setText(model.getData().toString() + "\n余额");
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.balance_error), Toast.LENGTH_SHORT).show();
                 }
             }
 
-            //请求异常后的回调方法
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
-                performanceThisMonthTv.setText("0" + "\n本月预估");
-            }
-            //主动调用取消请求的回调方法
-            @Override
-            public void onCancelled(CancelledException cex) {
-                performanceThisMonthTv.setText("0" + "\n本月预估");
-            }
-            @Override
-            public void onFinished() {
-            }
-        });
-    }
-
-    /**
-     * 取上月绩效
-     * @param userToken
-     */
-    private void callNetGetPerformanceLastMonth(String userToken) {
-        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_PERFORMANCE_LAST_MONTH + SPUtils.get(getActivity(), "UserToken", ""));
-        params.setConnectTimeout(30 * 1000);
-        x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
-                if (model.getStatus() == 0) {
-                    String performanceLastMonth = model.getData().toString();
-                    performanceLastMonthTv.setText(performanceLastMonth + "\n上月预估");
+                if (ex instanceof java.net.SocketTimeoutException) {
+                    Toast.makeText(getActivity(), getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.request_error), Toast.LENGTH_SHORT).show();
                 }
             }
 
-            //请求异常后的回调方法
-            @Override
-            public void onError(Throwable ex, boolean isOnCallback) {
-                performanceLastMonthTv.setText("0" + "\n上月预估");
-            }
-            //主动调用取消请求的回调方法
             @Override
             public void onCancelled(CancelledException cex) {
-                performanceLastMonthTv.setText("0" + "\n上月预估");
+
             }
+
             @Override
             public void onFinished() {
+
             }
         });
     }

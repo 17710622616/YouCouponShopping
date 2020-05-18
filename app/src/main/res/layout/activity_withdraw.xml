@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorMineGray">
+
+    <com.youcoupon.john_li.youcouponshopping.YouView.YouHeadView
+        android:id="@+id/wallet_withdraw_head"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="15dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorWhite"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/wallet_withdraw_balance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:text="可提现余额RMB："
+                android:textColor="@color/colorDrakGray"/>
+
+            <LinearLayout
+                android:id="@+id/wallet_withdraw_num_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="MOP $ "
+                    android:textSize="30dp"
+                    android:textColor="@color/colorBlack" />
+
+                <EditText
+                    android:id="@+id/wallet_withdraw_num"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:hint="請輸入金額"
+                    android:textSize="30dp"
+                    android:inputType="number"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.1dp"
+                android:background="@color/colorLineGray" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="姓        名："
+                    android:textColor="@color/colorBlack"
+                    android:textSize="20sp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"/>
+                <EditText
+                    android:id="@+id/wallet_withdraw_name_et"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="请输入联系人"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="20sp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"/>
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.1dp"
+                android:background="@color/colorLineGray" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="電        話："
+                    android:textColor="@color/colorBlack"
+                    android:textSize="20sp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"/>
+                <EditText
+                    android:id="@+id/wallet_withdraw_tel_et"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="请输入您的联系电话"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="20sp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"/>
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.1dp"
+                android:background="@color/colorLineGray" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="支  付  宝："
+                    android:textColor="@color/colorBlack"
+                    android:textSize="20sp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"/>
+                <EditText
+                    android:id="@+id/wallet_withdraw_alipay_et"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="请填写提现支付宝账户"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="20sp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"/>
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.1dp"
+                android:background="@color/colorLineGray" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="10dp">
+        <CheckBox
+            android:id="@+id/wallet_withdraw_isagree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/wallet_withdraw_agreement"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="同意《支付服務協議》"
+            android:textSize="12sp"
+            android:textColor="@color/colorDeepBlue"
+            android:gravity="center_vertical"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/wallet_withdraw_submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:padding="15dp"
+        android:gravity="center"
+        android:text="確認提現"
+        android:textColor="@color/colorWhite"
+        android:textSize="20sp"
+        android:background="@drawable/shape_title_check"/>
+</LinearLayout>

@@ -77,4 +77,6 @@ public class YouConfigor {
     public static final String ITEM_GET_TPWD = "/api/Item/GetItemTPWD?";
     // 获取余额
     public static final String GET_BALANCE = "/api/Wallet/getBalance";
+    // 余额提现
+    public static final String POST_WITH_DRAWAL = "/api/Wallet/createWithDraw?token=";
 }

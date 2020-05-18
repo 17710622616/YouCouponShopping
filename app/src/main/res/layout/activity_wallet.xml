@@ -14,13 +14,14 @@
         android:layout_height="match_parent"
         android:background="@color/colorMineGray">
 
-        <ImageView
+        <TextView
             android:id="@+id/wallet_bg_iv"
             android:layout_width="match_parent"
             android:layout_height="164dp"
-            android:scaleType="fitXY"
-            android:src="@mipmap/remai_bg"
-            android:layout_marginTop="20dp"/>
+            android:background="@drawable/shape_wallet_bg"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"/>
 
         <TextView
             android:id="@+id/wallet_money_tv"

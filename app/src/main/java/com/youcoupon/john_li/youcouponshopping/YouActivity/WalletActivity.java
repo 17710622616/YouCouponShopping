@@ -18,6 +18,7 @@ import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
 import com.youcoupon.john_li.youcouponshopping.YouView.YouHeadView;
 
 import org.xutils.common.Callback;
+import org.xutils.http.HttpMethod;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
 
@@ -25,6 +26,7 @@ public class WalletActivity extends BaseActivity implements View.OnClickListener
     private YouHeadView headView;
     private TextView moneyTv;
     private LinearLayout pwdLL, withdrwaLL;
+    private double balance;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,12 +65,15 @@ public class WalletActivity extends BaseActivity implements View.OnClickListener
                 finish();
                 break;
             case R.id.wallet_pwd_ll:
-                startActivity(new Intent(this, UpdatePayPwdActivity.class));
+                Intent intent = new Intent(WalletActivity.this, UpdatePayPwdActivity.class);
+                startActivity(intent);
                 break;
             case R.id.wallet_withdraw_ll:
-                Toast.makeText(WalletActivity.this, "如需充值錢包，請聯繫客服！", Toast.LENGTH_SHORT).show();
-                Intent intent2 = new Intent(this, ServiceActivity.class);
-                startActivity(intent2);
+                if (balance > 0) {
+                    getHasPayPw();
+                } else {
+                    Toast.makeText(WalletActivity.this, "您暂无可提现余额！", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }
@@ -83,7 +88,8 @@ public class WalletActivity extends BaseActivity implements View.OnClickListener
             public void onSuccess(String result) {
                 CommonModel model = JSON.parseObject(result.toString(), CommonModel.class);
                 if (model.getStatus() == 0) {
-                    moneyTv.setText(model.getData().toString());
+                    balance = Double.parseDouble(model.getData().toString());
+                    moneyTv.setText(String.valueOf(balance));
                 } else {
                     Toast.makeText(WalletActivity.this, getString(R.string.balance_error), Toast.LENGTH_SHORT).show();
                 }
@@ -106,6 +112,45 @@ public class WalletActivity extends BaseActivity implements View.OnClickListener
             @Override
             public void onFinished() {
 
+            }
+        });
+    }
+
+    /**
+     * 判断是否有支付密码
+     */
+    private void getHasPayPw() {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_USER_HAS_PAY_PW + SPUtils.get(WalletActivity.this, "UserToken", ""));
+        params.setConnectTimeout(30 * 1000);
+        x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
+                if (model.getStatus() == 0) {
+                    String hasPayPw =  JSON.toJSONString(model.getData()).toString();
+
+                    if (hasPayPw.equals("true")) {
+                        SPUtils.put(WalletActivity.this, "HasPayPw", "1");
+                        Intent intent2 = new Intent(WalletActivity.this, WithDrawActivity.class);
+                        intent2.putExtra("balance", !moneyTv.getText().toString().equals("") ? Double.parseDouble(moneyTv.getText().toString()) : 0.0);
+                        startActivity(intent2);
+                    } else {
+                        Toast.makeText(WalletActivity.this, "您暂未设置支付密码，请设置支付密码！", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(WalletActivity.this, UpdatePayPwdActivity.class);
+                        startActivity(intent);
+                    }
+                }
+            }
+            //请求异常后的回调方法
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+            }
+            //主动调用取消请求的回调方法
+            @Override
+            public void onCancelled(CancelledException cex) {
+            }
+            @Override
+            public void onFinished() {
             }
         });
     }

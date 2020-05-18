@@ -122,8 +122,13 @@ public class LoginActivity extends BaseActivity {
                 CommonModel model = JSON.parseObject(result, CommonModel.class);
                 if (model.getStatus() == 0) {
                     SPUtils.put(LoginActivity.this, "UserToken", model.getData().toString());
-                    // 获取用户信息
-                    getUserInfo(verifica, model.getData().toString());
+                    if (!verifica.equals("")) {
+                        // 绑定上下级关系
+                        callSubmitInvitationCode(verifica,  model.getData().toString());
+                    } else {
+                        // 获取用户信息
+                        getUserInfo(verifica, model.getData().toString());
+                    }
                 } else {
                     Toast.makeText(LoginActivity.this, getString(R.string.login_fail) + String.valueOf(model.getMessage()), Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
@@ -145,6 +150,7 @@ public class LoginActivity extends BaseActivity {
             }
             @Override
             public void onFinished() {
+
             }
         });
     }
@@ -218,10 +224,7 @@ public class LoginActivity extends BaseActivity {
             }
             @Override
             public void onFinished() {
-                if (!verifica.equals("")) {
-                    // 绑定上下级关系
-                    callSubmitInvitationCode(verifica, token);
-                }
+                dialog.dismiss();
             }
         });
     }
@@ -229,7 +232,7 @@ public class LoginActivity extends BaseActivity {
     /**
      * 绑定上下级关系
      */
-    private void callSubmitInvitationCode(final String verifica, String token) {
+    private void callSubmitInvitationCode(final String verifica, final String token) {
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.SUBMIT_INVITATION_CODE);
         params.addQueryStringParameter("invitationCode", verifica);
         params.addQueryStringParameter("token", token);
@@ -258,7 +261,8 @@ public class LoginActivity extends BaseActivity {
 
             @Override
             public void onFinished() {
-                dialog.dismiss();
+                // 获取用户信息
+                getUserInfo(verifica, token);
             }
         });
     }

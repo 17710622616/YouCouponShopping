@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.youcoupon.john_li.youcouponshopping.YouView.YouHeadView
+        android:id="@+id/wallet_head"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorMineGray">
+
+        <ImageView
+            android:id="@+id/wallet_bg_iv"
+            android:layout_width="match_parent"
+            android:layout_height="164dp"
+            android:scaleType="fitXY"
+            android:src="@mipmap/remai_bg"
+            android:layout_marginTop="20dp"/>
+
+        <TextView
+            android:id="@+id/wallet_money_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.0"
+            android:textSize="40sp"
+            android:textColor="@color/colorWhite"
+            android:layout_marginLeft="58dp"
+            android:layout_marginTop="63dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RMB"
+            android:textSize="14sp"
+            android:textColor="@color/colorDrakGray"
+            android:layout_marginLeft="58dp"
+            android:layout_below="@id/wallet_money_tv"/>
+
+        <LinearLayout
+            android:id="@+id/wallet_pwd_ll"
+            style="@style/mineLinearLayout"
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/wallet_bg_iv"
+            android:background="@drawable/shape_bg">
+
+            <ImageView
+                style="@style/MineItemImageView"
+                android:src="@mipmap/wallet"/>
+
+            <TextView
+                style="@style/MineItemTextView"
+                android:text="支付密码"/>
+
+            <ImageView
+                style="@style/MineItemImageNext"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/wallet_withdraw_ll"
+            style="@style/mineLinearLayout"
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/wallet_pwd_ll"
+            android:background="@drawable/shape_bg">
+
+            <ImageView
+                style="@style/MineItemImageView"
+                android:src="@mipmap/mine_wait_for_receiving"/>
+
+            <TextView
+                style="@style/MineItemTextView"
+                android:text="提现"/>
+
+            <ImageView
+                style="@style/MineItemImageNext"/>
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>

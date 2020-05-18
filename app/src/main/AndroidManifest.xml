@@ -54,6 +54,8 @@
         <activity android:name=".YouActivity.ChangePwdActivity" android:screenOrientation="portrait"/>
         <activity android:name=".YouActivity.OrderListActivity" android:screenOrientation="portrait"/>
         <activity android:name=".YouActivity.TeamListActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".YouActivity.WalletActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".YouActivity.UpdatePayPwdActivity" android:screenOrientation="portrait"/>
 
         <meta-data
             android:name="android.max_aspect"

@@ -93,7 +93,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     private ImageView shopIconIv;
     private RelativeLayout itemDetialIv;
     private LinearLayout shareLL;
-    private TextView merchandiseTitleTv, afterPriceTv, beforePriceTv, inSaleTv, merchantsTypeTv, couponValueTv, couponRemainCountTv, couponRedemptionTv, sellerNickTv, storeRatingTv, sellerRateTv, shopProvcitytV;
+    private TextView merchandiseTitleTv, afterPriceTv, beforePriceTv, inSaleTv, sahreTv, merchantsTypeTv, couponValueTv, couponRemainCountTv, couponRedemptionTv, sellerNickTv, storeRatingTv, sellerRateTv, shopProvcitytV;
     private RelativeLayout shopRL;
     private FrameLayout sellerRecommondFL;
     private NoScrollGridView mStoreRecommonGv;
@@ -141,6 +141,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         afterPriceTv = (TextView) findViewById(R.id.merchandise_detial_after);
         beforePriceTv = (TextView) findViewById(R.id.merchandise_detial_before);
         inSaleTv = (TextView) findViewById(R.id.merchandise_detial_in_sales);
+        sahreTv = findViewById(R.id.merchandise_share_tv);
         merchantsTypeTv = (TextView) findViewById(R.id.merchandise_detial_merchants_type);
         couponValueTv = (TextView) findViewById(R.id.merchandise_detial_coupon);
         couponRemainCountTv = (TextView) findViewById(R.id.merchandise_detial_coupon_remain_coun);
@@ -210,25 +211,42 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
 
         // 設置標題及內容
         if (mMaterialItemModel.getCouponInfo() != null) {
-            couponValueTv.setText(String.valueOf(mMaterialItemModel.getCouponInfo()));
-            couponRemainCountTv.setText("剩餘數量：" + String.valueOf(mMaterialItemModel.getCouponRemainCount()));
-            beforePriceTv.setText("原價¥" + mMaterialItemModel.getZkFinalPrice());
-            // 按指定模式在字符串查找
-            Pattern p=Pattern.compile("\\d+");
-            Matcher m=p.matcher(mMaterialItemModel.getCouponInfo());
-            double afterCoupon = 0.01;
-            while(m.find()) {
-                if (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) >= Double.parseDouble(m.group())) {
-                    if (m.find()) {
-                        afterPriceTv.setText("¥" + String.format("%.2f", (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) - Double.parseDouble(m.group()))));
-                        afterCoupon = Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) - Double.parseDouble(m.group());
+            if(!mMaterialItemModel.getCouponInfo().equals("")) {
+                couponValueTv.setText(String.valueOf(mMaterialItemModel.getCouponInfo()));
+                couponRemainCountTv.setText("剩餘數量：" + String.valueOf(mMaterialItemModel.getCouponRemainCount()));
+                beforePriceTv.setText("原價¥" + mMaterialItemModel.getZkFinalPrice());
+                // 按指定模式在字符串查找
+                Pattern p=Pattern.compile("\\d+");
+                Matcher m=p.matcher(mMaterialItemModel.getCouponInfo());
+                double afterCoupon = 0.01;
+                while(m.find()) {
+                    if (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) >= Double.parseDouble(m.group())) {
+                        if (m.find()) {
+                            if (Double.parseDouble(m.group()) == 0.0) {
+                                if (m.find()) {
+                                    afterPriceTv.setText("¥" + String.format("%.2f", (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) - Double.parseDouble(m.group()))));
+                                    afterCoupon = Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) - Double.parseDouble(m.group());
+                                }
+                            } else {
+                                afterPriceTv.setText("¥" + String.format("%.2f", (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) - Double.parseDouble(m.group()))));
+                                afterCoupon = Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) - Double.parseDouble(m.group());
+                            }
+                        }
+
+                        break;
                     }
-
-                    break;
                 }
-            }
 
-            couponRedemptionTv.setText("领券购买，返" +String.format("%.2f", (0.78 * (afterCoupon * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
+                sahreTv.setText("分享賺" +String.format("%.2f", (0.78 * (afterCoupon * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
+                couponRedemptionTv.setText("领券购买，返" +String.format("%.2f", (0.78 * (afterCoupon * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
+            } else {
+                beforePriceTv.setVisibility(View.GONE);
+                couponValueTv.setVisibility(View.GONE);
+                couponRemainCountTv.setVisibility(View.GONE);
+                afterPriceTv.setText(String.valueOf(mMaterialItemModel.getZkFinalPrice()));
+
+                couponRedemptionTv.setText("点我购买，返" +String.format("%.2f", (0.78 * (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
+            }
         } else {
             beforePriceTv.setVisibility(View.GONE);
             couponValueTv.setVisibility(View.GONE);
@@ -450,7 +468,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     private void callNetGetTPWD() {
         Map<String, String> paramsMap = new HashMap<>();
         String shareUrl = "";
-        String url = mMaterialItemModel.getCouponShareUrl().contains("http") ? mMaterialItemModel.getCouponShareUrl() : "http:" + mMaterialItemModel.getCouponShareUrl();
+        String url = mMaterialItemModel.getCouponShareUrl().contains("https") ? mMaterialItemModel.getCouponShareUrl() : "https:" + mMaterialItemModel.getCouponShareUrl();
         String userInfoJson = (String) SPUtils.get(MerchandiseDetialActivity.this, "UserInfo", "");
         if(!userInfoJson.equals("")) {
             UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
@@ -597,8 +615,29 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                         });*/
                 break;
             case R.id.merchandise_detial_detial_title_rl:
+                // 判断是否登录APP账户
+                if (!((String) SPUtils.get(MerchandiseDetialActivity.this, "UserToken", "")).equals("")) {
+                    // 判断relationId是否为0
+                    String userInfoJson = (String) SPUtils.get(MerchandiseDetialActivity.this, "UserInfo", "");
+                    if(!userInfoJson.equals("")) {
+                        UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
+                        if (userInfoModel.getRelationId() != 0) {
+                            // 拼接relationId打开领券链接
+                            openTBKUrl(userInfoModel.getRelationId());
+                        } else {
+                            // 打开提示成为合作者视窗
+                            showTBAuthDialog();
+                        }
+                    } else {
+                        Toast.makeText(MerchandiseDetialActivity.this, "登录信息异常！请重新登录", Toast.LENGTH_SHORT).show();
+                        startActivityForResult(new Intent(MerchandiseDetialActivity.this, LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                    }
+                } else {
+                    startActivityForResult(new Intent(MerchandiseDetialActivity.this, LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
+
                 //展示参数配置
-                AlibcTaokeParams detialTaokeParams = new AlibcTaokeParams("", "", "");
+                /*AlibcTaokeParams detialTaokeParams = new AlibcTaokeParams("", "", "");
                 //detialTaokeParams.setPid("mm_132021823_45408225_571244745");
                 detialTaokeParams.setPid("mm_132021823_45408225_109946850496");
                 detialTaokeParams.setAdzoneid("109946850496");
@@ -635,7 +674,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                                     Toast.makeText(MerchandiseDetialActivity.this, msg, Toast.LENGTH_SHORT).show();
                                 }
                             }
-                        });
+                        });*/
                 break;
             case R.id.merchandise_detial_shop_rl:
                 if (mSellerModel != null) {
@@ -818,7 +857,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
      * 打开分享提示
      */
     private void openShare() {
-        String content = "複至这条消息去桃宝," + mTpwd + ",【" + mMaterialItemModel.getTitle() + "," + mMaterialItemModel.getCouponInfo() + "】";
+        String content = "複至这条消息去桃寶," + mTpwd + ",【" + mMaterialItemModel.getTitle() + "," + mMaterialItemModel.getCouponInfo() + "】";
         YouCommonUtils.copyToClipboard(this, content);
         AlertDialog.Builder builder = new AlertDialog.Builder(MerchandiseDetialActivity.this);
         LayoutInflater inflater = LayoutInflater.from(MerchandiseDetialActivity.this);
@@ -827,12 +866,20 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         LinearLayout whatsapp = (LinearLayout) v.findViewById(R.id.dialog_whatsapp);
         LinearLayout fb = (LinearLayout) v.findViewById(R.id.dialog_fb);
         TextView shareTv = (TextView) v.findViewById(R.id.dialog_share_tv);
+        ImageView cancelIv = v.findViewById(R.id.dialog_share_cancel);
         //builer.setView(v);//这里如果使用builer.setView(v)，自定义布局只会覆盖title和button之间的那部分
         final Dialog dialog = builder.create();
         dialog.show();
         dialog.getWindow().setContentView(v);//自定义布局应该在这里添加，要在dialog.show()的后面
+        dialog.setCancelable(true);
         //dialog.getWindow().setGravity(Gravity.CENTER);//可以设置显示的位置
         shareTv.setText(content);
+        cancelIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
         wechat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

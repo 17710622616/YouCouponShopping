@@ -46,6 +46,7 @@ import com.youcoupon.john_li.youcouponshopping.YouActivity.SuggestActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.TeamListActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.TutorialActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.UserInfoActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.WalletActivity;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
@@ -69,7 +70,7 @@ import java.util.Map;
 
 public class MineFragment extends LazyLoadFragment implements View.OnClickListener{
     public static String TAG = MineFragment.class.getName();
-    private TextView nickTv, invitationCodeTv,taobaoAuthTv, performanceThisMonthTv, performanceLastMonthTv, integralTv;
+    private TextView nickTv, invitationCodeTv,taobaoAuthTv, performanceThisMonthTv, performanceLastMonthTv, balanceTv;
     private ImageView headIv;//userInfoLL
     private RelativeLayout userInfoRl;
     private RefreshLayout mRefreshLayout;
@@ -105,7 +106,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         headIv = (ImageView) findViewById(R.id.user_head);
         performanceThisMonthTv = (TextView) findViewById(R.id.mine_performance_this_month);
         performanceLastMonthTv = (TextView) findViewById(R.id.mine_performance_last_month);
-        integralTv = (TextView) findViewById(R.id.mine_integral);
+        balanceTv = (TextView) findViewById(R.id.mine_balance);
         //userInfoLL = (LinearLayout) findViewById(R.id.user_info);
         incomeLL = (LinearLayout) findViewById(R.id.mine_income);
         teamLL = (LinearLayout) findViewById(R.id.mine_team);
@@ -130,7 +131,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     public void setListener() {
         performanceThisMonthTv.setOnClickListener(this);
         performanceLastMonthTv.setOnClickListener(this);
-        integralTv.setOnClickListener(this);
+        balanceTv.setOnClickListener(this);
         userInfoRl.setOnClickListener(this);
         incomeLL.setOnClickListener(this);
         teamLL.setOnClickListener(this);
@@ -187,8 +188,13 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             case R.id.mine_performance_last_month:
 
                 break;
-            case R.id.mine_integral:
-                Toast.makeText(getApplicationContext(), "入口暂未开放，敬请期待！", Toast.LENGTH_LONG).show();
+            case R.id.mine_balance:
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    Intent walletIntent = new Intent(getActivity(), WalletActivity.class);
+                    startActivity(walletIntent);
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
                 break;
             case R.id.mine_income:
 
@@ -296,7 +302,10 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             } else {
                 invitationCodeTv.setText("邀请码：点我获取");
             }
-            //AliyunOSSUtils.downloadImg(mUserInfoModel.getHeadimg(), AliyunOSSUtils.initOSS(getActivity()), headIv, getActivity(), R.mipmap.head_boy);
+
+            //显示余额
+            balanceTv.setText(mUserInfoModel.getBalance() + "\n余额");
+            //头像
             x.image().bind(headIv, mUserInfoModel.getHead_img(), options);
 
             // 检查是否为合作者

@@ -31,7 +31,10 @@ import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.youcoupon.john_li.youcouponshopping.MerchandiseDetialActivity;
 import com.youcoupon.john_li.youcouponshopping.R;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.MaterialItemAdapter;
+import com.youcoupon.john_li.youcouponshopping.YouAdapter.SearchMaterialAdapter;
+import com.youcoupon.john_li.youcouponshopping.YouModel.HotKeyWordOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.MaterialClassifyItemOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.KeybordUtil;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.StatusBarUtil;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
@@ -64,15 +67,16 @@ public class SearchResultActivity extends AppCompatActivity {
     private LinearLayout mSearchIntroLL;
 
     private List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> searchModelList;
+    private List<HotKeyWordOutModel.DataBean> hotKeyWordList;
     private String str;
     private String sort = "tk_total_sales";
     private long pageNo = 1;
     private String isDefault = "true";
     private long pageSize = 10;
-    private MaterialItemAdapter mMaterialItemAdapter;
+    private SearchMaterialAdapter mSearchMaterialAdapter;
 
-    String[] titles = new String[]{"眉笔", "时尚连衣裙", "爽肤水", "积木", "男士内裤",
-            "Iphone", "扫地机器人", "毛绒玩具", "名片设计", "打印机"};
+    /*String[] titles = new String[]{"眉笔", "时尚连衣裙", "爽肤水", "积木", "男士内裤",
+            "Iphone", "扫地机器人", "毛绒玩具", "名片设计", "打印机"};*/
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,7 +129,8 @@ public class SearchResultActivity extends AppCompatActivity {
                 if (str != null) {
                     if (!str.equals("")) {
                         searchModelList.clear();
-                        callNetSearchItem(str);
+                        mRefreshLayout.autoRefresh();
+                        mSearchIntroLL.setVisibility(View.GONE);
                     }
                 }
             }
@@ -196,6 +201,8 @@ public class SearchResultActivity extends AppCompatActivity {
     private void initData() {
         // 獲取歷史數據
         searchModelList = new ArrayList<>();
+        // 热门搜索词
+        hotKeyWordList = new ArrayList<>();
 
         // searview
         //设置搜索框直接展开显示。左侧有放大镜(在搜索框中) 右侧有叉叉 可以关闭搜索框
@@ -231,13 +238,16 @@ public class SearchResultActivity extends AppCompatActivity {
             }
         });
 
-        mMaterialItemAdapter = new MaterialItemAdapter(searchModelList, this);
-        mGv.setAdapter(mMaterialItemAdapter);
+        mSearchMaterialAdapter = new SearchMaterialAdapter(searchModelList, this);
+        mGv.setAdapter(mSearchMaterialAdapter);
 
-        for (String text : titles) {
-            TextView textView = buildLabel(text);
-            mFlowLayout.addView(textView);
-        }
+        callGetHotWord();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        KeybordUtil.closeKeybord(this);
     }
 
     /**
@@ -262,8 +272,9 @@ public class SearchResultActivity extends AppCompatActivity {
             public void onSuccess(String result) {
                 MaterialClassifyItemOutModel model = JSON.parseObject(result, MaterialClassifyItemOutModel.class);
                 if (model.getStatus() == 0) {
+                    isDefault = model.getData().getIs_default();
                     searchModelList.addAll(model.getData().getMap_data());
-                    mMaterialItemAdapter.notifyDataSetChanged();
+                    mSearchMaterialAdapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
                 }
@@ -287,7 +298,6 @@ public class SearchResultActivity extends AppCompatActivity {
         });
     }
 
-
     /**
      * 獲取熱門關鍵詞
      */
@@ -297,10 +307,13 @@ public class SearchResultActivity extends AppCompatActivity {
         x.http().get(params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
-                MaterialClassifyItemOutModel model = JSON.parseObject(result, MaterialClassifyItemOutModel.class);
+                HotKeyWordOutModel model = JSON.parseObject(result, HotKeyWordOutModel.class);
                 if (model.getStatus() == 0) {
-                    searchModelList.addAll(model.getData().getMap_data());
-                    mMaterialItemAdapter.notifyDataSetChanged();
+                    hotKeyWordList.addAll(model.getData());
+                    for (HotKeyWordOutModel.DataBean text : hotKeyWordList) {
+                        TextView textView = buildLabel(text.getKeyWord());
+                        mFlowLayout.addView(textView);
+                    }
                 } else {
                     //Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
                 }

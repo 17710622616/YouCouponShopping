@@ -7,4 +7,6 @@
     <string name="network_error">网络异常</string>
     <string name="request_error">请求异常</string>
     <string name="no_more_data">暂无更多数据！</string>
+    <string name="my_wallet">我的钱包</string>
+    <string name="balance_error">获取余额异常</string>
 </resources>

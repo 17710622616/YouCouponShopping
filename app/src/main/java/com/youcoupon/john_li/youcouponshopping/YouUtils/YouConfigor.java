@@ -74,5 +74,7 @@ public class YouConfigor {
     // 获取二级下线成员
     public static final String GET_SECOND_LEVEL_MEMBER_LIST = "/api/Team/getSecondLevelMember?";
     // 获取淘口令
-    public static final String ITEM_GET_TPWD = "/api/Team/GetItemTPWD?";
+    public static final String ITEM_GET_TPWD = "/api/Item/GetItemTPWD?";
+    // 获取余额
+    public static final String GET_BALANCE = "/api/Wallet/getBalance";
 }

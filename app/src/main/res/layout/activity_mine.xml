@@ -130,12 +130,12 @@
                             android:paddingBottom="30dp"
                             android:paddingTop="30dp"/>
                         <TextView
-                            android:id="@+id/mine_integral"
+                            android:id="@+id/mine_balance"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:text="0\n积分"
+                            android:text="0.0\n余额"
                             android:textColor="@color/colorWhite"
                             android:textSize="16sp"
                             android:paddingBottom="30dp"

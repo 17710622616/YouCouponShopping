@@ -2,6 +2,7 @@ package com.youcoupon.john_li.youcouponshopping;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
@@ -120,6 +121,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     private MaterialItemAdapter mMaterialItemAdapter;
     // 淘口令
     private String mTpwd = "";
+    private ProgressDialog dialog;
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -516,7 +518,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
 
             @Override
             public void onFinished() {
-
+                dialog.dismiss();
             }
         });
     }
@@ -538,6 +540,11 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                 /*if (mSellerModel != null) {
                     openH5Url(String.valueOf(mSellerModel.getShopUrl()));
                 }*/
+                dialog = new ProgressDialog(this);
+                dialog.setTitle("提示");
+                dialog.setMessage("正在加载中......");
+                dialog.setCancelable(false);
+                dialog.show();
                 // 获取淘口令
                 // 判断是否登录APP账户
                 if (!((String) SPUtils.get(MerchandiseDetialActivity.this, "UserToken", "")).equals("")) {
@@ -547,14 +554,17 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                         if (userInfoModel.getRelationId() != 0) {
                             callNetGetTPWD();
                         } else {
+                            dialog.dismiss();
                             // 打开提示成为合作者视窗
                             showTBAuthDialog();
                         }
                     } else {
+                        dialog.dismiss();
                         Toast.makeText(MerchandiseDetialActivity.this, "登录信息异常！请重新登录", Toast.LENGTH_SHORT).show();
                         startActivityForResult(new Intent(MerchandiseDetialActivity.this, LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                     }
                 } else {
+                    dialog.dismiss();
                     startActivityForResult(new Intent(MerchandiseDetialActivity.this, LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                 }
                 break;
@@ -755,7 +765,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                     UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject((String) SPUtils.get(MerchandiseDetialActivity.this, "UserInfo", ""), UserInfoOutsideModel.DataBean.class);
                     userInfoModel.setRelationId(Long.parseLong(relationId));
 
-                    String userInfoJson = JSON.toJSONString(model.getData());
+                    String userInfoJson = JSON.toJSONString(userInfoModel);
                     SPUtils.put(MerchandiseDetialActivity.this, "UserInfo", userInfoJson);
                     Toast.makeText(getApplicationContext(), "申请成为合作者成功，快去分享或者购买吧！" + model.getMessage(), Toast.LENGTH_SHORT).show();
                 } else {

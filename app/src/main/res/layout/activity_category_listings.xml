@@ -80,14 +80,15 @@
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tab_layout"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="?attr/actionBarSize"
                 app:tabMode="scrollable"
                 app:tabTextColor="@color/colorLineGray"
                 app:tabIndicatorHeight="2dp"
                 app:tabSelectedTextColor="@color/colorDrakGray"
                 app:tabIndicatorColor="@color/colorPrimaryDark"
-                android:background="@color/colorWhite"/>
+                android:background="@color/colorWhite"
+                android:layout_gravity="center"/>
 
             <GridView
                 android:id="@+id/category_listing_gv"

@@ -66,6 +66,7 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
     private ImageView headImgIv;
     private LinearLayout headImgLL, nameLL,sexLL, birthdayLL, areaLL;
     private TextView nameTv,sexTv, birthdayTv, areaTv, saveTv;
+    private EditText desEt;
     private ProgressDialog dialog;
 
     private File dir; //圖片文件夾路徑
@@ -114,6 +115,7 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
         birthdayTv = findViewById(R.id.userinfo_birthday_tv);
         areaTv = findViewById(R.id.userinfo_flag_tv);
         saveTv = findViewById(R.id.userinfo_save_btn);
+        desEt = findViewById(R.id.userinfo_des_et);
         nameLL = findViewById(R.id.userinfo_name_ll);
         sexLL = findViewById(R.id.userinfo_sex_ll);
         birthdayLL = findViewById(R.id.userinfo_birthday_ll);
@@ -151,12 +153,17 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
                     sexTv.setText("保密");
                     break;
             }
+
             if (mUserInfoModel.getBirth_day().equals("")) {
                 birthdayTv.setText("0000-00-00");
             } else {
                 birthdayTv.setText(mUserInfoModel.getBirth_day());
             }
             birthdayTv.setText(mUserInfoModel.getBirth_day());
+            if (!mUserInfoModel.getDescx().equals("")) {
+                desEt.setText(mUserInfoModel.getDescx());
+            }
+
             areaTv.setText(mUserInfoModel.getAddress());
             x.image().bind(headImgIv, mUserInfoModel.getHead_img(), options);
         } else {
@@ -204,16 +211,26 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
         dialog.setMessage("正在修改中......");
         dialog.setCancelable(false);
         dialog.show();
+        mUserInfoModel.setDescx(desEt.getText().toString());
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.UPDATE_USER_INFO);
         params.setAsJsonContent(true);
-        params.addQueryStringParameter("nickname", String.valueOf(mUserInfoModel.getNick_name()));
-        params.addQueryStringParameter("headimg", String.valueOf(mUserInfoModel.getHead_img()));
-        params.addQueryStringParameter("birthday", String.valueOf(mUserInfoModel.getBirth_day()));
-        params.addQueryStringParameter("realName", String.valueOf(mUserInfoModel.getAddress()));
-        params.addQueryStringParameter("descx", String.valueOf(mUserInfoModel.getDescx()));
-        params.addQueryStringParameter("idCardNo", String.valueOf(mUserInfoModel.getId_card_no()));
-        params.addQueryStringParameter("address", String.valueOf(mUserInfoModel.getAddress()));
-        params.addHeader("token", String.valueOf(SPUtils.get(this, "UserToken", "")));
+        JSONObject jsonObj = new JSONObject();
+        try {
+            jsonObj.put("mobile", String.valueOf(mUserInfoModel.getMobile()));
+            jsonObj.put("nick_name", String.valueOf(mUserInfoModel.getNick_name()));
+            jsonObj.put("head_img", String.valueOf(mUserInfoModel.getHead_img()));
+            jsonObj.put("birth_day", String.valueOf(mUserInfoModel.getBirth_day()));
+            jsonObj.put("real_name", String.valueOf(mUserInfoModel.getReal_name()));
+            jsonObj.put("descx", String.valueOf(mUserInfoModel.getDescx()));
+            jsonObj.put("sex", String.valueOf(mUserInfoModel.getSex()));
+            jsonObj.put("id_card_no", String.valueOf(mUserInfoModel.getId_card_no()));
+            jsonObj.put("address", String.valueOf(mUserInfoModel.getAddress()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String urlJson = jsonObj.toString();
+        params.setBodyContent(urlJson);
+        params.addQueryStringParameter("token", String.valueOf(SPUtils.get(this, "UserToken", "")));
         String uri = params.getUri();
         params.setConnectTimeout(30 * 1000);
         x.http().request(HttpMethod.POST, params, new Callback.CommonCallback<String>() {

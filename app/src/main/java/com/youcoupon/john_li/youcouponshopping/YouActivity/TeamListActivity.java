@@ -192,7 +192,9 @@ public class TeamListActivity extends BaseActivity implements View.OnClickListen
                     List<TeamMemberOutModel.DataBean.DataModelsBean> orderModelsFromNet = model.getData().getDataModels();
                     memberList.addAll(orderModelsFromNet);
                     mSmartTeamRefreshAdapter.notifyDataSetChanged();
-                } else {
+                } else if (model.getStatus() == -2){
+                    Toast.makeText(TeamListActivity.this,  "获取成员列表成功！暂无成员", Toast.LENGTH_SHORT).show();
+                }else {
                     Toast.makeText(TeamListActivity.this,  "获取成员列表异常", Toast.LENGTH_SHORT).show();
                 }
             }

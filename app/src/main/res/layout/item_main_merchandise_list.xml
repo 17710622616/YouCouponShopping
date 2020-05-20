@@ -40,7 +40,7 @@
                 android:text="標題"
                 android:textSize="14sp"
                 android:textColor="@color/colorBlack"
-                android:maxLines="2"/>
+                android:lines="2"/>
 
             <TextView
                 android:id="@+id/item_main_merchandise_original_price"

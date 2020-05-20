@@ -1,5 +1,6 @@
 package com.youcoupon.john_li.youcouponshopping.YouActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -27,6 +28,7 @@ public class WalletActivity extends BaseActivity implements View.OnClickListener
     private TextView moneyTv;
     private LinearLayout pwdLL, withdrwaLL;
     private double balance;
+    private ProgressDialog dialog;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +57,7 @@ public class WalletActivity extends BaseActivity implements View.OnClickListener
     public void initData() {
         callNetGetBalance();
         headView.setTitle(getResources().getString(R.string.my_wallet));
+        headView.setRightText("余额记录", this);
         headView.setLeft(this);
     }
 
@@ -64,20 +67,36 @@ public class WalletActivity extends BaseActivity implements View.OnClickListener
             case R.id.head_left:
                 finish();
                 break;
+            case R.id.head_right_tv:
+                startActivity(new Intent(this, WalletRecrodActivity.class));
+                break;
             case R.id.wallet_pwd_ll:
-                Intent intent = new Intent(WalletActivity.this, UpdatePayPwdActivity.class);
-                startActivity(intent);
+                dialog = new ProgressDialog(this);
+                dialog.setTitle("系统");
+                dialog.setMessage("检查是否有支付密码......");
+                dialog.setCancelable(false);
+                dialog.show();
+                getHasPayPw(1);
                 break;
             case R.id.wallet_withdraw_ll:
+                dialog = new ProgressDialog(this);
+                dialog.setTitle("系统");
+                dialog.setMessage("检查是否有支付密码......");
+                dialog.setCancelable(false);
+                dialog.show();
                 if (balance > 0) {
-                    getHasPayPw();
+                    getHasPayPw(2);
                 } else {
+                    dialog.dismiss();;
                     Toast.makeText(WalletActivity.this, "您暂无可提现余额！", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
     }
 
+    /**
+     * 获取余额
+     */
     private void callNetGetBalance() {
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_BALANCE);
         params.addQueryStringParameter("token", String.valueOf(SPUtils.get(this, "UserToken", "")));
@@ -119,7 +138,7 @@ public class WalletActivity extends BaseActivity implements View.OnClickListener
     /**
      * 判断是否有支付密码
      */
-    private void getHasPayPw() {
+    private void getHasPayPw(final int i) {
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_USER_HAS_PAY_PW + SPUtils.get(WalletActivity.this, "UserToken", ""));
         params.setConnectTimeout(30 * 1000);
         x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
@@ -129,15 +148,27 @@ public class WalletActivity extends BaseActivity implements View.OnClickListener
                 if (model.getStatus() == 0) {
                     String hasPayPw =  JSON.toJSONString(model.getData()).toString();
 
-                    if (hasPayPw.equals("true")) {
-                        SPUtils.put(WalletActivity.this, "HasPayPw", "1");
-                        Intent intent2 = new Intent(WalletActivity.this, WithDrawActivity.class);
-                        intent2.putExtra("balance", !moneyTv.getText().toString().equals("") ? Double.parseDouble(moneyTv.getText().toString()) : 0.0);
-                        startActivity(intent2);
+                    if (i == 2){
+                        if (hasPayPw.equals("true")) {
+                            SPUtils.put(WalletActivity.this, "HasPayPw", "1");
+                            Intent intent2 = new Intent(WalletActivity.this, WithDrawActivity.class);
+                            intent2.putExtra("balance", !moneyTv.getText().toString().equals("") ? Double.parseDouble(moneyTv.getText().toString()) : 0.0);
+                            startActivity(intent2);
+                        } else {
+                            Toast.makeText(WalletActivity.this, "您暂未设置支付密码，请设置支付密码！", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(WalletActivity.this, UpdatePayPwdActivity.class);
+                            startActivity(intent);
+                        }
                     } else {
-                        Toast.makeText(WalletActivity.this, "您暂未设置支付密码，请设置支付密码！", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(WalletActivity.this, UpdatePayPwdActivity.class);
-                        startActivity(intent);
+                        if (hasPayPw.equals("true")) {
+                            Intent intent = new Intent(WalletActivity.this, UpdatePayPwdActivity.class);
+                            intent.putExtra("startWay", "UPDATE");
+                            startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(WalletActivity.this, UpdatePayPwdActivity.class);
+                            intent.putExtra("startWay", "CREATE");
+                            startActivity(intent);
+                        }
                     }
                 }
             }
@@ -151,6 +182,7 @@ public class WalletActivity extends BaseActivity implements View.OnClickListener
             }
             @Override
             public void onFinished() {
+                dialog.dismiss();;
             }
         });
     }

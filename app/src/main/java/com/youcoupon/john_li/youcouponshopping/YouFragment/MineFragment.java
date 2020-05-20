@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.ali.auth.third.login.LoginService;
 import com.ali.auth.third.login.callback.LogoutCallback;
@@ -41,6 +42,7 @@ import com.youcoupon.john_li.youcouponshopping.YouActivity.BecomePartnerActivity
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BussinesActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.ChangePwdActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.OrderListActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.PerformanceActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.ServiceActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.SuggestActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.TeamListActivity;
@@ -48,6 +50,7 @@ import com.youcoupon.john_li.youcouponshopping.YouActivity.TutorialActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.UserInfoActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.WalletActivity;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.PerformanceOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
@@ -61,6 +64,7 @@ import org.xutils.http.RequestParams;
 import org.xutils.image.ImageOptions;
 import org.xutils.x;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -167,7 +171,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         //taobaoAuth();
 
         // 显示用户信息
-        showUserInfo();
+        //showUserInfo();
     }
 
     @Override
@@ -183,10 +187,20 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 }
                 break;
             case R.id.mine_performance_this_month:
-
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    Intent performanceIntent = new Intent(getActivity(), PerformanceActivity.class);
+                    startActivity(performanceIntent);
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
                 break;
             case R.id.mine_performance_last_month:
-
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    Intent performanceIntent = new Intent(getActivity(), PerformanceActivity.class);
+                    startActivity(performanceIntent);
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
                 break;
             case R.id.mine_balance:
                 if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
@@ -197,7 +211,12 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 }
                 break;
             case R.id.mine_income:
-
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    Intent performanceIntent = new Intent(getActivity(), PerformanceActivity.class);
+                    startActivity(performanceIntent);
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
                 break;
             case R.id.mine_team:
                 if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
@@ -384,8 +403,9 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             x.image().bind(headIv, "", options);
             nickTv.setText("立即登录");
             invitationCodeTv.setVisibility(View.INVISIBLE);
-            performanceThisMonthTv.setText("0.0\n本月预估");
-            performanceLastMonthTv.setText("0.0\n上月预估");
+            performanceThisMonthTv.setText("0.0元\n本月预估");
+            performanceLastMonthTv.setText("0.0元\n上月预估");
+            balanceTv.setText("0.0元\n余额");
             Toast.makeText(getActivity(), "您暂未等，请先登录！", Toast.LENGTH_SHORT).show();
         }
 
@@ -402,9 +422,9 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
-                CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
+                PerformanceOutModel model =  JSON.parseObject(result.toString(), PerformanceOutModel.class);
                 if (model.getStatus() == 0) {
-                    String performanceThisMonth =  model.getData().toString();
+                    String performanceThisMonth =  model.getData().getCommisonAmount().toString();
                     performanceThisMonthTv.setText(performanceThisMonth + "元\n本月预估");
                 }
             }
@@ -435,9 +455,9 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
-                CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
+                PerformanceOutModel model =  JSON.parseObject(result.toString(), PerformanceOutModel.class);
                 if (model.getStatus() == 0) {
-                    String performanceLastMonth = model.getData().toString();
+                    String performanceLastMonth = model.getData().getCommisonAmount().toString();
                     performanceLastMonthTv.setText(performanceLastMonth + "元\n上月预估");
                 }
             }
@@ -502,7 +522,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             public void onSuccess(String result) {
                 CommonModel model = JSON.parseObject(result.toString(), CommonModel.class);
                 if (model.getStatus() == 0) {
-                    balanceTv.setText(model.getData().toString() + "\n余额");
+                    balanceTv.setText(model.getData().toString() + "元\n余额");
                 } else {
                     Toast.makeText(getActivity(), getString(R.string.balance_error), Toast.LENGTH_SHORT).show();
                 }
@@ -567,7 +587,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                     UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject((String) SPUtils.get(getActivity(), "UserInfo", ""), UserInfoOutsideModel.DataBean.class);
                     userInfoModel.setRelationId(Long.parseLong(relationId));
 
-                    String userInfoJson = JSON.toJSONString(model.getData());
+                    String userInfoJson = JSON.toJSONString(userInfoModel);
                     SPUtils.put(getActivity(), "UserInfo", userInfoJson);
 
                     // 刷新合作者界面
@@ -843,5 +863,20 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                         }
                     }
                 });
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        try {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

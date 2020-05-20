@@ -60,7 +60,7 @@ public class YouConfigor {
     // 修改头像
     public static final String UPDATE_HEAD_IMG = "/api/User/chgHeadImg?";
     // 修改用户信息
-    public static final String UPDATE_USER_INFO = "";
+    public static final String UPDATE_USER_INFO = "/api/User/chgUserInfo?";
     // 提交邀请码
     public static final String SUBMIT_INVITATION_CODE = "/api/User/submitInvitationCode?";
     // 订单列表
@@ -79,4 +79,14 @@ public class YouConfigor {
     public static final String GET_BALANCE = "/api/Wallet/getBalance";
     // 余额提现
     public static final String POST_WITH_DRAWAL = "/api/Wallet/createWithDraw?token=";
+    // 钱包记录
+    public static final String GET_WALLET_RECORDE = "/api/Wallet/getWalletRecordList?";
+    // 修改密码
+    public static final String UPDATE_PAY_PWD = "/api/User/chgPayPwd?";
+    // 新增密码
+    public static final String ADD_PAY_PWD = "/api/User/addPayPwd?";
+    // 获取版本号
+    public static final String CHECK_VERSION = "/api/Tool/GetAPKVer?";
+    // 版本更新下载地址
+    public static final String GET_NEW_APK = "/api/Tool/GetAPK?";
 }

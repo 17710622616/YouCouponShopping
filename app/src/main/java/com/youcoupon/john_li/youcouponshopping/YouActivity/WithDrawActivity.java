@@ -71,7 +71,6 @@ public class WithDrawActivity extends BaseActivity implements View.OnClickListen
     public void initData() {
         headView.setLeft(this);
         headView.setTitle("余额提现");
-        headView.setRightText("余额记录", this);
         mWithDrawalModel = new WithDrawalModel();
         balance = getIntent().getDoubleExtra("balance", 0.0);
         balanceTv.setText("可提现余额RMB：" + balance);
@@ -82,9 +81,6 @@ public class WithDrawActivity extends BaseActivity implements View.OnClickListen
         switch (v.getId()) {
             case R.id.head_left:
                 finish();
-                break;
-            case R.id.head_right_tv:
-                //startActivity(new Intent(this, WithDrawalDeitalActivity.class));
                 break;
             case R.id.wallet_withdraw_agreement:
                 //startActivity(new Intent(this, PaymentAgreementActivity.class));

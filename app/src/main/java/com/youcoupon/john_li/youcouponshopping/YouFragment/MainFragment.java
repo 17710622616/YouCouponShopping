@@ -155,6 +155,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), CategoryListingsActivity.class);
                 intent.putExtra("ClassifyModel", JSON.toJSONString(mainClassifyList.get(position)));
+                intent.putExtra("Positon", 0);
                 startActivity(intent);
             }
         });

@@ -34,6 +34,7 @@ import com.gyf.immersionbar.BarHide;
 import com.gyf.immersionbar.ImmersionBar;
 import com.gyf.immersionbar.OnKeyboardListener;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
+import com.youcoupon.john_li.youcouponshopping.YouFragment.ClassifyFragment;
 import com.youcoupon.john_li.youcouponshopping.YouFragment.MainFragment;
 import com.youcoupon.john_li.youcouponshopping.YouFragment.MineFragment;
 import com.youcoupon.john_li.youcouponshopping.YouFragment.ShopCartFragment;
@@ -54,7 +55,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedChangeListener {
-    private RadioButton park_rb,forum_rb,mine_rb;
+    private RadioButton home_rb,forum_rb,classify_rb,mine_rb;
     private RadioGroup bottom_group;
     private FragmentManager fm;
     private Fragment cacheFragment;
@@ -104,7 +105,8 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     @Override
     public void initView() {
         bottom_group = (RadioGroup)findViewById(R.id.bottom_main_group);
-        park_rb = (RadioButton) findViewById(R.id.bottom_main);
+        home_rb = (RadioButton) findViewById(R.id.bottom_main);
+        classify_rb = findViewById(R.id.bottom_main_classify);
         forum_rb = (RadioButton) findViewById(R.id.bottom_main_recommend);
         mine_rb = (RadioButton) findViewById(R.id.bottom_main_mine);
 
@@ -217,19 +219,29 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
         switch (i){
             case R.id.bottom_main:
-                park_rb.setTextColor(getResources().getColor(R.color.colorPrimary));
+                home_rb.setTextColor(getResources().getColor(R.color.colorPrimary));
+                classify_rb.setTextColor(getResources().getColor(R.color.colorFottor));
                 forum_rb.setTextColor(getResources().getColor(R.color.colorFottor));
                 mine_rb.setTextColor(getResources().getColor(R.color.colorFottor));
                 switchPages(MainFragment.class,MainFragment.TAG);
                 break;
+            case R.id.bottom_main_classify:
+                home_rb.setTextColor(getResources().getColor(R.color.colorFottor));
+                classify_rb.setTextColor(getResources().getColor(R.color.colorPrimary));
+                forum_rb.setTextColor(getResources().getColor(R.color.colorFottor));
+                mine_rb.setTextColor(getResources().getColor(R.color.colorFottor));
+                switchPages(ClassifyFragment.class, ClassifyFragment.TAG);
+                break;
             case R.id.bottom_main_recommend:
-                park_rb.setTextColor(getResources().getColor(R.color.colorFottor));
+                home_rb.setTextColor(getResources().getColor(R.color.colorFottor));
+                classify_rb.setTextColor(getResources().getColor(R.color.colorFottor));
                 forum_rb.setTextColor(getResources().getColor(R.color.colorPrimary));
                 mine_rb.setTextColor(getResources().getColor(R.color.colorFottor));
                 switchPages(ShopCartFragment.class, ShopCartFragment.TAG);
                 break;
             case R.id.bottom_main_mine:
-                park_rb.setTextColor(getResources().getColor(R.color.colorFottor));
+                home_rb.setTextColor(getResources().getColor(R.color.colorFottor));
+                classify_rb.setTextColor(getResources().getColor(R.color.colorFottor));
                 forum_rb.setTextColor(getResources().getColor(R.color.colorFottor));
                 mine_rb.setTextColor(getResources().getColor(R.color.colorPrimary));
                 switchPages(MineFragment.class,MineFragment.TAG);

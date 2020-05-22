@@ -139,6 +139,7 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
     public void initData() {
         Intent intent = getIntent();
         mClassifyTitleModel = JSON.parseObject(intent.getStringExtra("ClassifyModel"), MainClassifyOutModel.DataBean.ResultsBean.class);
+        position = intent.getIntExtra("Positon", 0);
         if (mClassifyTitleModel != null) {
             headView.setTitle(String.valueOf(mClassifyTitleModel.getActivity_title()));
         }

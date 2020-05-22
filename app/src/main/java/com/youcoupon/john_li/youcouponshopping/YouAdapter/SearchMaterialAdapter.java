@@ -94,7 +94,32 @@ public class SearchMaterialAdapter extends BaseAdapter {
                 // 按指定模式在字符串查找
                 Pattern p=Pattern.compile("\\d+");
                 Matcher m=p.matcher(list.get(position).getCouponInfo());
-                double afterCoupon = 0.01;
+                double afterCoupon = Double.parseDouble(list.get(position).getZkFinalPrice());;
+                double couponAmount = 0.001;
+                while(m.find()) {
+                    // 判断不为0，避开减.00的阶段
+                    if(Double.parseDouble(m.group()) != 0.0) {
+                        // 当不为0时判断是否是起减金额
+                        if (Double.parseDouble(list.get(position).getZkFinalPrice()) >= Double.parseDouble(m.group())) {
+                            while (m.find()){
+                                if (Double.parseDouble(m.group()) != 0.0) {
+                                    String price = list.get(position).getZkFinalPrice();
+                                    afterCoupon = Double.parseDouble(list.get(position).getZkFinalPrice()) - Double.parseDouble(m.group());
+                                    couponAmount = Double.parseDouble(m.group());
+                                    //holder.merchandise_price_after_discount.setText("¥" + String.format("%.2f", (Double.parseDouble(list.get(position).getZkFinalPrice()) - Double.parseDouble(m.group()))));
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                holder.merchandise_price_after_discount.setText("¥" + String.format("%.2f", afterCoupon));
+                holder.merchandise_original_coupon_value.setText("减" + couponAmount + "元");
+                holder.item_main_merchandise_rebate.setText("预计返利：" + String.format("%.2f", (0.78 * (afterCoupon * Double.parseDouble(list.get(position).getCommissionRate()) * 0.01))));
+                holder.merchandise_price_after_discount.setText("¥" + String.format("%.2f", (Double.parseDouble(list.get(position).getZkFinalPrice()) - couponAmount)));
+                /*double afterCoupon = 0.01;
                 double couponAmount = 0.01;
                 while(m.find()) {
                     double price = Double.parseDouble(list.get(position).getZkFinalPrice());
@@ -114,7 +139,7 @@ public class SearchMaterialAdapter extends BaseAdapter {
                         holder.item_main_merchandise_rebate.setText("预计返利：" + String.format("%.2f", (0.78 * (afterCoupon * Double.parseDouble(list.get(position).getCommissionRate()) * 0.01))));
                         break;
                     }
-                }
+                }*/
             } else {
                 holder.merchandise_original_coupon_value.setVisibility(View.GONE);
                 holder.item_main_merchandise_rebate.setText("预计返利：" + String.format("%.2f", (0.78 * (Double.parseDouble(list.get(position).getZkFinalPrice()) * Double.parseDouble(list.get(position).getCommissionRate()) * 0.01))));

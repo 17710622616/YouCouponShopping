@@ -9,6 +9,8 @@ import com.alibaba.baichuan.android.trade.callback.AlibcTradeInitCallback;
 import org.greenrobot.eventbus.EventBus;
 import org.xutils.x;
 
+import cn.jpush.android.api.JPushInterface;
+
 /**
  * Created by John on 20/5/2018.
  */
@@ -18,7 +20,9 @@ public class YouApplication extends Application {
     public void onCreate() {
         super.onCreate();
         x.Ext.init(this);
-       CrashCatchHandler.getInstance().init(this);
+        JPushInterface.init(this);
+        String id = JPushInterface.getRegistrationID(this);
+        CrashCatchHandler.getInstance().init(this);
         AlibcTradeSDK.asyncInit(this, new AlibcTradeInitCallback() {
             @Override
             public void onSuccess() {

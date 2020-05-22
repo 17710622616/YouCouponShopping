@@ -89,4 +89,6 @@ public class YouConfigor {
     public static final String CHECK_VERSION = "/api/Tool/GetAPKVer?";
     // 版本更新下载地址
     public static final String GET_NEW_APK = "/api/Tool/GetAPK?";
+    // 好券直播分类
+    public static final String CLASSIFY_TITLE = "/api/Classify/classifyTitle?";
 }

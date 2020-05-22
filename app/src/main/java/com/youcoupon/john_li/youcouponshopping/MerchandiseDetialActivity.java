@@ -220,7 +220,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                 // 按指定模式在字符串查找
                 Pattern p=Pattern.compile("\\d+");
                 Matcher m=p.matcher(mMaterialItemModel.getCouponInfo());
-                double afterCoupon = 0.01;
+                /*double afterCoupon = 0.01;
                 while(m.find()) {
                     if (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) >= Double.parseDouble(m.group())) {
                         if (m.find()) {
@@ -237,8 +237,28 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
 
                         break;
                     }
+                }*/
+                double afterCoupon = Double.parseDouble(mMaterialItemModel.getZkFinalPrice());
+                double couponAmount = 0.001;
+                while(m.find()) {
+                    // 判断不为0，避开减.00的阶段
+                    if(Double.parseDouble(m.group()) != 0.0) {
+                        // 当不为0时判断是否是起减金额
+                        if (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) >= Double.parseDouble(m.group())) {
+                            while (m.find()){
+                                if (Double.parseDouble(m.group()) != 0.0) {
+                                    String price = mMaterialItemModel.getZkFinalPrice();
+                                    afterCoupon = Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) - Double.parseDouble(m.group());
+                                    couponAmount = Double.parseDouble(m.group());
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
                 }
 
+                afterPriceTv.setText("¥" + String.format("%.2f", afterCoupon));
                 sahreTv.setText("分享賺" +String.format("%.2f", (0.78 * (afterCoupon * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
                 couponRedemptionTv.setText("领券购买，返" +String.format("%.2f", (0.78 * (afterCoupon * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
             } else {
@@ -246,7 +266,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                 couponValueTv.setVisibility(View.GONE);
                 couponRemainCountTv.setVisibility(View.GONE);
                 afterPriceTv.setText(String.valueOf(mMaterialItemModel.getZkFinalPrice()));
-
+                sahreTv.setText("分享賺" +String.format("%.2f", (0.78 * (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
                 couponRedemptionTv.setText("点我购买，返" +String.format("%.2f", (0.78 * (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
             }
         } else {
@@ -254,7 +274,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
             couponValueTv.setVisibility(View.GONE);
             couponRemainCountTv.setVisibility(View.GONE);
             afterPriceTv.setText(String.valueOf(mMaterialItemModel.getZkFinalPrice()));
-
+            sahreTv.setText("分享賺" +String.format("%.2f", (0.78 * (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
             couponRedemptionTv.setText("点我购买，返" +String.format("%.2f", (0.78 * (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
         }
         merchandiseTitleTv.setText(mMaterialItemModel.getTitle());
@@ -724,9 +744,10 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
             }
         });
         //设置反面按钮
-        builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("不要返利", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                openTBKUrl(2459322072L);
                 dialog.dismiss();
             }
         });

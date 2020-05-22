@@ -38,6 +38,19 @@
             android:textSize="10sp" />
 
         <RadioButton
+            android:id="@+id/bottom_main_classify"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableTop="@drawable/selector_classify"
+            android:gravity="center"
+            android:text="好券"
+            android:textColor="@color/colorDrakGray"
+            android:textSize="10sp" />
+
+        <RadioButton
             android:id="@+id/bottom_main_mine"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

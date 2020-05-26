@@ -143,8 +143,6 @@ public class WebH5Activity extends BaseActivity implements View.OnClickListener 
 
         });
         mWebView.loadUrl(webUrl);
-
-
     }
 
     @Override

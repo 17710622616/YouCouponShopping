@@ -487,7 +487,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     /**
      * 获取商品淘口令
      */
-    private void callNetGetTPWD() {
+    private void callNetGetTPWD(long relationId) {
         Map<String, String> paramsMap = new HashMap<>();
         String userInfoJson = (String) SPUtils.get(MerchandiseDetialActivity.this, "UserInfo", "");
         String shareUrl = "";
@@ -498,14 +498,10 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
             } else {
                 url = mMaterialItemModel.getCouponShareUrl().contains("https") ? mMaterialItemModel.getCouponShareUrl() : "https:" + mMaterialItemModel.getCouponShareUrl();
             }
-            UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
-            if (userInfoModel.getRelationId() != 0) {
-                shareUrl = url + "&relationId=" + userInfoModel.getRelationId();
-            } else {
-                // 打开提示成为合作者视窗
-                //shareUrl = url;
-                showTBAuthDialog();
+            if (relationId != 0) {
+                shareUrl = url + "&relationId=" + relationId;
             }
+
         } else {
             Toast.makeText(MerchandiseDetialActivity.this, "登录信息异常！请重新登录", Toast.LENGTH_SHORT).show();
             startActivityForResult(new Intent(MerchandiseDetialActivity.this, LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
@@ -572,11 +568,11 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                     if(!userInfoJson1.equals("")) {
                         UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson1, UserInfoOutsideModel.DataBean.class);
                         if (userInfoModel.getRelationId() != 0) {
-                            callNetGetTPWD();
+                            callNetGetTPWD(userInfoModel.getRelationId());
                         } else {
                             dialog.dismiss();
                             // 打开提示成为合作者视窗
-                            showTBAuthDialog();
+                            showTBAuthDialog(1);
                         }
                     } else {
                         dialog.dismiss();
@@ -589,6 +585,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                 }
                 break;
             case R.id.merchandise_detial_coupon_redemption:
+                // 領券購買
                 // 判断是否登录APP账户
                 if (!((String) SPUtils.get(MerchandiseDetialActivity.this, "UserToken", "")).equals("")) {
                     // 判断relationId是否为0
@@ -600,7 +597,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                             openTBKUrl(userInfoModel.getRelationId());
                         } else {
                             // 打开提示成为合作者视窗
-                            showTBAuthDialog();
+                            showTBAuthDialog(0);
                         }
                     } else {
                         Toast.makeText(MerchandiseDetialActivity.this, "登录信息异常！请重新登录", Toast.LENGTH_SHORT).show();
@@ -651,6 +648,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                         });*/
                 break;
             case R.id.merchandise_detial_detial_title_rl:
+                // 宝贝详情
                 // 判断是否登录APP账户
                 if (!((String) SPUtils.get(MerchandiseDetialActivity.this, "UserToken", "")).equals("")) {
                     // 判断relationId是否为0
@@ -662,7 +660,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                             openTBKUrl(userInfoModel.getRelationId());
                         } else {
                             // 打开提示成为合作者视窗
-                            showTBAuthDialog();
+                            showTBAuthDialog(0);
                         }
                     } else {
                         Toast.makeText(MerchandiseDetialActivity.this, "登录信息异常！请重新登录", Toast.LENGTH_SHORT).show();
@@ -722,8 +720,9 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
 
     /**
      * 显示淘宝授权的视图
+     * @param way 0打开，1为分享
      */
-    private void showTBAuthDialog() {
+    private void showTBAuthDialog(final int way) {
         //dialog_taobao_auth
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("请完成淘宝登录");
@@ -747,7 +746,11 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         builder.setNegativeButton("不要返利", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                openTBKUrl(2459322072L);
+                if(way == 0) {
+                    openTBKUrl(2459322072L);
+                } else {
+                    callNetGetTPWD(2459322072L);
+                }
                 dialog.dismiss();
             }
         });

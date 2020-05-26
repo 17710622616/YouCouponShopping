@@ -75,16 +75,24 @@ public class SmartOrderRefreshAdapter extends RecyclerView.Adapter<SmartOrderRef
         holder.item_order_income.setText("预估收入\n" + list.get(position).getIncome_rate());
         switch (list.get(position).getTk_status()) {
             case 3:
-                holder.item_order_status.setText("订单结算");
+                holder.item_order_status.setText("待结算");
+                holder.item_order_status.setBackground(mContext.getResources().getDrawable(R.drawable.shape_order_status));
                 break;
             case 12:
                 holder.item_order_status.setText("订单付款");
+                holder.item_order_status.setBackground(mContext.getResources().getDrawable(R.drawable.shape_order_status));
                 break;
             case 13:
                 holder.item_order_status.setText("订单失效");
+                holder.item_order_status.setBackground(mContext.getResources().getDrawable(R.drawable.shape_order_status_gray));
                 break;
             case 14:
                 holder.item_order_status.setText("订单成功");
+                holder.item_order_status.setBackground(mContext.getResources().getDrawable(R.drawable.shape_order_status));
+                break;
+            case 20:
+                holder.item_order_status.setText("结算成功");
+                holder.item_order_status.setBackground(mContext.getResources().getDrawable(R.drawable.shape_order_status_green));
                 break;
         }
     }

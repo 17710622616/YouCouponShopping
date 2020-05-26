@@ -1,8 +1,10 @@
 package com.youcoupon.john_li.youcouponshopping.YouActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -53,7 +55,8 @@ public class PerformanceActivity extends BaseActivity implements View.OnClickLis
         headView.setLeft(this);
         headView.setTitle("我的效益");
         headView.setRight(R.mipmap.question, this);
-        callNetGetPerformanceLastMonth();
+        callNetGetPerformanceToday();
+        callNetGetPerformanceThisMonth();
         callNetGetPerformanceLastMonth();
     }
 
@@ -64,10 +67,50 @@ public class PerformanceActivity extends BaseActivity implements View.OnClickLis
                 finish();
                 break;
             case R.id.head_right:
+                Intent intent = new Intent(PerformanceActivity.this, WebH5Activity.class);
+                intent.putExtra("title", "新手教程");
+                intent.putExtra("webUrl", "https://bsmaco.m.icoc.bz/col.jsp?id=103");
+                startActivity(intent);
                 break;
         }
     }
 
+    /**
+     * 取当日绩效
+     */
+    private void callNetGetPerformanceToday() {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_PERFORMANCE_TODAY + SPUtils.get(PerformanceActivity.this, "UserToken", ""));
+        params.setConnectTimeout(30 * 1000);
+        x.http().request(HttpMethod.GET ,params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                PerformanceOutModel model =  JSON.parseObject(result.toString(), PerformanceOutModel.class);
+                if (model.getStatus() == 0) {
+                    String performanceThisMonth =  model.getData().getCommisonAmount().toString();
+                    todayPerformanceTv.setText("当日预估\n" +performanceThisMonth + "元");
+                    todayOrderCountTv.setText("订单数量\n"+model.getData().getTotalCount());
+                } else {
+                    todayPerformanceTv.setText("当日预估\n0元");
+                    todayOrderCountTv.setText("订单数量\n0");
+                    Toast.makeText(PerformanceActivity.this, "获取当日预估效益失败！", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            //请求异常后的回调方法
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                todayPerformanceTv.setText("当日预估\n0元");
+                todayOrderCountTv.setText("订单数量\n0");
+            }
+            //主动调用取消请求的回调方法
+            @Override
+            public void onCancelled(CancelledException cex) {
+            }
+            @Override
+            public void onFinished() {
+            }
+        });
+    }
 
     /**
      * 取本月绩效
@@ -83,6 +126,10 @@ public class PerformanceActivity extends BaseActivity implements View.OnClickLis
                     String performanceThisMonth =  model.getData().getCommisonAmount().toString();
                     thisPerformanceTv.setText("本月预估\n" +performanceThisMonth + "元");
                     thisOrderCountTv.setText("订单数量\n"+model.getData().getTotalCount());
+                } else {
+                    thisPerformanceTv.setText("本月预估\n0元");
+                    thisOrderCountTv.setText("订单数量\n0");
+                    Toast.makeText(PerformanceActivity.this, "获取本月预估效益失败！", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -95,8 +142,6 @@ public class PerformanceActivity extends BaseActivity implements View.OnClickLis
             //主动调用取消请求的回调方法
             @Override
             public void onCancelled(CancelledException cex) {
-                thisPerformanceTv.setText("本月预估\n0元");
-                thisOrderCountTv.setText("订单数量\n0");
             }
             @Override
             public void onFinished() {
@@ -118,6 +163,10 @@ public class PerformanceActivity extends BaseActivity implements View.OnClickLis
                     String performanceLastMonth = model.getData().getCommisonAmount().toString();
                     lastPerformanceTv.setText("上月预估\n" + performanceLastMonth + "元");
                     lastOrderCountTv.setText("订单数量\n" + model.getData().getTotalCount());
+                } else {
+                    lastPerformanceTv.setText("上月预估\n0元");
+                    lastOrderCountTv.setText("订单数量\n0");
+                    Toast.makeText(PerformanceActivity.this, "获取上月预估效益失败！", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -130,8 +179,6 @@ public class PerformanceActivity extends BaseActivity implements View.OnClickLis
             //主动调用取消请求的回调方法
             @Override
             public void onCancelled(CancelledException cex) {
-                lastPerformanceTv.setText("上月预估\n0元");
-                lastOrderCountTv.setText("订单数量\n0");
             }
             @Override
             public void onFinished() {

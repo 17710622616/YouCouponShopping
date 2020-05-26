@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="今日"
+            android:text="今日预估"
             android:textSize="20sp"
             android:textColor="@color/colorBlack"
             android:textStyle="bold"
@@ -79,7 +79,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="本月"
+            android:text="本月预估"
             android:textSize="20sp"
             android:textColor="@color/colorBlack"
             android:textStyle="bold"
@@ -135,7 +135,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="上月"
+            android:text="上月预估"
             android:textSize="20sp"
             android:textColor="@color/colorBlack"
             android:textStyle="bold"

@@ -49,6 +49,7 @@ import com.youcoupon.john_li.youcouponshopping.YouActivity.TeamListActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.TutorialActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.UserInfoActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.WalletActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.WalletRecrodActivity;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.PerformanceOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
@@ -212,8 +213,8 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 break;
             case R.id.mine_income:
                 if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
-                    Intent performanceIntent = new Intent(getActivity(), PerformanceActivity.class);
-                    startActivity(performanceIntent);
+                    Intent walletRecrodIntent = new Intent(getActivity(), WalletRecrodActivity.class);
+                    startActivity(walletRecrodIntent);
                 } else {
                     startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                 }

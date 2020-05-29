@@ -172,6 +172,36 @@ public class MaterialClassifyItemOutModel {
             private List<String> SmallImages;
             private String ItemUrl;
             private String Provcity;
+            // 折扣后价格
+            private double PriceAfterDiscount;
+            // 优惠券减多少元
+            private double OriginalCouponValue;
+            // 预计返利
+            private double RebateMoney;
+
+            public double getPriceAfterDiscount() {
+                return PriceAfterDiscount;
+            }
+
+            public void setPriceAfterDiscount(double priceAfterDiscount) {
+                PriceAfterDiscount = priceAfterDiscount;
+            }
+
+            public double getOriginalCouponValue() {
+                return OriginalCouponValue;
+            }
+
+            public void setOriginalCouponValue(double originalCouponValue) {
+                OriginalCouponValue = originalCouponValue;
+            }
+
+            public double getRebateMoney() {
+                return RebateMoney;
+            }
+
+            public void setRebateMoney(double rebateMoney) {
+                RebateMoney = rebateMoney;
+            }
 
             public String getProvcity() {
                 return Provcity;

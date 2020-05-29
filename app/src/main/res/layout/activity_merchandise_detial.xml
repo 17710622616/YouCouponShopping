@@ -71,7 +71,8 @@
                         android:layout_gravity="center_vertical"
                         android:text="XXXXXX"
                         android:textColor="@color/colorBlack"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"
+                        android:textIsSelectable="true"/>
 
                     <TextView
                         android:id="@+id/merchandise_detial_coupon"

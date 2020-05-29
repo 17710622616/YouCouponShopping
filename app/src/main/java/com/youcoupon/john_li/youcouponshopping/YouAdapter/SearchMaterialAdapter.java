@@ -88,7 +88,7 @@ public class SearchMaterialAdapter extends BaseAdapter {
         holder.merchandise_original_price.getPaint().setFlags(Paint. STRIKE_THRU_TEXT_FLAG); //中划线
         holder.merchandise_after_discoun.setText("券后價：");
         holder.merchandise_price_after_discount.setText("¥" + list.get(position).getZkFinalPrice());
-        if (list.get(position).getCouponInfo() != null) {
+        /*if (list.get(position).getCouponInfo() != null) {
             if(!list.get(position).getCouponInfo().equals("")) {
                 //holder.merchandise_original_coupon_value.setText(list.get(position).getCouponInfo());
                 // 按指定模式在字符串查找
@@ -119,7 +119,7 @@ public class SearchMaterialAdapter extends BaseAdapter {
                 holder.merchandise_original_coupon_value.setText("减" + couponAmount + "元");
                 holder.item_main_merchandise_rebate.setText("预计返利：" + String.format("%.2f", (0.78 * (afterCoupon * Double.parseDouble(list.get(position).getCommissionRate()) * 0.01))));
                 holder.merchandise_price_after_discount.setText("¥" + String.format("%.2f", (Double.parseDouble(list.get(position).getZkFinalPrice()) - couponAmount)));
-                /*double afterCoupon = 0.01;
+                *//*double afterCoupon = 0.01;
                 double couponAmount = 0.01;
                 while(m.find()) {
                     double price = Double.parseDouble(list.get(position).getZkFinalPrice());
@@ -139,7 +139,7 @@ public class SearchMaterialAdapter extends BaseAdapter {
                         holder.item_main_merchandise_rebate.setText("预计返利：" + String.format("%.2f", (0.78 * (afterCoupon * Double.parseDouble(list.get(position).getCommissionRate()) * 0.01))));
                         break;
                     }
-                }*/
+                }*//*
             } else {
                 holder.merchandise_original_coupon_value.setVisibility(View.GONE);
                 holder.item_main_merchandise_rebate.setText("预计返利：" + String.format("%.2f", (0.78 * (Double.parseDouble(list.get(position).getZkFinalPrice()) * Double.parseDouble(list.get(position).getCommissionRate()) * 0.01))));
@@ -147,6 +147,19 @@ public class SearchMaterialAdapter extends BaseAdapter {
         } else {
             holder.merchandise_original_coupon_value.setVisibility(View.GONE);
             holder.item_main_merchandise_rebate.setText("预计返利：" + String.format("%.2f", (0.78 * (Double.parseDouble(list.get(position).getZkFinalPrice()) * Double.parseDouble(list.get(position).getCommissionRate()) * 0.01))));
+        }*/
+        if (list.get(position).getCouponInfo() != null) {
+            if(!list.get(position).getCouponInfo().equals("")) {
+                holder.merchandise_price_after_discount.setText("¥" + String.format("%.2f", list.get(position).getPriceAfterDiscount()));
+                holder.merchandise_original_coupon_value.setText("减" + String.format("%.2f", list.get(position).getOriginalCouponValue()) + "元");
+                holder.item_main_merchandise_rebate.setText("预计返利：" + String.format("%.2f", list.get(position).getRebateMoney()));
+            } else {
+                holder.merchandise_original_coupon_value.setVisibility(View.GONE);
+                holder.item_main_merchandise_rebate.setText("预计返利：" + String.format("%.2f", list.get(position).getRebateMoney()));
+            }
+        } else {
+            holder.merchandise_original_coupon_value.setVisibility(View.GONE);
+            holder.item_main_merchandise_rebate.setText("预计返利：" + String.format("%.2f", list.get(position).getRebateMoney()));
         }
         holder.item_main_merchandise_volume.setText("月销：" + list.get(position).getVolume());
         return convertView;

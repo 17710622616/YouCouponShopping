@@ -47,10 +47,22 @@ public class YouConfigor {
     public static final String GET_USER_HAS_PAY_PW = "/api/User/hasPayPwd?token=";
     //獲取用戶当月收益
     public static final String GET_PERFORMANCE_THIS_MONTH = "/api/Performance/GetThisMonthPerformance?token=";
+    //獲取一级当月收益
+    public static final String GET_FIRST_PERFORMANCE_THIS_MONTH = "/api/Performance/GetFirstThisMonthPerformance?token=";
+    //獲取二级当月收益
+    public static final String GET_SECOND_PERFORMANCE_THIS_MONTH = "/api/Performance/GetSecondThisMonthPerformance?token=";
     //獲取用戶上月收益
     public static final String GET_PERFORMANCE_LAST_MONTH = "/api/Performance/GetLastMonthPerformance?token=";
+    //獲取一级上月收益
+    public static final String GET_FIRST_PERFORMANCE_LAST_MONTH = "/api/Performance/GetFirstLastMonthPerformance?token=";
+    //獲取二级上月收益
+    public static final String GET_SECOND_PERFORMANCE_LAST_MONTH = "/api/Performance/GetSecondLastMonthPerformance?token=";
     //獲取用戶当日收益
-    public static final String GET_PERFORMANCE_TODAY = "/api/Performance/GetTodayPerformance?";
+    public static final String GET_PERFORMANCE_TODAY = "/api/Performance/GetTodayPerformance?token=";
+    //一级合伙人本今日预估绩效查看
+    public static final String GET_FIRST_PERFORMANCE_TODAY = "/api/Performance/GetTodayPerformance?token=";
+    //二级合伙人本今日预估绩效查看
+    public static final String GET_SECOND_PERFORMANCE_TODAY = "/api/Performance/GetSecondTodayPerformance?token=";
     //检查是否是合作者(通过H5方式时)
     public static final String CHECK_IS_PARTNER = "/api/User/becomePartnerByH5?";
     // 获取验证码

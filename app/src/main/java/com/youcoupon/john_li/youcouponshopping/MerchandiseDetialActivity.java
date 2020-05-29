@@ -217,27 +217,33 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                 couponValueTv.setText(String.valueOf(mMaterialItemModel.getCouponInfo()));
                 couponRemainCountTv.setText("剩餘數量：" + String.valueOf(mMaterialItemModel.getCouponRemainCount()));
                 beforePriceTv.setText("原價¥" + mMaterialItemModel.getZkFinalPrice());
+                afterPriceTv.setText("¥" + String.format("%.2f", mMaterialItemModel.getPriceAfterDiscount()));
+                sahreTv.setText("分享賺" + String.format("%.2f", mMaterialItemModel.getRebateMoney()));
+                couponRedemptionTv.setText("领券购买，返" + String.format("%.2f", mMaterialItemModel.getRebateMoney()));
+            } else {
+                beforePriceTv.setVisibility(View.GONE);
+                couponValueTv.setVisibility(View.GONE);
+                couponRemainCountTv.setVisibility(View.GONE);
+                afterPriceTv.setText(String.valueOf(mMaterialItemModel.getZkFinalPrice()));
+                sahreTv.setText("分享賺" + String.format("%.2f", mMaterialItemModel.getRebateMoney()));
+                couponRedemptionTv.setText("点我购买，返" + String.format("%.2f", mMaterialItemModel.getRebateMoney()));
+            }
+        } else {
+            beforePriceTv.setVisibility(View.GONE);
+            couponValueTv.setVisibility(View.GONE);
+            couponRemainCountTv.setVisibility(View.GONE);
+            afterPriceTv.setText(String.valueOf(mMaterialItemModel.getZkFinalPrice()));
+            sahreTv.setText("分享賺" + String.format("%.2f", mMaterialItemModel.getRebateMoney()));
+            couponRedemptionTv.setText("点我购买，返" + String.format("%.2f", mMaterialItemModel.getRebateMoney()));
+        }
+        /*if (mMaterialItemModel.getCouponInfo() != null) {
+            if(!mMaterialItemModel.getCouponInfo().equals("")) {
+                couponValueTv.setText(String.valueOf(mMaterialItemModel.getCouponInfo()));
+                couponRemainCountTv.setText("剩餘數量：" + String.valueOf(mMaterialItemModel.getCouponRemainCount()));
+                beforePriceTv.setText("原價¥" + mMaterialItemModel.getZkFinalPrice());
                 // 按指定模式在字符串查找
                 Pattern p=Pattern.compile("\\d+");
                 Matcher m=p.matcher(mMaterialItemModel.getCouponInfo());
-                /*double afterCoupon = 0.01;
-                while(m.find()) {
-                    if (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) >= Double.parseDouble(m.group())) {
-                        if (m.find()) {
-                            if (Double.parseDouble(m.group()) == 0.0) {
-                                if (m.find()) {
-                                    afterPriceTv.setText("¥" + String.format("%.2f", (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) - Double.parseDouble(m.group()))));
-                                    afterCoupon = Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) - Double.parseDouble(m.group());
-                                }
-                            } else {
-                                afterPriceTv.setText("¥" + String.format("%.2f", (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) - Double.parseDouble(m.group()))));
-                                afterCoupon = Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) - Double.parseDouble(m.group());
-                            }
-                        }
-
-                        break;
-                    }
-                }*/
                 double afterCoupon = Double.parseDouble(mMaterialItemModel.getZkFinalPrice());
                 double couponAmount = 0.001;
                 while(m.find()) {
@@ -276,7 +282,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
             afterPriceTv.setText(String.valueOf(mMaterialItemModel.getZkFinalPrice()));
             sahreTv.setText("分享賺" +String.format("%.2f", (0.78 * (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
             couponRedemptionTv.setText("点我购买，返" +String.format("%.2f", (0.78 * (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
-        }
+        }*/
         merchandiseTitleTv.setText(mMaterialItemModel.getTitle());
         inSaleTv.setText("售" + String.valueOf(mMaterialItemModel.getVolume()) + "件");
         if (mMaterialItemModel.getUserType() == 0) {

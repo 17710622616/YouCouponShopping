@@ -86,13 +86,13 @@
                     android:id="@+id/tab_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="?attr/actionBarSize"
-                    app:tabMode="scrollable"
+                    android:background="@color/colorWhite"
                     app:tabTextColor="@color/colorLineGray"
                     app:tabIndicatorHeight="2dp"
                     app:tabSelectedTextColor="@color/colorDrakGray"
                     app:tabIndicatorColor="@color/colorPrimaryDark"
-                    android:background="@color/colorWhite"
-                    android:layout_gravity="center"/>
+                    app:tabGravity="center"
+                    app:tabMode="fixed"/>
             </LinearLayout>
 
             <GridView

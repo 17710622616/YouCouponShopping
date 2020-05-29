@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
@@ -65,6 +66,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     private Toolbar mToolbar;
     private ImageView activity01Iv, activity02Iv;
     private LinearLayout searchLL;
+    private TextView mainTv;
 
     // 猜你喜歡商品列表是否為最後一頁
     private String isDefault = "true";
@@ -113,6 +115,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         mHotListView = (RecyclerView) findViewById(R.id.main_hot_lv);
         mHotListView.setHasFixedSize(true);
 
+        mainTv = (TextView) findViewById(R.id.main_tv);
         activity01Iv = (ImageView) findViewById(R.id.main_activity_01);
         activity02Iv = (ImageView) findViewById(R.id.main_activity_02);
         mListView = (NoScrollGridView) findViewById(R.id.main_lv);
@@ -133,6 +136,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
             public void onLoadmore(RefreshLayout refreshlayout) {
                 //和最大的数据比较
                 if (isDefault.equals("true")){
+                    mainTv.setVisibility(View.GONE);
                     Toast.makeText(getActivity(), "没有更多数据了~", Toast.LENGTH_SHORT).show();
                     mRefreshLayout.finishRefresh();
                     mRefreshLayout.finishLoadmore();
@@ -145,6 +149,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
+                mainTv.setVisibility(View.VISIBLE);
                 pageNo = 1;
                 mMapGuessLikeList.clear();
                 callNetGetMerchandiseList();
@@ -321,8 +326,6 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
 
             @Override
             public void onFinished() {
-                mRefreshLayout.finishRefresh();
-                mRefreshLayout.finishLoadmore();
             }
         });
     }

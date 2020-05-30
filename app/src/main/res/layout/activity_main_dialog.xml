@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#00000000">
+    <ImageView
+        android:layout_width="320dp"
+        android:layout_height="420dp"
+        android:scaleType="fitXY"
+        android:src="@mipmap/taoqianggou"
+        android:layout_gravity="center"/>
+    <ImageView
+        android:id="@+id/main_dialog_cancel"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:scaleType="fitXY"
+        android:src="@mipmap/cancel"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"/>
+</LinearLayout>

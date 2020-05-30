@@ -105,4 +105,6 @@ public class YouConfigor {
     public static final String GET_NEW_APK = "/api/Tool/GetAPK?";
     // 好券直播分类
     public static final String CLASSIFY_TITLE = "/api/Classify/classifyTitle?";
+    //获取主页活动
+    public static final String GET_MAIN_ACTIVITY = "/api/Activity/GetMainActivity";
 }

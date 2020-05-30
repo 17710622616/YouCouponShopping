@@ -40,6 +40,7 @@ import com.youcoupon.john_li.youcouponshopping.YouFragment.MineFragment;
 import com.youcoupon.john_li.youcouponshopping.YouFragment.ShopCartFragment;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.SearchOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouModel.SysOperationOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
 
@@ -193,6 +194,64 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                     } else {
                         Toast.makeText(getApplicationContext(), "暂未找到查询列表！", Toast.LENGTH_SHORT).show();
                     }
+                } else {
+                    Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
+    }
+
+    /**
+     * 请求网络获取活动查看
+     * @param str
+     */
+    private void callNetGetMainActivity(String str) {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_MAIN_ACTIVITY);
+        params.setConnectTimeout(30 * 1000);
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                final SysOperationOutModel model = JSON.parseObject(result, SysOperationOutModel.class);
+                if (model.getStatus() == 0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    //点击对话框以外的区域是否让对话框消失
+                    builder.setCancelable(true);
+                    //设置正面按钮
+                    builder.setPositiveButton("去看看", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(MainActivity.this, MerchandiseDetialActivity.class);
+                            //intent.putExtra("MerchandiseModel", JSON.toJSONString(model.getData().getResults().get(0)));
+                            startActivity(intent);
+                            dialog.dismiss();
+                        }
+                    });
+                    //设置反面按钮
+                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(MainActivity.this, "你点击了不是", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    //显示对话框
+                    dialog.show();
                 } else {
                     Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
                 }

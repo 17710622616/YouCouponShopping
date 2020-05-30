@@ -15,10 +15,16 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.WebChromeClient;
+import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.IdRes;
@@ -28,12 +34,19 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.alibaba.baichuan.android.trade.AlibcTrade;
+import com.alibaba.baichuan.android.trade.callback.AlibcTradeCallback;
 import com.alibaba.baichuan.android.trade.model.AlibcShowParams;
+import com.alibaba.baichuan.android.trade.model.OpenType;
+import com.alibaba.baichuan.trade.biz.context.AlibcTradeResult;
+import com.alibaba.baichuan.trade.biz.core.taoke.AlibcTaokeParams;
+import com.alibaba.baichuan.trade.common.utils.AlibcLogger;
 import com.alibaba.fastjson.JSON;
 import com.gyf.immersionbar.BarHide;
 import com.gyf.immersionbar.ImmersionBar;
 import com.gyf.immersionbar.OnKeyboardListener;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.WebH5Activity;
 import com.youcoupon.john_li.youcouponshopping.YouFragment.ClassifyFragment;
 import com.youcoupon.john_li.youcouponshopping.YouFragment.MainFragment;
 import com.youcoupon.john_li.youcouponshopping.YouFragment.MineFragment;
@@ -78,6 +91,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         setListener();
         initData();
         checkAPPVersion();
+        callNetGetMainActivity();
 
         /*alibcShowParams = new AlibcShowParams(OpenType.Native, false);
         exParams = new HashMap<>();
@@ -218,9 +232,8 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
 
     /**
      * 请求网络获取活动查看
-     * @param str
      */
-    private void callNetGetMainActivity(String str) {
+    private void callNetGetMainActivity() {
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_MAIN_ACTIVITY);
         params.setConnectTimeout(30 * 1000);
         x.http().get(params, new Callback.CommonCallback<String>() {
@@ -229,37 +242,49 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                 final SysOperationOutModel model = JSON.parseObject(result, SysOperationOutModel.class);
                 if (model.getStatus() == 0) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    //点击对话框以外的区域是否让对话框消失
-                    builder.setCancelable(true);
-                    //设置正面按钮
-                    builder.setPositiveButton("去看看", new DialogInterface.OnClickListener() {
+                    LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+                    View v = inflater.inflate(R.layout.activity_main_dialog, null);
+                    ImageView iv = (ImageView) v.findViewById(R.id.main_dialog_iv);
+                    ImageView btn_sure = (ImageView) v.findViewById(R.id.main_dialog_cancel);
+                    //builer.setView(v);//这里如果使用builer.setView(v)，自定义布局只会覆盖title和button之间的那部分
+                    final Dialog dialog = builder.create();
+                    dialog.show();
+                    dialog.getWindow().setContentView(v);//自定义布局应该在这里添加，要在dialog.show()的后面
+                    //dialog.getWindow().setGravity(Gravity.CENTER);//可以设置显示的位置
+                    iv.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = new Intent(MainActivity.this, MerchandiseDetialActivity.class);
-                            //intent.putExtra("MerchandiseModel", JSON.toJSONString(model.getData().getResults().get(0)));
-                            startActivity(intent);
+                        public void onClick(View v) {
+                            switch (model.getData().getFcategory()) {
+                                case "1":
+                                    Intent intent = new Intent(MainActivity.this, WebH5Activity.class);
+                                    intent.putExtra("title",model.getData().getFdesc());
+                                    intent.putExtra("webUrl",model.getData().getFvalue());
+                                    startActivity(intent);
+                                    break;
+                                case "2":
+                                    openH5Url(model.getData().getFvalue());
+                                    break;
+                            }
                             dialog.dismiss();
                         }
                     });
-                    //设置反面按钮
-                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
+                    btn_sure.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(MainActivity.this, "你点击了不是", Toast.LENGTH_SHORT).show();
+                        public void onClick(View arg0) {
                             dialog.dismiss();
                         }
                     });
-                    AlertDialog dialog = builder.create();
                     //显示对话框
                     dialog.show();
                 } else {
-                    Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
-                Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -272,6 +297,44 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
 
             }
         });
+    }
+
+    /**
+     * 设置打开淘宝H5页面
+     */
+    private void openH5Url(String url) {
+        AlibcTaokeParams taokeParams = new AlibcTaokeParams("", "", "");
+        //taokeParams.setPid("mm_132021823_45408225_571244745");
+        taokeParams.setPid("mm_132021823_45408225_109946850496");
+        taokeParams.setAdzoneid("109946850496");
+        //adzoneid是需要taokeAppkey参数才可以转链成功&店铺页面需要卖家id（sellerId），具体设置方式如下：
+        taokeParams.extraParams = new HashMap<>();
+        taokeParams.extraParams.put("taokeAppkey", "24882815");
+        //taokeParams.extraParams.put("sellerId", String.valueOf(mMaterialItemModel.getSellerId()));
+        //自定义参数
+        Map<String, String> trackParams = new HashMap<>();
+        trackParams.put("isv_code", "appisvcode");
+        trackParams.put("alibaba", "阿里巴巴");//自定义参数部分，可任意增删改
+
+        alibcShowParams = new AlibcShowParams(OpenType.Auto);
+        alibcShowParams.setClientType("taobao");
+
+        // 以显示传入url的方式打开页面（第二个参数是套件名称）
+        AlibcTrade.openByUrl(MainActivity.this, "", url, null,
+                new WebViewClient(), new WebChromeClient(), alibcShowParams,
+                taokeParams, trackParams, new AlibcTradeCallback() {
+                    @Override
+                    public void onTradeSuccess(AlibcTradeResult tradeResult) {
+                        //AlibcLogger.i(TAG, "request success");
+                    }
+                    @Override
+                    public void onFailure(int code, String msg) {
+                        //AlibcLogger.e(TAG, "code=" + code + ", msg=" + msg);
+                        if (code == -1) {
+                            //Toast.makeText(MerchandiseDetialActivity.this, msg, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     @Override

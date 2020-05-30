@@ -6,8 +6,9 @@
     android:orientation="vertical"
     android:background="#00000000">
     <ImageView
-        android:layout_width="320dp"
-        android:layout_height="420dp"
+        android:id="@+id/main_dialog_iv"
+        android:layout_width="240dp"
+        android:layout_height="310dp"
         android:scaleType="fitXY"
         android:src="@mipmap/taoqianggou"
         android:layout_gravity="center"/>

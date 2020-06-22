@@ -10,7 +10,8 @@ public class YouConfigor {
     /*********************************************************************地址********************************************************************************/
     // 測試地址
     //public static final String BASE_URL = "http://youcouponapi.azurewebsites.net/";
-    public static final String BASE_URL = "http://114.67.76.158:10082/";
+    //public static final String BASE_URL = "http://114.67.76.158:10082/";
+    public static final String BASE_URL = "http://118.190.1.209:10082/";
 
     /*********************************************************************api********************************************************************************/
     // 選品庫API

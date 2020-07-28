@@ -35,7 +35,8 @@
             android:gravity="center"
             android:text="购物车"
             android:textColor="@color/colorDrakGray"
-            android:textSize="10sp" />
+            android:textSize="10sp"
+            android:visibility="gone"/>
 
         <RadioButton
             android:id="@+id/bottom_main_classify"

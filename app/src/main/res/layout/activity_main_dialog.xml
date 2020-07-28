@@ -4,14 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#00000000">
+    android:background="@color/colorAlpha">
     <ImageView
         android:id="@+id/main_dialog_iv"
         android:layout_width="240dp"
         android:layout_height="310dp"
         android:scaleType="fitXY"
         android:src="@mipmap/taoqianggou"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:background="@color/colorAlpha"/>
     <ImageView
         android:id="@+id/main_dialog_cancel"
         android:layout_width="30dp"
@@ -19,5 +20,6 @@
         android:scaleType="fitXY"
         android:src="@mipmap/cancel"
         android:layout_marginTop="20dp"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:background="@color/colorAlpha"/>
 </LinearLayout>

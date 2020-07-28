@@ -244,12 +244,14 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                     LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
                     View v = inflater.inflate(R.layout.activity_main_dialog, null);
+                    v.setBackgroundResource(R.color.colorAlpha);
                     ImageView iv = (ImageView) v.findViewById(R.id.main_dialog_iv);
                     ImageView btn_sure = (ImageView) v.findViewById(R.id.main_dialog_cancel);
                     //builer.setView(v);//这里如果使用builer.setView(v)，自定义布局只会覆盖title和button之间的那部分
                     final Dialog dialog = builder.create();
                     dialog.show();
                     dialog.getWindow().setContentView(v);//自定义布局应该在这里添加，要在dialog.show()的后面
+                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                     //dialog.getWindow().setGravity(Gravity.CENTER);//可以设置显示的位置
                     iv.setOnClickListener(new View.OnClickListener() {
                         @Override

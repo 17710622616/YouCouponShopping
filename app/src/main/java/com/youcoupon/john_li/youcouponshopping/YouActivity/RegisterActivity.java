@@ -41,7 +41,7 @@ import java.util.Map;
  */
 
 public class RegisterActivity extends BaseActivity {
-    private TextView loginTv, codeTv;
+    private TextView loginTv, codeTv, userAggrementTV, secretServiceTV;
     private Button registerBtn;
     private EditText phoneEt, pwEt,verificaEt,visitorTv;
     private ProgressDialog dialog;
@@ -67,6 +67,8 @@ public class RegisterActivity extends BaseActivity {
         pwEt = findViewById(R.id.register_et_password);
         verificaEt = findViewById(R.id.register_et_verifica);
         visitorTv = findViewById(R.id.register_et_visitor);
+        userAggrementTV = findViewById(R.id.register_secret_service_tv);
+        secretServiceTV = findViewById(R.id.register_user_aggrement_tv);
 
         codeTv.setTextColor(getResources().getColor(R.color.colorDrakGray));
         codeTv.setEnabled(false);
@@ -135,6 +137,25 @@ public class RegisterActivity extends BaseActivity {
                     codeTv.setEnabled(false);
                     codeTv.setTextColor(Color.WHITE);
                 }
+            }
+        });
+
+        userAggrementTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RegisterActivity.this, WebH5Activity.class);
+                intent.putExtra("title", "隐私服务协议");
+                intent.putExtra("webUrl", "https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0html/YouCoupon/secret_service.html");
+                startActivity(intent);
+            }
+        });
+        secretServiceTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RegisterActivity.this, WebH5Activity.class);
+                intent.putExtra("title", "用户服务协议");
+                intent.putExtra("webUrl", "https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0html/YouCoupon/user_agreement.html");
+                startActivity(intent);
             }
         });
     }

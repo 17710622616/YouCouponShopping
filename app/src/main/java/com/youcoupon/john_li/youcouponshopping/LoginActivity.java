@@ -17,6 +17,7 @@ import com.gyf.immersionbar.ImmersionBar;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.ForgetPwdActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.RegisterActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.WebH5Activity;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.SmsOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
@@ -41,7 +42,7 @@ import java.util.Map;
  */
 
 public class LoginActivity extends BaseActivity {
-    private TextView registerTv, forgetTv;
+    private TextView registerTv, forgetTv, userAggrementTV, secretServiceTV;
     private Button loginBtn;
     private EditText phoneEt, pwEt;
     private ProgressDialog dialog;
@@ -66,6 +67,8 @@ public class LoginActivity extends BaseActivity {
         forgetTv = findViewById(R.id.tv_forget_password);
         phoneEt = findViewById(R.id.login_et_phone);
         pwEt = findViewById(R.id.login_et_password);
+        userAggrementTV = findViewById(R.id.login_secret_service_tv);
+        secretServiceTV = findViewById(R.id.login_user_aggrement_tv);
     }
 
     @Override
@@ -94,6 +97,24 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 startActivityForResult(new Intent(LoginActivity.this, ForgetPwdActivity.class), 10002);
+            }
+        });
+        userAggrementTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, WebH5Activity.class);
+                intent.putExtra("title", "隐私服务协议");
+                intent.putExtra("webUrl", "https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0html/YouCoupon/secret_service.html");
+                startActivity(intent);
+            }
+        });
+        secretServiceTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, WebH5Activity.class);
+                intent.putExtra("title", "用户服务协议");
+                intent.putExtra("webUrl", "https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0html/YouCoupon/user_agreement.html");
+                startActivity(intent);
             }
         });
     }

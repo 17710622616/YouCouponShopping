@@ -338,6 +338,24 @@
                 <View style="@style/underLine"/>
 
                 <LinearLayout
+                    android:id="@+id/mine_common"
+                    android:orientation="horizontal"
+                    style="@style/mineLinearLayout">
+                    <ImageView
+                        style="@style/MineItemImageView"
+                        android:src="@mipmap/suggest"/>
+
+                    <TextView
+                        style="@style/MineItemTextView"
+                        android:text="常见问题"/>
+
+                    <ImageView
+                        style="@style/MineItemImageNext"/>
+                </LinearLayout>
+
+                <View style="@style/underLine"/>
+
+                <LinearLayout
                     android:id="@+id/mine_login_out"
                     android:orientation="horizontal"
                     style="@style/mineLinearLayout">

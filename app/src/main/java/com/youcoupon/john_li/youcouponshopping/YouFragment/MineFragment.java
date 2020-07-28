@@ -37,6 +37,7 @@ import com.alipay.sdk.tid.Tid;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.youcoupon.john_li.youcouponshopping.LoginActivity;
+import com.youcoupon.john_li.youcouponshopping.MainActivity;
 import com.youcoupon.john_li.youcouponshopping.R;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BecomePartnerActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BussinesActivity;
@@ -50,6 +51,7 @@ import com.youcoupon.john_li.youcouponshopping.YouActivity.TutorialActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.UserInfoActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.WalletActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.WalletRecrodActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.WebH5Activity;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.PerformanceOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
@@ -79,7 +81,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     private ImageView headIv;//userInfoLL
     private RelativeLayout userInfoRl;
     private RefreshLayout mRefreshLayout;
-    private LinearLayout taobaoLL,courseLL,changePwdLL, suggestLL, shareLL, serviceLL, bussinessLL, loginOutLL;
+    private LinearLayout taobaoLL,courseLL,changePwdLL, suggestLL, shareLL, serviceLL, bussinessLL, commonLL, loginOutLL;
     private LinearLayout incomeLL, teamLL, orderLL;
     private ProgressDialog dialog;
 
@@ -123,6 +125,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         shareLL = (LinearLayout) findViewById(R.id.mine_share);
         serviceLL = (LinearLayout) findViewById(R.id.mine_service);
         bussinessLL = (LinearLayout) findViewById(R.id.mine_bussiness);
+        commonLL = (LinearLayout) findViewById(R.id.mine_common);
         loginOutLL = (LinearLayout) findViewById(R.id.mine_login_out);
         userInfoRl = (RelativeLayout) findViewById(R.id.user_info_rl);
 
@@ -148,6 +151,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         shareLL.setOnClickListener(this);
         serviceLL.setOnClickListener(this);
         bussinessLL.setOnClickListener(this);
+        commonLL.setOnClickListener(this);
         loginOutLL.setOnClickListener(this);
         mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
@@ -237,11 +241,16 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 }
                 break;
             case R.id.mine_course:
-                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                /*if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
                     startActivity(new Intent(getActivity(), TutorialActivity.class));
                 } else {
                     startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
-                }
+                }*/
+
+                Intent intent = new Intent(getActivity(), WebH5Activity.class);
+                intent.putExtra("title", "教程讲解");
+                intent.putExtra("webUrl", "https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0html/YouCoupon/tutorial.html");
+                startActivity(intent);
                 break;
             case R.id.mine_update_pwd:
                 if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
@@ -261,11 +270,26 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 loginOut();
                 break;
             case R.id.mine_service:
-                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                /*if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
                     startActivity(new Intent(getActivity(), ServiceActivity.class));
                 } else {
                     startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
-                }
+                }*/
+                Intent intent1 = new Intent(getActivity(), WebH5Activity.class);
+                intent1.putExtra("title", "客服服务");
+                intent1.putExtra("webUrl", "https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0html/YouCoupon/about_us.html");
+                startActivity(intent1);
+                break;
+            case R.id.mine_common:
+                /*if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    startActivity(new Intent(getActivity(), ServiceActivity.class));
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }*/
+                Intent intent2 = new Intent(getActivity(), WebH5Activity.class);
+                intent2.putExtra("title", "常见问题");
+                intent2.putExtra("webUrl", "https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0html/YouCoupon/common_problem.html");
+                startActivity(intent2);
                 break;
             case R.id.mine_bussiness:
                 if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {

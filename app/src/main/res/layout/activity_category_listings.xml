@@ -92,7 +92,7 @@
                     app:tabSelectedTextColor="@color/colorDrakGray"
                     app:tabIndicatorColor="@color/colorPrimaryDark"
                     app:tabGravity="center"
-                    app:tabMode="fixed"/>
+                    app:tabMode="scrollable"/>
             </LinearLayout>
 
             <GridView

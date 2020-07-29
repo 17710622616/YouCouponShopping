@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 import com.alibaba.baichuan.android.trade.AlibcTradeSDK;
 import com.alibaba.baichuan.android.trade.callback.AlibcTradeInitCallback;
+import com.mob.MobSDK;
 
 import org.greenrobot.eventbus.EventBus;
 import org.xutils.x;
@@ -36,5 +37,7 @@ public class YouApplication extends Application {
                 Toast.makeText(YouApplication.this, "初始化失败,code=" + code + ", msg=" + msg, Toast.LENGTH_LONG).show();
             }
         });
+        // MOBSDK是否同意隐私协议
+        MobSDK.submitPolicyGrantResult(false, null);
     }
 }

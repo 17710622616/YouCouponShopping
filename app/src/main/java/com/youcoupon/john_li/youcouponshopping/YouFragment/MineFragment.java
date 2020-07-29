@@ -34,6 +34,7 @@ import com.alibaba.baichuan.trade.biz.login.AlibcLoginCallback;
 import com.alibaba.baichuan.trade.common.utils.AlibcLogger;
 import com.alibaba.fastjson.JSON;
 import com.alipay.sdk.tid.Tid;
+import com.mob.MobSDK;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.youcoupon.john_li.youcouponshopping.LoginActivity;
@@ -70,6 +71,8 @@ import org.xutils.x;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+
+import cn.sharesdk.onekeyshare.OnekeyShare;
 
 /**
  * Created by John_Li on 25/5/2018.
@@ -267,7 +270,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 }
                 break;
             case R.id.mine_share:
-                loginOut();
+                mobShare();
                 break;
             case R.id.mine_service:
                 /*if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
@@ -315,6 +318,22 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 }
                 break;
         }
+    }
+
+    private void mobShare() {
+        OnekeyShare oks = new OnekeyShare();
+        // title标题，微信、QQ和QQ空间等平台使用
+        oks.setTitle("优券商城");
+        // titleUrl QQ和QQ空间跳转链接
+        oks.setTitleUrl("http://sharesdk.cn");
+        // text是分享文本，所有平台都需要这个字段
+        oks.setText("优券商城");
+        // setImageUrl是网络图片的url
+        oks.setImageUrl("https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0YouCoupon/img/logo.png");
+        // url在微信、Facebook等平台中使用
+        oks.setUrl("http://sharesdk.cn");
+        // 启动分享GUI
+        oks.show(MobSDK.getContext());
     }
 
     @Override

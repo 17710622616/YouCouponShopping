@@ -247,26 +247,7 @@
                 <View style="@style/underLine"/>
 
                 <LinearLayout
-                    android:id="@+id/mine_update_pwd"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="10dp"
-                    style="@style/mineLinearLayout">
-                    <ImageView
-                        style="@style/MineItemImageView"
-                        android:src="@mipmap/course"/>
-
-                    <TextView
-                        style="@style/MineItemTextView"
-                        android:text="修改密码"/>
-
-                    <ImageView
-                        style="@style/MineItemImageNext"/>
-                </LinearLayout>
-
-                <View style="@style/underLine"/>
-
-                <LinearLayout
-                    android:id="@+id/mine_suggest"
+                    android:id="@+id/mine_common"
                     android:orientation="horizontal"
                     style="@style/mineLinearLayout">
                     <ImageView
@@ -275,7 +256,25 @@
 
                     <TextView
                         style="@style/MineItemTextView"
-                        android:text="意见反馈"/>
+                        android:text="常见问题"/>
+
+                    <ImageView
+                        style="@style/MineItemImageNext"/>
+                </LinearLayout>
+
+                <View style="@style/underLine"/>
+
+                <LinearLayout
+                    android:id="@+id/mine_update_pwd"
+                    android:orientation="horizontal"
+                    style="@style/mineLinearLayout">
+                    <ImageView
+                        style="@style/MineItemImageView"
+                        android:src="@mipmap/course"/>
+
+                    <TextView
+                        style="@style/MineItemTextView"
+                        android:text="修改密码"/>
 
                     <ImageView
                         style="@style/MineItemImageNext"/>
@@ -302,6 +301,24 @@
                 <View style="@style/underLine"/>
 
                 <LinearLayout
+                    android:id="@+id/mine_suggest"
+                    android:orientation="horizontal"
+                    style="@style/mineLinearLayout">
+                    <ImageView
+                        style="@style/MineItemImageView"
+                        android:src="@mipmap/suggest"/>
+
+                    <TextView
+                        style="@style/MineItemTextView"
+                        android:text="意见反馈"/>
+
+                    <ImageView
+                        style="@style/MineItemImageNext"/>
+                </LinearLayout>
+
+                <View style="@style/underLine"/>
+
+                <LinearLayout
                     android:id="@+id/mine_service"
                     android:orientation="horizontal"
                     style="@style/mineLinearLayout">
@@ -311,7 +328,7 @@
 
                     <TextView
                         style="@style/MineItemTextView"
-                        android:text="客服服务"/>
+                        android:text="关于我们"/>
 
                     <ImageView
                         style="@style/MineItemImageNext"/>
@@ -330,24 +347,6 @@
                     <TextView
                         style="@style/MineItemTextView"
                         android:text="商业合作"/>
-
-                    <ImageView
-                        style="@style/MineItemImageNext"/>
-                </LinearLayout>
-
-                <View style="@style/underLine"/>
-
-                <LinearLayout
-                    android:id="@+id/mine_common"
-                    android:orientation="horizontal"
-                    style="@style/mineLinearLayout">
-                    <ImageView
-                        style="@style/MineItemImageView"
-                        android:src="@mipmap/suggest"/>
-
-                    <TextView
-                        style="@style/MineItemTextView"
-                        android:text="常见问题"/>
 
                     <ImageView
                         style="@style/MineItemImageNext"/>

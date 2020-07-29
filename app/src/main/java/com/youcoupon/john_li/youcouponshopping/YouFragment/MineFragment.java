@@ -276,7 +276,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                     startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                 }*/
                 Intent intent1 = new Intent(getActivity(), WebH5Activity.class);
-                intent1.putExtra("title", "客服服务");
+                intent1.putExtra("title", "关于我们");
                 intent1.putExtra("webUrl", "https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0html/YouCoupon/about_us.html");
                 startActivity(intent1);
                 break;

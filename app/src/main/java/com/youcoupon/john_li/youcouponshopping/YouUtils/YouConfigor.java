@@ -108,4 +108,8 @@ public class YouConfigor {
     public static final String CLASSIFY_TITLE = "/api/Classify/classifyTitle?";
     //获取主页活动
     public static final String GET_MAIN_ACTIVITY = "/api/Activity/GetMainActivity";
+    //提交商业合作
+    public static final String POST_BUSINESS = "/api/Tool/submitBusinessCooperation";
+    //提交意见反馈
+    public static final String POST_FEEDBACK = "/api/Tool/submitFeedBack";
 }

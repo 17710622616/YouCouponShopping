@@ -122,9 +122,10 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         mGridView = (NoScrollGridView) findViewById(R.id.main_classify);
         searchLL = (LinearLayout) findViewById(R.id.main_search_ll);
 
-        mRefreshLayout.setEnableAutoLoadmore(false);//是否启用列表惯性滑动到底部时自动加载更多
+        mRefreshLayout.setEnableAutoLoadmore(true);//是否启用列表惯性滑动到底部时自动加载更多
         mRefreshLayout.setDisableContentWhenRefresh(true);//是否在刷新的时候禁止列表的操作
         mRefreshLayout.setDisableContentWhenLoading(true);//是否在加载的时候禁止列表的操作
+        //mRefreshLayout.setFooterMaxDragRate(0.01f);//触发加载距离 与 FooterHeight 的比率1.0.4
         // 设置header的高度
         // mRefreshLayout.setHeaderHeightPx((int)(BSSMCommonUtils.getDeviceWitdh(getActivity()) / 4.05));//Header标准高度（显示下拉高度>=标准高度 触发刷新）
     }

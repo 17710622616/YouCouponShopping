@@ -176,7 +176,6 @@ public class LoginActivity extends BaseActivity {
         });
     }
 
-
     /**
      * 獲取用戶信息
      * @param verifica

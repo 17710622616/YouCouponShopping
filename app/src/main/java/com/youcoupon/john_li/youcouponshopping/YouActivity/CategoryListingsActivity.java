@@ -74,7 +74,7 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             headView.setHeadHight();
         }
-        mRefreshLayout.setEnableAutoLoadmore(false);//是否启用列表惯性滑动到底部时自动加载更多
+        mRefreshLayout.setEnableAutoLoadmore(true);//是否启用列表惯性滑动到底部时自动加载更多
         mRefreshLayout.setDisableContentWhenRefresh(true);//是否在刷新的时候禁止列表的操作
         mRefreshLayout.setDisableContentWhenLoading(true);//是否在加载的时候禁止列表的操作
     }

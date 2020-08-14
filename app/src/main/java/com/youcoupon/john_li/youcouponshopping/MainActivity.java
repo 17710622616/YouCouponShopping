@@ -54,6 +54,7 @@ import com.youcoupon.john_li.youcouponshopping.YouFragment.ShopCartFragment;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.SearchOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.SysOperationOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
 
@@ -91,7 +92,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         setListener();
         initData();
         checkAPPVersion();
-        callNetGetMainActivity();
+        checkHasShowActivity();
 
         /*alibcShowParams = new AlibcShowParams(OpenType.Native, false);
         exParams = new HashMap<>();
@@ -159,6 +160,20 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                 }
             }
         }*/
+    }
+
+    /**
+     * 检查是否显示过活动界面
+     */
+    private void checkHasShowActivity() {
+        String hasShowActivity = String.valueOf(SPUtils.get(MainActivity.this, "PasttDay", "0000-00-00"));
+        try {
+            if (!hasShowActivity.equals(YouCommonUtils.getTimeToday())) {
+                callNetGetMainActivity();
+            }
+        } catch (Exception e) {
+
+        }
     }
 
     /**
@@ -279,6 +294,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                     });
                     //显示对话框
                     dialog.show();
+                    SPUtils.put(MainActivity.this, "PasttDay", YouCommonUtils.getTimeToday());
                 } else {
                     //Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
                 }

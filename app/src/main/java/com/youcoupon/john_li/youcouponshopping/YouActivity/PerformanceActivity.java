@@ -95,8 +95,8 @@ public class PerformanceActivity extends BaseActivity implements View.OnClickLis
                 break;
             case R.id.head_right:
                 Intent intent = new Intent(PerformanceActivity.this, WebH5Activity.class);
-                intent.putExtra("title", "新手教程");
-                intent.putExtra("webUrl", "https://bsmaco.m.icoc.bz/col.jsp?id=103");
+                intent.putExtra("title", "绩效讲解");
+                intent.putExtra("webUrl", "https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0html/YouCoupon/performance_explanation.html");
                 startActivity(intent);
                 break;
         }

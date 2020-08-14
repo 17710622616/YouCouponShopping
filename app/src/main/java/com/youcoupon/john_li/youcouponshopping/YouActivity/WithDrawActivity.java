@@ -83,7 +83,10 @@ public class WithDrawActivity extends BaseActivity implements View.OnClickListen
                 finish();
                 break;
             case R.id.wallet_withdraw_agreement:
-                //startActivity(new Intent(this, PaymentAgreementActivity.class));
+                Intent intent = new Intent(WithDrawActivity.this, WebH5Activity.class);
+                intent.putExtra("title", "支付服務協議");
+                intent.putExtra("webUrl", "https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0html/YouCoupon/payment_agreement.html");
+                startActivity(intent);
                 break;
             case R.id.wallet_withdraw_submit:
                 if (isagreeCb.isChecked() && !withdrawNum.getText().toString().equals("") && !alipayEt.getText().toString().equals("") && !telEv.getText().toString().equals("") && !nameEv.getText().toString().equals("")) {

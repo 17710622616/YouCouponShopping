@@ -68,8 +68,16 @@ public class BussinesActivity extends BaseActivity implements View.OnClickListen
                 break;
             case R.id.head_right_tv:
                 loadingLL.setVisibility(View.VISIBLE);
-                if (bussinesEt.getText() != null && bussinesName.getText() != null && bussinesPhone.getText() != null ){
-                    callNetSubmitBussines();
+                String name = bussinesName.getText().toString();
+                String content = bussinesEt.getText().toString();
+                String tel = bussinesPhone.getText().toString();
+                if (name != null && content != null && tel != null ){
+                    if (!name.equals("") && !content.equals("") && !tel.equals("")){
+                        callNetSubmitBussines();
+                    } else {
+                        loadingLL.setVisibility(View.GONE);
+                        Toast.makeText(getApplicationContext(), "请完善资料！", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     loadingLL.setVisibility(View.GONE);
                     Toast.makeText(getApplicationContext(), "请完善资料！", Toast.LENGTH_SHORT).show();
@@ -79,16 +87,11 @@ public class BussinesActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void callNetSubmitBussines() {
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("提示");
-        dialog.setMessage("正在提交中......");
-        dialog.setCancelable(false);
-        dialog.show();
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("contact", String.valueOf(bussinesName.getText()));
         paramsMap.put("tel", String.valueOf(bussinesPhone.getText()));
         paramsMap.put("content",  String.valueOf(bussinesEt.getText()));
-        paramsMap.put("token", String.valueOf(SPUtils.get(BussinesActivity.this, "UserToken", "")));
+        paramsMap.put("token",  String.valueOf(SPUtils.get(BussinesActivity.this, "UserToken", "")));
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.POST_BUSINESS + YouCommonUtils.createLinkStringByGet(paramsMap));
         params.setAsJsonContent(true);
         String uri = params.getUri();
@@ -99,6 +102,7 @@ public class BussinesActivity extends BaseActivity implements View.OnClickListen
                 CommonModel model = JSON.parseObject(result, CommonModel.class);
                 if (model.getStatus() == 0) {
                     Toast.makeText(BussinesActivity.this, String.valueOf(model.getMessage()), Toast.LENGTH_SHORT).show();
+                    loadingLL.setVisibility(View.GONE);
                     finish();
                 } else {
                     Toast.makeText(BussinesActivity.this,  String.valueOf(model.getMessage()), Toast.LENGTH_SHORT).show();
@@ -107,11 +111,10 @@ public class BussinesActivity extends BaseActivity implements View.OnClickListen
             //请求异常后的回调方法
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
-                dialog.dismiss();
                 if (ex instanceof java.net.SocketTimeoutException) {
-                    Toast.makeText(BussinesActivity.this, R.string.callnet_timeout, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(BussinesActivity.this, getString(R.string.callnet_timeout), Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(BussinesActivity.this, R.string.login_fail, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(BussinesActivity.this, getString(R.string.request_error)  + "-->" + ex.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
             //主动调用取消请求的回调方法
@@ -120,7 +123,7 @@ public class BussinesActivity extends BaseActivity implements View.OnClickListen
             }
             @Override
             public void onFinished() {
-                dialog.dismiss();
+                loadingLL.setVisibility(View.GONE);
             }
         });
     }

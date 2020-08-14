@@ -37,22 +37,22 @@ public class MyReceiver extends BroadcastReceiver {
 				String regId = bundle.getString(JPushInterface.EXTRA_REGISTRATION_ID);
 				Logger.d(TAG, "[MyReceiver] 接收Registration Id : " + regId);
 				//send the Registration Id to your server...
-				Toast.makeText(context, "接收Registration", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(context, "接收Registration", Toast.LENGTH_SHORT).show();
 
 			} else if (JPushInterface.ACTION_MESSAGE_RECEIVED.equals(intent.getAction())) {
 				Logger.d(TAG, "[MyReceiver] 接收到推送下来的自定义消息: " + bundle.getString(JPushInterface.EXTRA_MESSAGE));
 				//processCustomMessage(context, bundle);
-				Toast.makeText(context, "接收到推送下来的自定义消息", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(context, "接收到推送下来的自定义消息", Toast.LENGTH_SHORT).show();
 
 			} else if (JPushInterface.ACTION_NOTIFICATION_RECEIVED.equals(intent.getAction())) {
 				Logger.d(TAG, "[MyReceiver] 接收到推送下来的通知");
 				int notifactionId = bundle.getInt(JPushInterface.EXTRA_NOTIFICATION_ID);
 				Logger.d(TAG, "[MyReceiver] 接收到推送下来的通知的ID: " + notifactionId);
-				Toast.makeText(context, "接收到推送下来的通知", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(context, "接收到推送下来的通知", Toast.LENGTH_SHORT).show();
 
 			} else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
 				Logger.d(TAG, "[MyReceiver] 用户点击打开了通知");
-				Toast.makeText(context, "MyReceiver用户点击打开了通知", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(context, "MyReceiver用户点击打开了通知", Toast.LENGTH_SHORT).show();
 
 				//打开自定义的Activity
 				/*Intent i = new Intent(context, TestActivity.class);

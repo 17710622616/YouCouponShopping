@@ -55,7 +55,7 @@ public class PushMessageReceiver extends JPushMessageReceiver{
     public void onMultiActionClicked(Context context, Intent intent) {
         Log.e(TAG, "[onMultiActionClicked] 用户点击了通知栏按钮");
         String nActionExtra = intent.getExtras().getString(JPushInterface.EXTRA_NOTIFICATION_ACTION_EXTRA);
-        Toast.makeText(context, "用户点击了通知栏按钮", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, "用户点击了通知栏按钮", Toast.LENGTH_SHORT).show();
 
         //开发者根据不同 Action 携带的 extra 字段来分配不同的动作。
         if(nActionExtra==null){

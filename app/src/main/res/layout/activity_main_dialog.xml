@@ -10,7 +10,7 @@
         android:layout_width="240dp"
         android:layout_height="310dp"
         android:scaleType="fitXY"
-        android:src="@mipmap/taoqianggou"
+        android:src="@mipmap/img_loading"
         android:layout_gravity="center"
         android:background="@color/colorAlpha"/>
     <ImageView

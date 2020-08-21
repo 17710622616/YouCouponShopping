@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/StudioProjects-YouCouponShopping.iml" filepath="$PROJECT_DIR$/.idea/modules/StudioProjects-YouCouponShopping.iml" group="YouCouponShopping" />
       <module fileurl="file://$PROJECT_DIR$/YouCoupon.iml" filepath="$PROJECT_DIR$/YouCoupon.iml" group="YouCoupon" />
       <module fileurl="file://$PROJECT_DIR$/YouCouponShopping.iml" filepath="$PROJECT_DIR$/YouCouponShopping.iml" group="YouCouponShopping" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/YouCouponShopping-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/YouCouponShopping-app.iml" group="YouCouponShopping/app" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="YouCoupon/app" />
     </modules>
   </component>

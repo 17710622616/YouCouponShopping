@@ -157,9 +157,9 @@
                         android:orientation="vertical"
                         android:gravity="center">
                         <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@mipmap/mine_obligation"/>
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@mipmap/income"/>
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -174,9 +174,9 @@
                         android:orientation="vertical"
                         android:gravity="center">
                         <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@mipmap/mine_to_be_send"/>
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@mipmap/team_member"/>
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -191,9 +191,9 @@
                         android:orientation="vertical"
                         android:gravity="center">
                         <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@mipmap/mine_wait_for_receiving"/>
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@mipmap/order"/>
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -209,7 +209,7 @@
                     style="@style/mineLinearLayout">
                     <ImageView
                         style="@style/MineItemImageView"
-                        android:src="@mipmap/taobao"/>
+                        android:src="@mipmap/taobao_icon"/>
 
                     <TextView
                         style="@style/MineItemTextView"
@@ -252,7 +252,7 @@
                     style="@style/mineLinearLayout">
                     <ImageView
                         style="@style/MineItemImageView"
-                        android:src="@mipmap/suggest"/>
+                        android:src="@mipmap/commen_problem"/>
 
                     <TextView
                         style="@style/MineItemTextView"
@@ -270,7 +270,7 @@
                     style="@style/mineLinearLayout">
                     <ImageView
                         style="@style/MineItemImageView"
-                        android:src="@mipmap/course"/>
+                        android:src="@mipmap/update_pwd"/>
 
                     <TextView
                         style="@style/MineItemTextView"
@@ -324,7 +324,7 @@
                     style="@style/mineLinearLayout">
                     <ImageView
                         style="@style/MineItemImageView"
-                        android:src="@mipmap/contact_service"/>
+                        android:src="@mipmap/about_us"/>
 
                     <TextView
                         style="@style/MineItemTextView"
@@ -360,7 +360,7 @@
                     style="@style/mineLinearLayout">
                     <ImageView
                         style="@style/MineItemImageView"
-                        android:src="@mipmap/service"/>
+                        android:src="@mipmap/exit"/>
 
                     <TextView
                         style="@style/MineItemTextView"

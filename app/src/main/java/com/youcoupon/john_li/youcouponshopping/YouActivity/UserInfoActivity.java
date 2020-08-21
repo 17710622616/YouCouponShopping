@@ -54,6 +54,7 @@ import java.util.Map;
 import com.alibaba.fastjson.JSON;
 import com.gyf.immersionbar.ImmersionBar;
 import com.youcoupon.john_li.youcouponshopping.R;
+import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.PhotoUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
@@ -79,7 +80,7 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
     private UserInfoOutsideModel.DataBean mUserInfoModel;
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.head_iimg).setFailureDrawableId(R.mipmap.head_iimg).build();
     //private OSSClient oss;
-    private AsyncTask asyncTask;
+    /*private AsyncTask asyncTask;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -94,7 +95,7 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
                     break;
             }
         }
-    };
+    };*/
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -412,34 +413,6 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
     }
 
     /**
-     * 自动获取相机权限
-     */
-    private void autoObtainCameraPermission() {
-        try {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-                    Toast.makeText(UserInfoActivity.this, "您已经拒绝过一次", Toast.LENGTH_SHORT).show();
-                }
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE}, CAMERA_PERMISSIONS_REQUEST_CODE);
-            } else {//有权限直接调用系统相机拍照
-                SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
-                Date date = new Date(System.currentTimeMillis());
-                fileUri = new File(dir.getPath() + "/headImg" + format.format(date) + ".jpg");
-                imageUri = Uri.fromFile(fileUri);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-                    imageUri = FileProvider.getUriForFile(UserInfoActivity.this, "com.youcoupon.john_li.youcouponshopping" + ".fileprovider", fileUri);//通过FileProvider创建一个content类型的Uri
-                }
-
-                PhotoUtils.takePicture(this, imageUri, CODE_CAMERA_REQUEST);
-            }
-        }catch (Exception e) {
-
-        }
-    }
-
-    /**
      * 自动获取相冊权限
      */
     private void autoObtainStoragePermission() {
@@ -449,33 +422,6 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
         startActivityForResult(intent, CODE_GALLERY_REQUEST);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        switch (requestCode) {
-            case CAMERA_PERMISSIONS_REQUEST_CODE: {//调用系统相机申请拍照权限回调
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
-                    Date date = new Date(System.currentTimeMillis());
-                    fileUri = new File(dir.getPath() + "head" + format.format(date) + ".jpg");
-                    imageUri = Uri.fromFile(fileUri);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                        imageUri = FileProvider.getUriForFile(UserInfoActivity.this, "com.youcoupon.john_li.youcouponshopping" + ".fileprovider", fileUri);//通过FileProvider创建一个content类型的Uri
-                    PhotoUtils.takePicture(this, imageUri, CODE_CAMERA_REQUEST);
-                } else {
-                    Toast.makeText(UserInfoActivity.this, "请允许打开相机", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            }
-            case STORAGE_PERMISSIONS_REQUEST_CODE://调用系统相册申请Sdcard权限回调
-                // 使用意图直接调用手机相册  
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                // 打开手机相册,设置请求码  
-                startActivityForResult(intent, CODE_GALLERY_REQUEST);
-                break;
-        }
-    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -511,50 +457,7 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
-    private void postImg(String filePath) {
-        callNetUpdateHeadImg(filePath);
-        /*RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.UPLOAD_FILE);
-        // 添加到请求body体的参数, 只有POST, PUT, PATCH, DELETE请求支持.
-        // params.addBodyParameter("wd", "xUtils");
-        // 使用multipart表单上传文件
-        params.setMultipart(true);
-        params.addHeader("token", String.valueOf(SPUtils.get(UserInfoActivity.this, "UserToken", "")));
-        File img = new File(filePath);
-        params.addBodyParameter("file", img, "multipart/form-data"); // 如果文件没有扩展名, 最好设置contentType参数.
-        x.http().post(params, new Callback.CommonCallback<JSONObject>() {
-            @Override
-            public void onSuccess(JSONObject result) {
-                UploadFileOutModel model =  JSON.parseObject(result.toString(), UploadFileOutModel.class);
-                if (model.getStatus() == 0) {
-                    mUserInfoModel.setHead_img(fileUri.getName());
-                    callNetUpdateHeadImg(model.getMsg());
-                    //Toast.makeText(UserInfoActivity.this, "上傳頭像成功！", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(UserInfoActivity.this, "上传头像失败！", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onError(Throwable ex, boolean isOnCallback) {
-                if (ex instanceof java.net.SocketTimeoutException) {
-                    Toast.makeText(UserInfoActivity.this, getString(R.string.network_error), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(UserInfoActivity.this, getString(R.string.request_error), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(CancelledException cex) {
-            }
-
-            @Override
-            public void onFinished() {
-            }
-
-        });*/
-    }
-
-    private void callNetUpdateHeadImg(String imgUrl) {
+    private void callNetUpdateHeadImg(final String imgUrl) {
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("imgUrl", imgUrl);
         paramsMap.put("token", String.valueOf(SPUtils.get(this, "UserToken", "")));
@@ -564,34 +467,13 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
         x.http().request(HttpMethod.GET, params, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
-                UserInfoOutsideModel model =  JSON.parseObject(result.toString(), UserInfoOutsideModel.class);
+                CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
                 if (model.getStatus() == 0) {
-                    if (model.getData().getNick_name() == null) {
-                        model.getData().setNick_name("用戶");
-                    }
-                    if (model.getData().getAddress() == null) {
-                        model.getData().setAddress("");
-                    }
-                    if (model.getData().getReal_name() == null) {
-                        model.getData().setReal_name("");
-                    }
-                    if (model.getData().getAddress() == null) {
-                        model.getData().setAddress("");
-                    }
-                    if (model.getData().getDescx() == null) {
-                        model.getData().setDescx("");
-                    }
-                    if (model.getData().getHead_img() == null) {
-                        model.getData().setHead_img("");
-                    }
-                    if (model.getData().getBirth_day() == null) {
-                        model.getData().setBirth_day("");
-                    }
-                    if (model.getData().getInviteCode() == null) {
-                        model.getData().setBirth_day("");
-                    }
-                    String userInfoJson = JSON.toJSONString(model.getData());
-                    SPUtils.put(UserInfoActivity.this, "UserInfo", userInfoJson);
+                    String userInfoJson = (String) SPUtils.get(UserInfoActivity.this, "UserInfo", "");
+                    UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
+                    userInfoModel.setHead_img(imgUrl);
+                    String newUserInfoJson = JSON.toJSONString(userInfoModel);
+                    SPUtils.put(UserInfoActivity.this, "UserInfo", newUserInfoJson);
                     EventBus.getDefault().post("LOGIN");
                     Toast.makeText(UserInfoActivity.this, "上传头像成功", Toast.LENGTH_LONG).show();
                 } else {
@@ -617,6 +499,109 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
             @Override
             public void onFinished() {
 
+            }
+        });
+    }
+
+    /**
+     * 自动获取相机权限
+     */
+    private void autoObtainCameraPermission() {
+        try {
+            if (ContextCompat.checkSelfPermission(UserInfoActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(UserInfoActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                if (ActivityCompat.shouldShowRequestPermissionRationale(UserInfoActivity.this, Manifest.permission.CAMERA)) {
+                    Toast.makeText(UserInfoActivity.this, "您已经拒绝过一次", Toast.LENGTH_SHORT).show();
+                }
+                ActivityCompat.requestPermissions(UserInfoActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE}, CAMERA_PERMISSIONS_REQUEST_CODE);
+            } else {//有权限直接调用系统相机拍照
+                SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+                Date date = new Date(System.currentTimeMillis());
+                fileUri = new File(dir.getPath() + "/headImg" + format.format(date) + ".jpg");
+                imageUri = Uri.fromFile(fileUri);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+                    imageUri = FileProvider.getUriForFile(UserInfoActivity.this, "com.youcoupon.john_li.youcouponshopping" + ".fileprovider", fileUri);//通过FileProvider创建一个content类型的Uri
+                }
+
+                PhotoUtils.takePicture(UserInfoActivity.this, imageUri, CODE_CAMERA_REQUEST);
+            }
+        }catch (Exception e) {
+
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case CAMERA_PERMISSIONS_REQUEST_CODE: {//调用系统相机申请拍照权限回调
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+                    Date date = new Date(System.currentTimeMillis());
+                    fileUri = new File(dir.getPath() + "head" + format.format(date) + ".jpg");
+                    imageUri = Uri.fromFile(fileUri);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                        imageUri = FileProvider.getUriForFile(UserInfoActivity.this, "com.youcoupon.john_li.youcouponshopping" + ".fileprovider", fileUri);//通过FileProvider创建一个content类型的Uri
+                    PhotoUtils.takePicture(UserInfoActivity.this, imageUri, CODE_CAMERA_REQUEST);
+                } else {
+                    Toast.makeText(UserInfoActivity.this, "请允许打开相机", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            }
+            case STORAGE_PERMISSIONS_REQUEST_CODE://调用系统相册申请Sdcard权限回调
+                // 使用意图直接调用手机相册
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                // 打开手机相册,设置请求码
+                startActivityForResult(intent, CODE_GALLERY_REQUEST);
+                break;
+        }
+    }
+
+    private void postImg(String filePath) {
+        RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.UPLOAD_FILE);
+        // 添加到请求body体的参数, 只有POST, PUT, PATCH, DELETE请求支持.
+        // params.addBodyParameter("wd", "xUtils");
+        // 使用multipart表单上传文件
+        params.setMultipart(true);
+        File img = new File(filePath);
+        params.addBodyParameter("file", img, "multipart/form-data"); // 如果文件没有扩展名, 最好设置contentType参数.
+        x.http().post(params, new Callback.CacheCallback<JSONObject>() {
+            @Override
+            public void onSuccess(JSONObject result) {
+                CommonModel model = JSON.parseObject(result.toString(), CommonModel.class);
+                if (model.getStatus() == 0) {
+                    mUserInfoModel.setHead_img(fileUri.getName());
+                    callNetUpdateHeadImg(String.valueOf(model.getData()));
+                    Toast.makeText(UserInfoActivity.this, "上傳頭像成功！", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(UserInfoActivity.this, "头像上传失败！", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                if (ex instanceof java.net.SocketTimeoutException) {
+                    Toast.makeText(UserInfoActivity.this, getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(UserInfoActivity.this, getString(R.string.request_error), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+
+            @Override
+            public boolean onCache(JSONObject result) {
+                return false;
             }
         });
     }

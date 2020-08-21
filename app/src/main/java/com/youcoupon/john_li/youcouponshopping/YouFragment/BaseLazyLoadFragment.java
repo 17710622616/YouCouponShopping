@@ -92,6 +92,10 @@ public class BaseLazyLoadFragment extends Fragment {
     @Override
     public void onDestroy() {
         Log.d("TAG", "onDestroy() : ");
-        super.onDestroy();
+        if (getActivity() != null) {
+            if (!getActivity().isDestroyed()) {
+                super.onDestroy();
+            }
+        }
     }
 }

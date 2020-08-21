@@ -1,11 +1,22 @@
 package com.youcoupon.john_li.youcouponshopping.YouFragment;
 
+import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
@@ -15,7 +26,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.ali.auth.third.login.LoginService;
@@ -33,7 +48,7 @@ import com.alibaba.baichuan.trade.biz.login.AlibcLogin;
 import com.alibaba.baichuan.trade.biz.login.AlibcLoginCallback;
 import com.alibaba.baichuan.trade.common.utils.AlibcLogger;
 import com.alibaba.fastjson.JSON;
-import com.alipay.sdk.tid.Tid;
+import com.alibaba.fastjson.JSONObject;
 import com.mob.MobSDK;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -56,6 +71,7 @@ import com.youcoupon.john_li.youcouponshopping.YouActivity.WebH5Activity;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.PerformanceOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.PhotoUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
@@ -68,11 +84,19 @@ import org.xutils.http.RequestParams;
 import org.xutils.image.ImageOptions;
 import org.xutils.x;
 
+import java.io.File;
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.onekeyshare.OnekeyShare;
+import cn.sharesdk.tencent.qq.QQ;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by John_Li on 25/5/2018.
@@ -88,6 +112,30 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     private LinearLayout incomeLL, teamLL, orderLL;
     private ProgressDialog dialog;
 
+    private File dir; //圖片文件夾路徑
+    private File fileUri;//照片文件路徑
+    private Uri imageUri;//照片文件路徑
+    private static final int CODE_GALLERY_REQUEST = 2;   //0xa0
+    private static final int CODE_CAMERA_REQUEST = 1;    //0xa1
+    private static final int CAMERA_PERMISSIONS_REQUEST_CODE = 0x03;
+    private static final int STORAGE_PERMISSIONS_REQUEST_CODE = 0x04;
+    //RequestOptions options = new RequestOptions().placeholder(R.mipmap.head_boy).error(R.mipmap.load_img_fail_list).diskCacheStrategy(DiskCacheStrategy.ALL).override(Target.SIZE_ORIGINAL);
+    private AsyncTask asyncTask;
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 0:     // 頭像提交至OSS成功
+                    mUserInfoModel.setHead_img(fileUri.getName());
+                    Toast.makeText(getActivity(), "上傳頭像成功！", Toast.LENGTH_LONG).show();
+                    break;
+                case -1:    // 頭像提交至OSS失敗
+                    Toast.makeText(getActivity(), "上傳頭像失败！", Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
+    };
     private AlibcShowParams alibcShowParams;//页面打开方式，默认，H5，Native
     private Map<String, String> exParams;//yhhpass参数
     private UserInfoOutsideModel.DataBean mUserInfoModel;
@@ -317,23 +365,52 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                     startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                 }
                 break;
+            case R.id.dialog_app_wechat:
+                break;
+            case R.id.dialog_app_whatsapp:
+                break;
+            case R.id.dialog_app_fb:
+                break;
         }
     }
 
     private void mobShare() {
-        OnekeyShare oks = new OnekeyShare();
+        /*OnekeyShare oks = new OnekeyShare();
         // title标题，微信、QQ和QQ空间等平台使用
         oks.setTitle("优券商城");
         // titleUrl QQ和QQ空间跳转链接
-        oks.setTitleUrl("http://sharesdk.cn");
+        oks.setTitleUrl("http://easybangbangda.top");
         // text是分享文本，所有平台都需要这个字段
         oks.setText("优券商城");
         // setImageUrl是网络图片的url
         oks.setImageUrl("https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0YouCoupon/img/logo.png");
         // url在微信、Facebook等平台中使用
-        oks.setUrl("http://sharesdk.cn");
+        oks.setUrl("http://easybangbangda.top");
         // 启动分享GUI
-        oks.show(MobSDK.getContext());
+        oks.show(MobSDK.getContext());*/
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        final View v = inflater.inflate(R.layout.dialog_app_share, null);
+        v.setBackgroundResource(R.color.colorAlpha);
+        LinearLayout wechat = (LinearLayout) v.findViewById(R.id.dialog_app_wechat);
+        LinearLayout whatsapp = (LinearLayout) v.findViewById(R.id.dialog_app_whatsapp);
+        LinearLayout fb = (LinearLayout) v.findViewById(R.id.dialog_app_fb);
+        //TextView shareTv = (TextView) v.findViewById(R.id.dialog_share_tv);
+        ImageView cancelIv = v.findViewById(R.id.dialog_app_cancel);
+        final Dialog dialog = builder.create();
+        dialog.show();
+        dialog.getWindow().setContentView(v);//自定义布局应该在这里添加，要在dialog.show()的后面
+        //dialog.setCancelable(true);
+        cancelIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        wechat.setOnClickListener(this);
+        whatsapp.setOnClickListener(this);
+        fb.setOnClickListener(this);
     }
 
     @Override
@@ -597,14 +674,19 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == getActivity().RESULT_OK) {
-            if (requestCode == 10001) {
-                callNetchechIsPartner();
-            } else if (requestCode == 10002) {
-
-            } else if (requestCode == 10003) {
-                String userName = data.getStringExtra("userName");
-                String passWord = data.getStringExtra("passWord");
-                callNetLogin(userName, passWord);
+            switch(requestCode) {
+                case 10001:
+                    callNetchechIsPartner();
+                    break;
+                case 10002:
+                    break;
+                case 10003:
+                    String userName = data.getStringExtra("userName");
+                    String passWord = data.getStringExtra("passWord");
+                    callNetLogin(userName, passWord);
+                    break;
+                default:
+                    break;
             }
         }
     }

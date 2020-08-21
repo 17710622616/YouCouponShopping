@@ -9,6 +9,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.youcoupon.john_li.youcouponshopping.R;
 import com.youcoupon.john_li.youcouponshopping.YouModel.FavoriteOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.MainClassifyOutModel;
@@ -23,11 +25,12 @@ import java.util.List;
  * Created by John_Li on 8/4/2019.
  */
 
-public class MainClassifyAdapter extends BaseAdapter {
+public class MainClassifyAdapter extends RecyclerView.Adapter<MainClassifyAdapter.MainClassifyViewHolder> implements View.OnClickListener {
     private List<MainClassifyOutModel.DataBean.ResultsBean> list;
     private int[] iconArr = {R.mipmap.exemption_from_postage99,R.mipmap.time_limit,R.mipmap.boutique,R.mipmap.guide,R.mipmap.head_boy};
     private Context mContext;
     private LayoutInflater mInflater;
+    private MainClassifyAdapter.OnItemClickListener mOnitemClickListener = null;
 
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setImageScaleType(ImageView.ScaleType.FIT_XY).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
     public MainClassifyAdapter(List<MainClassifyOutModel.DataBean.ResultsBean> list, Context context) {
@@ -37,7 +40,27 @@ public class MainClassifyAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getCount() {
+    public MainClassifyAdapter.MainClassifyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.item_main_classify, parent, false);
+        MainClassifyAdapter.MainClassifyViewHolder vh = new MainClassifyAdapter.MainClassifyViewHolder(view);
+        vh.item_main_classify_iv = (ImageView) view.findViewById(R.id.item_main_classify_iv);
+        vh.item_main_classify_tv = (TextView) view.findViewById(R.id.item_main_classify_tv);
+        return vh;
+    }
+
+    @Override
+    public void onBindViewHolder(MainClassifyAdapter.MainClassifyViewHolder holder, int position) {
+        /*if (iconArr.length - 1 < position) {
+            holder.item_main_classify_iv.setImageResource(R.mipmap.loading);
+        } else {
+            holder.item_main_classify_iv.setImageResource(iconArr[position]);
+        }*/
+        x.image().bind(holder.item_main_classify_iv, list.get(position).getImg_url(), options);
+        holder.item_main_classify_tv.setText(list.get(position).getActivity_title());
+    }
+
+    @Override
+    public int getItemCount() {
         if (list.size() > 5) {
             return 5;
         }
@@ -46,40 +69,25 @@ public class MainClassifyAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
-        return list.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder = null;
-        if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.item_main_classify, null);
-            holder = new ViewHolder();
-            holder.item_main_classify_iv = convertView.findViewById(R.id.item_main_classify_iv);
-            holder.item_main_classify_tv = convertView.findViewById(R.id.item_main_classify_tv);
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
+    public void onClick(View v) {
+        if (mOnitemClickListener != null) {
+            mOnitemClickListener.onItemClick(v, (int)v.getTag());
         }
-
-        /*if (iconArr.length - 1 < position) {
-            holder.item_main_classify_iv.setImageResource(R.mipmap.loading);
-        } else {
-            holder.item_main_classify_iv.setImageResource(iconArr[position]);
-        }*/
-        x.image().bind(holder.item_main_classify_iv, list.get(position).getImg_url(), options);
-        holder.item_main_classify_tv.setText(list.get(position).getActivity_title());
-        return convertView;
     }
 
-    class ViewHolder {
+    public void setOnItemClickListenr(MainClassifyAdapter.OnItemClickListener onItemClickListener) {
+        this.mOnitemClickListener = onItemClickListener;
+    }
+
+    public static interface OnItemClickListener {
+        void onItemClick(View view, int position);
+    }
+
+    public class MainClassifyViewHolder extends RecyclerView.ViewHolder {
         public ImageView item_main_classify_iv;
         public TextView item_main_classify_tv;
+        public MainClassifyViewHolder (View view){
+            super(view);
+        }
     }
 }

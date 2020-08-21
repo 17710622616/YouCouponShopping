@@ -9,6 +9,7 @@ import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -42,6 +43,7 @@ import com.alibaba.baichuan.trade.biz.context.AlibcTradeResult;
 import com.alibaba.baichuan.trade.biz.core.taoke.AlibcTaokeParams;
 import com.alibaba.baichuan.trade.common.utils.AlibcLogger;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.wireless.security.open.maldetection.IMalDetect;
 import com.gyf.immersionbar.BarHide;
 import com.gyf.immersionbar.ImmersionBar;
 import com.gyf.immersionbar.OnKeyboardListener;
@@ -62,6 +64,7 @@ import org.xutils.common.Callback;
 import org.xutils.common.task.PriorityExecutor;
 import org.xutils.http.HttpMethod;
 import org.xutils.http.RequestParams;
+import org.xutils.image.ImageOptions;
 import org.xutils.x;
 
 import java.io.File;
@@ -77,6 +80,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
 
     private AlibcShowParams alibcShowParams;//页面打开方式，默认，H5，Native
     private Map<String, String> exParams;//yhhpass参数
+    private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setImageScaleType(ImageView.ScaleType.FIT_XY).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -258,16 +262,67 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                 if (model.getStatus() == 0) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                     LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-                    View v = inflater.inflate(R.layout.activity_main_dialog, null);
+                    final View v = inflater.inflate(R.layout.activity_main_dialog, null);
                     v.setBackgroundResource(R.color.colorAlpha);
                     ImageView iv = (ImageView) v.findViewById(R.id.main_dialog_iv);
                     ImageView btn_sure = (ImageView) v.findViewById(R.id.main_dialog_cancel);
                     //builer.setView(v);//这里如果使用builer.setView(v)，自定义布局只会覆盖title和button之间的那部分
                     final Dialog dialog = builder.create();
-                    dialog.show();
-                    dialog.getWindow().setContentView(v);//自定义布局应该在这里添加，要在dialog.show()的后面
-                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                    //dialog.getWindow().setGravity(Gravity.CENTER);//可以设置显示的位置
+                    //dialog.show();
+                    final SysOperationOutModel.FloatingActivityModel activityModel = JSON.parseObject(model.getData().getFvalue(), SysOperationOutModel.FloatingActivityModel.class);
+                    if (model.getData().getFcategory().equals("1")) {
+                        x.image().bind(iv, activityModel.getImgUrl(), options, new Callback.CommonCallback<Drawable>() {
+                            @Override
+                            public void onSuccess(Drawable result) {
+                                //显示对话框
+                                dialog.show();
+                                dialog.getWindow().setContentView(v);//自定义布局应该在这里添加，要在dialog.show()的后面
+                                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                                //dialog.getWindow().setGravity(Gravity.CENTER);//可以设置显示的位置
+                            }
+
+                            @Override
+                            public void onError(Throwable ex, boolean isOnCallback) {
+
+                            }
+
+                            @Override
+                            public void onCancelled(CancelledException cex) {
+
+                            }
+
+                            @Override
+                            public void onFinished() {
+
+                            }
+                        });
+                    } else {
+                        x.image().bind(iv, "res://" + R.mipmap.taoqianggou, options, new Callback.CommonCallback<Drawable>() {
+                            @Override
+                            public void onSuccess(Drawable result) {
+                                //显示对话框
+                                dialog.show();
+                                dialog.getWindow().setContentView(v);//自定义布局应该在这里添加，要在dialog.show()的后面
+                                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                                //dialog.getWindow().setGravity(Gravity.CENTER);//可以设置显示的位置
+                            }
+
+                            @Override
+                            public void onError(Throwable ex, boolean isOnCallback) {
+
+                            }
+
+                            @Override
+                            public void onCancelled(CancelledException cex) {
+
+                            }
+
+                            @Override
+                            public void onFinished() {
+
+                            }
+                        });
+                    }
                     iv.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -275,7 +330,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                                 case "1":
                                     Intent intent = new Intent(MainActivity.this, WebH5Activity.class);
                                     intent.putExtra("title",model.getData().getFdesc());
-                                    intent.putExtra("webUrl",model.getData().getFvalue());
+                                    intent.putExtra("webUrl",activityModel.getUrl());
                                     startActivity(intent);
                                     break;
                                 case "2":
@@ -292,17 +347,16 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                             dialog.dismiss();
                         }
                     });
-                    //显示对话框
-                    dialog.show();
+
                     SPUtils.put(MainActivity.this, "PasttDay", YouCommonUtils.getTimeToday());
                 } else {
-                    //Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
-                //Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
+                Log.d("YouCoupon","获取查询列表失敗！");
             }
 
             @Override
@@ -686,8 +740,28 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                 //点击取消正在下载的操作
                 //cancelable.cancel();
             }});
-
         m_progressDlg.show();
     }
 
+    // 第一次按下返回键的事件
+    private long firstPressedTime;
+    // System.currentTimeMillis() 当前系统的时间
+    @Override
+    public void onBackPressed() {
+        if (System.currentTimeMillis() - firstPressedTime < 2000) {
+            super.onBackPressed();
+        } else {
+            Toast.makeText(MainActivity.this, "再按一次退出", Toast.LENGTH_SHORT).show();
+            firstPressedTime = System.currentTimeMillis();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (this != null) {
+            if (!this.isDestroyed()) {
+                super.onDestroy();
+            }
+        }
+    }
 }

@@ -80,4 +80,25 @@ public class SysOperationOutModel {
             this.fvalue = fvalue;
         }
     }
+
+    public static class FloatingActivityModel {
+        private String imgUrl;
+        private String url;
+
+        public String getImgUrl() {
+            return imgUrl;
+        }
+
+        public void setImgUrl(String imgUrl) {
+            this.imgUrl = imgUrl;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+    }
 }

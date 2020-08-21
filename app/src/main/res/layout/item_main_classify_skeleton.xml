@@ -16,9 +16,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:gravity="center"
         android:textSize="14sp"
-        android:textColor="@color/colorBlack"
-        android:text="标题"
+        android:background="@color/colorLoadingGray"
         android:padding="3dp"/>
 </LinearLayout>

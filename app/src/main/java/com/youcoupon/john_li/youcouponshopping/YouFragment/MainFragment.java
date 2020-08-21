@@ -12,10 +12,15 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.alibaba.fastjson.JSON;
+import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
+import com.ethanhua.skeleton.Skeleton;
+import com.ethanhua.skeleton.SkeletonScreen;
 import com.gyf.immersionbar.ImmersionBar;
 import com.gyf.immersionbar.OnNavigationBarListener;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
@@ -61,7 +66,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     public static String TAG = MainFragment.class.getName();
     private RecyclerView mHotListView;
     private NoScrollGridView mListView;
-    private NoScrollGridView mGridView;
+    private RecyclerView mGridView;
     private RefreshLayout mRefreshLayout;
     private Toolbar mToolbar;
     private ImageView activity01Iv, activity02Iv;
@@ -76,6 +81,12 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     private long totalCount;
     private long pageNo = 1;
     private long pageSize = 10;
+    // 热门骨架屏
+    RecyclerViewSkeletonScreen.Builder hotBuilder;
+    private SkeletonScreen hotSkeletonScreen;
+    // 分类骨架屏
+    RecyclerViewSkeletonScreen.Builder classifyhotBuilder;
+    private SkeletonScreen classifySkeletonScreen;
     // 定向活動標題列表
     private List<MainClassifyOutModel.DataBean.ResultsBean> mainClassifyList;
     private List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> mainHotItemModelList;
@@ -86,7 +97,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     private MainHotRefreshAdapter mMainHotRefreshAdapter;
     private MainClassifyAdapter mMainClassifyAdapter;
     private MaterialItemAdapter mMaterialItemAdapter;
-    private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setImageScaleType(ImageView.ScaleType.FIT_XY).setLoadingDrawableId(R.mipmap.activity_bg01).setFailureDrawableId(R.mipmap.activity_bg01).build();
+    private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setImageScaleType(ImageView.ScaleType.FIT_XY).setLoadingDrawableId(R.mipmap.activity_floating).setFailureDrawableId(R.mipmap.activity_floating).build();
 
     @Override
     protected void onCreateViewLazy(Bundle savedInstanceState) {
@@ -119,7 +130,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         activity01Iv = (ImageView) findViewById(R.id.main_activity_01);
         activity02Iv = (ImageView) findViewById(R.id.main_activity_02);
         mListView = (NoScrollGridView) findViewById(R.id.main_lv);
-        mGridView = (NoScrollGridView) findViewById(R.id.main_classify);
+        mGridView = (RecyclerView) findViewById(R.id.main_classify);
         searchLL = (LinearLayout) findViewById(R.id.main_search_ll);
 
         mRefreshLayout.setEnableAutoLoadmore(true);//是否启用列表惯性滑动到底部时自动加载更多
@@ -156,15 +167,6 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
                 callNetGetMerchandiseList();
             }
         });
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), CategoryListingsActivity.class);
-                intent.putExtra("ClassifyModel", JSON.toJSONString(mainClassifyList.get(position)));
-                intent.putExtra("Positon", 0);
-                startActivity(intent);
-            }
-        });
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -177,22 +179,54 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
 
 
     private void initData() {
-        mainClassifyList = new ArrayList<>();
-        mMapGuessLikeList = new ArrayList<>();
         mActivityList = new ArrayList<>();
 
+        // 分类
+        mainClassifyList = new ArrayList<>();
         mMainClassifyAdapter = new MainClassifyAdapter(mainClassifyList, getActivity());
-        mGridView.setAdapter(mMainClassifyAdapter);
+        mGridView.setLayoutManager(new GridLayoutManager(getActivity(), 5, LinearLayoutManager.VERTICAL,false));
+        classifyhotBuilder =  Skeleton.bind(mGridView);
+        classifySkeletonScreen = classifyhotBuilder
+                .adapter(mMainClassifyAdapter)//设置实际adapter
+                .shimmer(true)//是否开启动画
+                .angle(30)//shimmer的倾斜角度
+                .color(R.color.colorLoadingGray)//shimmer的颜色
+                .frozen(false)//true则表示显示骨架屏时，RecyclerView不可滑动，否则可以滑动
+                .duration(1200)//动画时间，以毫秒为单位
+                .count(5)//显示骨架屏时item的个数
+                .load(R.layout.item_main_classify_skeleton)//骨架屏UI
+                .show(); //default count is 10
+
+        mMainClassifyAdapter.setOnItemClickListenr(new MainClassifyAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Intent intent = new Intent(getActivity(), CategoryListingsActivity.class);
+                intent.putExtra("ClassifyModel", JSON.toJSONString(mainClassifyList.get(position)));
+                intent.putExtra("Positon", 0);
+                startActivity(intent);
+            }
+        });
+
+        // 猜你喜欢
+        mMapGuessLikeList = new ArrayList<>();
         mMaterialItemAdapter = new MaterialItemAdapter(mMapGuessLikeList, getActivity());
         mListView.setAdapter(mMaterialItemAdapter);
 
-        int spanCount = 1; // 只显示一行
+        // 热门
         mainHotItemModelList = new ArrayList<>();
         mMainHotRefreshAdapter = new MainHotRefreshAdapter(getActivity(), mainHotItemModelList);
-        RecyclerView.LayoutManager layoutManager = new StaggeredGridLayoutManager(spanCount, HORIZONTAL);
-        mHotListView.setLayoutManager(layoutManager);
-        mHotListView.setAdapter(mMainHotRefreshAdapter);
-
+        mHotListView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        hotBuilder = Skeleton.bind(mHotListView);
+        hotSkeletonScreen = hotBuilder
+                .adapter(mMainHotRefreshAdapter)//设置实际adapter
+                .shimmer(true)//是否开启动画
+                .angle(30)//shimmer的倾斜角度
+                .color(R.color.colorLoadingGray)//shimmer的颜色
+                .frozen(true)//true则表示显示骨架屏时，RecyclerView不可滑动，否则可以滑动
+                .duration(1200)//动画时间，以毫秒为单位
+                .count(3)//显示骨架屏时item的个数
+                .load(R.layout.item_main_hot_skeleton)//骨架屏UI
+                .show(); //default count is 10
         mMainHotRefreshAdapter.setOnItemClickListenr(new MainHotRefreshAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -202,10 +236,12 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
             }
         });
 
+        // 第一次添加了骨架屏所以不刷新
         callNetGetTitleList();
         callNetGetHotMerchandiseList();
         callNetGetActivitList();
-        mRefreshLayout.autoRefresh();
+        callNetGetMerchandiseList();
+        //mRefreshLayout.autoRefresh();
     }
 
     @Override
@@ -231,14 +267,19 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
                 if (model.getStatus() == 0) {
                     mainClassifyList.addAll(model.getData().getResults());
                     mMainClassifyAdapter.notifyDataSetChanged();
+                    classifySkeletonScreen.hide();
                 } else {
                     Toast.makeText(getApplicationContext(), "獲取定向活動標題列表失敗！", Toast.LENGTH_SHORT).show();
+                    classifySkeletonScreen.hide();
+                    classifyhotBuilder.shimmer(false).show();
                 }
             }
 
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
                 Toast.makeText(getApplicationContext(), "獲取定向活動標題列表失敗！", Toast.LENGTH_SHORT).show();
+                classifySkeletonScreen.hide();
+                classifyhotBuilder.shimmer(false).show();
             }
 
             @Override
@@ -248,7 +289,6 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
 
             @Override
             public void onFinished() {
-
             }
         });
     }
@@ -310,14 +350,19 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
                     isHotDefault = model.getData().getIs_default();
                     mainHotItemModelList.addAll(model.getData().getMap_data());
                     mMainHotRefreshAdapter.notifyDataSetChanged();
+                    hotSkeletonScreen.hide();
                 } else {
                     Toast.makeText(getApplicationContext(), "獲取熱賣数据失敗！", Toast.LENGTH_SHORT).show();
+                    hotSkeletonScreen.hide();
+                    hotBuilder.shimmer(false).show();
                 }
             }
 
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
                 Toast.makeText(getApplicationContext(), "獲取熱賣数据失敗！", Toast.LENGTH_SHORT).show();
+                hotSkeletonScreen.hide();
+                hotBuilder.shimmer(false).show();
             }
 
             @Override

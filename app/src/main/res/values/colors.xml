@@ -12,6 +12,7 @@
     <color name="colorCommentGray">#F4F4F4</color>
     <color name="colorLightGray">#fdfdfd</color>
     <color name="colorLineGray">#c9c9c9</color>
+    <color name="colorLoadingGray">#e6e6e6</color>
     <color name="colorDrakGray">#707070</color>
     <color name="colorOrderGray">#434345</color>
     <color name="colorBlack">#000000</color>

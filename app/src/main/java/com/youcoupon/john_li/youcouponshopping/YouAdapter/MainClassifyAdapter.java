@@ -45,6 +45,7 @@ public class MainClassifyAdapter extends RecyclerView.Adapter<MainClassifyAdapte
         MainClassifyAdapter.MainClassifyViewHolder vh = new MainClassifyAdapter.MainClassifyViewHolder(view);
         vh.item_main_classify_iv = (ImageView) view.findViewById(R.id.item_main_classify_iv);
         vh.item_main_classify_tv = (TextView) view.findViewById(R.id.item_main_classify_tv);
+        view.setOnClickListener(this);
         return vh;
     }
 
@@ -57,6 +58,7 @@ public class MainClassifyAdapter extends RecyclerView.Adapter<MainClassifyAdapte
         }*/
         x.image().bind(holder.item_main_classify_iv, list.get(position).getImg_url(), options);
         holder.item_main_classify_tv.setText(list.get(position).getActivity_title());
+        holder.itemView.setTag(position);
     }
 
     @Override

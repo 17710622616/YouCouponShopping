@@ -27,12 +27,13 @@ import java.util.regex.Pattern;
  * Created by John_Li on 30/5/2018.
  */
 
-public class MaterialItemAdapter extends BaseAdapter {
+public class MaterialItemAdapter extends BaseAdapter implements View.OnClickListener {
     private List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> list;
     private Context mContext;
     private LayoutInflater mInflater;
 
     private ImageOptions options;
+    private MaterialItemAdapter.OnItemClickListener mOnitemClickListener = null;
     public MaterialItemAdapter(List<MaterialClassifyItemOutModel.DataBean.MaterialItemModel> list, Context context) {
         this.list = list;
         mContext = context;
@@ -149,5 +150,20 @@ public class MaterialItemAdapter extends BaseAdapter {
     class ViewHolder {
         public ImageView merchandise_iv;
         public TextView merchandise_title, merchandise_original_price, merchandise_after_discoun, merchandise_price_after_discount, merchandise_original_coupon_value,item_main_merchandise_volume,item_main_merchandise_rebate;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (mOnitemClickListener != null) {
+            mOnitemClickListener.onItemClick(v, (int)v.getTag());
+        }
+    }
+
+    public void setOnItemClickListenr(MaterialItemAdapter.OnItemClickListener onItemClickListener) {
+        this.mOnitemClickListener = onItemClickListener;
+    }
+
+    public static interface OnItemClickListener {
+        void onItemClick(View view, int position);
     }
 }

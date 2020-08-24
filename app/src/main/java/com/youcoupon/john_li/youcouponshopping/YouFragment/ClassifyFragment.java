@@ -127,6 +127,17 @@ public class ClassifyFragment extends LazyLoadFragment implements View.OnClickLi
         //mGv.setAdapter(mClassifyItemAdapter);
         //添加Android自带的分割线
         //mGv.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL));
+        mClassifyItemAdapter.setOnItemClickListenr(new ClassifyItemRecycleAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (mainAllClassifyList.size() > 0) {
+                    Intent intent = new Intent(getActivity(), CategoryListingsActivity.class);
+                    intent.putExtra("ClassifyModel", JSON.toJSONString(mainAllClassifyList.get(0)));
+                    intent.putExtra("Positon", position);
+                    startActivity(intent);
+                }
+            }
+        });
         callNetGetTitleList();
     }
 

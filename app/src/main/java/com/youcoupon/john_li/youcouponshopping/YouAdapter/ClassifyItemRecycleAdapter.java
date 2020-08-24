@@ -22,11 +22,12 @@ import org.xutils.x;
 
 import java.util.List;
 
-public class ClassifyItemRecycleAdapter extends RecyclerView.Adapter<ClassifyItemRecycleAdapter.ClassifyViewHolder> {
+public class ClassifyItemRecycleAdapter extends RecyclerView.Adapter<ClassifyItemRecycleAdapter.ClassifyViewHolder> implements View.OnClickListener {
     private List<MainClassifyOutModel.DataBean.ResultsBean.ChildItemBean> list;
     private Context mContext;
     private LayoutInflater mInflater;
     private ImageOptions options;
+    private ClassifyItemRecycleAdapter.OnItemClickListener mOnitemClickListener = null;
 
     public ClassifyItemRecycleAdapter(List<MainClassifyOutModel.DataBean.ResultsBean.ChildItemBean> list, Context context) {
         this.list = list;
@@ -42,6 +43,7 @@ public class ClassifyItemRecycleAdapter extends RecyclerView.Adapter<ClassifyIte
         ClassifyItemRecycleAdapter.ClassifyViewHolder vh = new ClassifyItemRecycleAdapter.ClassifyViewHolder(view);
         vh.item_classify_iv = (ImageView) view.findViewById(R.id.item_classify_iv);
         vh.item_classify_tv = (TextView) view.findViewById(R.id.item_classify_tv);
+        view.setOnClickListener(this);
         return vh;
     }
 
@@ -49,6 +51,7 @@ public class ClassifyItemRecycleAdapter extends RecyclerView.Adapter<ClassifyIte
     public void onBindViewHolder(ClassifyItemRecycleAdapter.ClassifyViewHolder holder, int position) {
         x.image().bind(holder.item_classify_iv, list.get(position).getImg_url(), options);
         holder.item_classify_tv.setText(list.get(position).getChild_activity_title());
+        holder.itemView.setTag(position);
     }
 
     @Override
@@ -62,5 +65,19 @@ public class ClassifyItemRecycleAdapter extends RecyclerView.Adapter<ClassifyIte
         public ClassifyViewHolder(View view){
             super(view);
         }
+    }
+    @Override
+    public void onClick(View v) {
+        if (mOnitemClickListener != null) {
+            mOnitemClickListener.onItemClick(v, (int)v.getTag());
+        }
+    }
+
+    public void setOnItemClickListenr(ClassifyItemRecycleAdapter.OnItemClickListener onItemClickListener) {
+        this.mOnitemClickListener = onItemClickListener;
+    }
+
+    public static interface OnItemClickListener {
+        void onItemClick(View view, int position);
     }
 }

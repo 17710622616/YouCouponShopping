@@ -797,16 +797,16 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
 
                     String userInfoJson = JSON.toJSONString(userInfoModel);
                     SPUtils.put(MerchandiseDetialActivity.this, "UserInfo", userInfoJson);
-                    Toast.makeText(getApplicationContext(), "申请成为合作者成功，快去分享或者购买吧！" + model.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "申请成为合作者成功，快去分享或者购买吧！" + model.getMessage(), Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(getApplicationContext(), "申请成为合作者失败，请重新申请成为合作者领取返利！" + model.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "申请成为合作者失败，请重新申请成为合作者领取返利！" + model.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
 
             //请求异常后的回调方法
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
-                Toast.makeText(getApplicationContext(), "申请成为合作者异常，请重新申请成为合作者领取返利！", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "申请成为合作者异常，请重新申请成为合作者领取返利！", Toast.LENGTH_LONG).show();
             }
             //主动调用取消请求的回调方法
             @Override

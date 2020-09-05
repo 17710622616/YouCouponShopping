@@ -119,11 +119,11 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
                     isFirst = false;
                 } else {
                     position = tab.getPosition();
+                    mRefreshLayout.autoRefresh();
                 }
                 if (mMaterialItemModelList != null) {
                     mMaterialItemModelList.clear();
                 }
-                callNetGetItemList();
             }
 
             @Override
@@ -148,7 +148,6 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
         mMaterialItemModelList = new ArrayList<>();
         mMetrialItemAdapter = new MaterialItemAdapter(mMaterialItemModelList, this);
         mGv.setAdapter(mMetrialItemAdapter);
-        mRefreshLayout.autoRefresh();
 
 
         /**动态添加值**/
@@ -177,6 +176,9 @@ public class CategoryListingsActivity extends BaseActivity implements View.OnCli
         }
 
         mTabLayout.getTabAt(position).select();
+        if (position == 0) {
+            mRefreshLayout.autoRefresh();
+        }
 
         if (mClassifyTitleModel.getChildItem().size() == 1) {
             mTabLayout.setVisibility(View.GONE);

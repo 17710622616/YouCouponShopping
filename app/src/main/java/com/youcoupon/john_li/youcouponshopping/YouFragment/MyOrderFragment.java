@@ -138,7 +138,7 @@ public class MyOrderFragment extends LazyLoadFragment {
 
     private void initData() {
         orderList = new ArrayList<>();
-        mSmartOrderRefreshAdapter = new SmartOrderRefreshAdapter(getActivity(), orderList);
+        mSmartOrderRefreshAdapter = new SmartOrderRefreshAdapter(getActivity(), orderList, 0);
         mRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecycleView.setAdapter(mSmartOrderRefreshAdapter);
         //添加Android自带的分割线

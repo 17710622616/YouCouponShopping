@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -173,6 +174,59 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
                 Intent intent = new Intent(getActivity(), MerchandiseDetialActivity.class);
                 intent.putExtra("MerchandiseModel", JSON.toJSONString(mMapGuessLikeList.get(position)));
                 startActivity(intent);
+            }
+        });
+
+        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            //用来标记是否正在向最后一个滑动
+            boolean isSlidingToLast = false;
+            private boolean scrollFlag = false;// 标记是否滑动
+            private int lastVisibleItemPosition = 0;// 标记上次滑动位置
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                switch (scrollState) {
+                    case SCROLL_STATE_IDLE://停止滚动时
+                        scrollFlag = false;
+                        //判断滚动到底部
+                        if (mListView.getLastVisiblePosition() == (mListView.getCount() - 1)) {
+
+                        }
+                        //判断滚动到顶部
+                        if (mListView.getFirstVisiblePosition() == 0) {
+
+                        }
+
+
+                        int lastVisibleItem = view.getLastVisiblePosition();
+                        int totalItemCount = view.getChildCount();
+
+                        if (lastVisibleItem == (totalItemCount - 1) && isSlidingToLast) {
+                            mRefreshLayout.autoLoadmore();
+                        }
+                        break;
+                    case SCROLL_STATE_TOUCH_SCROLL://滚动时
+                        scrollFlag = true;
+                        break;
+                    case SCROLL_STATE_FLING://惯性滚动时
+                        scrollFlag = false;
+                        break;
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (scrollFlag) {
+                    if (firstVisibleItem > lastVisibleItemPosition) {
+                        //上滑
+                        isSlidingToLast = true;
+                    } else if (firstVisibleItem < lastVisibleItemPosition) {
+                        //下滑
+                        isSlidingToLast = false;
+                    } else {
+                        return;
+                    }
+                    lastVisibleItemPosition = firstVisibleItem;
+                }
             }
         });
     }

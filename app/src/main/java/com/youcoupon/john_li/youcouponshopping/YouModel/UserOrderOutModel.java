@@ -168,6 +168,33 @@ public class UserOrderOutModel {
             private String deposit_price;
             private String tb_deposit_time;
             private String tk_deposit_time;
+            private String ownPlatformRevenue;
+            private String firstPlatformRevenue;
+            private String secondPlatformRevenue;
+
+            public String getOwnPlatformRevenue() {
+                return ownPlatformRevenue;
+            }
+
+            public void setOwnPlatformRevenue(String ownPlatformRevenue) {
+                this.ownPlatformRevenue = ownPlatformRevenue;
+            }
+
+            public String getFirstPlatformRevenue() {
+                return firstPlatformRevenue;
+            }
+
+            public void setFirstPlatformRevenue(String firstPlatformRevenue) {
+                this.firstPlatformRevenue = firstPlatformRevenue;
+            }
+
+            public String getSecondPlatformRevenue() {
+                return secondPlatformRevenue;
+            }
+
+            public void setSecondPlatformRevenue(String secondPlatformRevenue) {
+                this.secondPlatformRevenue = secondPlatformRevenue;
+            }
 
             public long getId() {
                 return id;

@@ -32,15 +32,18 @@ public class SmartOrderRefreshAdapter extends RecyclerView.Adapter<SmartOrderRef
     private LruCache<String ,BitmapDrawable> mMemoryCache;
     private OnItemClickListener mOnitemClickListener = null;
     private InnerItemOnclickListener mListener;
+    // 等级，0：自己，1：上级，2：上上级
+    private int level;
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
 
-    public SmartOrderRefreshAdapter(Context context, List<UserOrderOutModel.DataBean.OrderListBean> list) {
+    public SmartOrderRefreshAdapter(Context context, List<UserOrderOutModel.DataBean.OrderListBean> list, int level) {
         this.list = list;
         mContext = context;
         mInflater = LayoutInflater.from(context);
         //计算内存，并且给Lrucache 设置缓存大小
         int maxMemory = (int) Runtime.getRuntime().maxMemory();
         int cacheSize = maxMemory/6;
+        this.level = level;
         mMemoryCache = new LruCache<String ,BitmapDrawable>(cacheSize){
             @Override
             protected int sizeOf(String key, BitmapDrawable value) {
@@ -71,8 +74,19 @@ public class SmartOrderRefreshAdapter extends RecyclerView.Adapter<SmartOrderRef
         holder.item_order_shop_name.setText(list.get(position).getSeller_shop_title());
         holder.item_order_no.setText("订单编号:" + list.get(position).getTrade_id());
         holder.item_create_time.setText("创建时间:" + list.get(position).getTk_create_time());
-        holder.item_pay_money.setText("付款金额\n" + list.get(position).getPay_price());
-        holder.item_order_income.setText("预估收入\n" + list.get(position).getIncome_rate());
+        //holder.item_pay_money.setText("付款金额\n" + list.get(position).getPay_price());
+        holder.item_pay_money.setText("付款金额\n" + list.get(position).getAlipay_total_price());
+        switch (level) {
+            case 0:
+                holder.item_order_income.setText("预估收入\n" + String.format("%.2f", Double.parseDouble(list.get(position).getOwnPlatformRevenue())));
+                break;
+            case 1:
+                holder.item_order_income.setText("预估收入\n" + String.format("%.2f", Double.parseDouble(list.get(position).getFirstPlatformRevenue())));
+                break;
+            case 2:
+                holder.item_order_income.setText("预估收入\n" + String.format("%.2f", Double.parseDouble(list.get(position).getSecondPlatformRevenue())));
+                break;
+        }
         switch (list.get(position).getTk_status()) {
             case 3:
                 holder.item_order_status.setText("待结算");

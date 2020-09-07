@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -53,6 +54,7 @@ import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.gyf.immersionbar.ImmersionBar;
+import com.youcoupon.john_li.youcouponshopping.MainActivity;
 import com.youcoupon.john_li.youcouponshopping.R;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
@@ -77,6 +79,8 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
     private static final int CODE_CAMERA_REQUEST = 1;    //0xa1
     private static final int CAMERA_PERMISSIONS_REQUEST_CODE = 0x03;
     private static final int STORAGE_PERMISSIONS_REQUEST_CODE = 0x04;
+    // 运行时权限
+    public static final int MY_PERMISSION_REQUEST_CODE = 10000;
     private UserInfoOutsideModel.DataBean mUserInfoModel;
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setLoadingDrawableId(R.mipmap.head_iimg).setFailureDrawableId(R.mipmap.head_iimg).build();
     //private OSSClient oss;
@@ -400,7 +404,7 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
         albumTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                autoObtainStoragePermission();
+                checkRuntimePermission();
                 dialog.dismiss();
             }
         });
@@ -410,6 +414,139 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
                 dialog.dismiss();
             }
         });
+    }
+
+    /**
+     * 检查运行时权限
+     *      需要3个权限(都是危险权限):
+     *      1. 读取位置权限;
+     *      2. 读取外部存储器权限;
+     *      3. 写入外部存储器权限
+     */
+    private void checkRuntimePermission() {
+        //第 1 步: 检查是否有相应的权限
+        boolean isAllGranted = checkPermissionAllGranted(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
+        // 如果这3个权限全都拥有, 则直接执行备份代码
+        if (isAllGranted) {
+            autoObtainStoragePermission();
+        } else {
+            //第 2 步: 请求权限
+            // 一次请求多个权限, 如果其他有权限是已经授予的将会自动忽略掉
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    /**
+     * 检查是否拥有指定的所有权限
+     */
+    private boolean checkPermissionAllGranted(String[] permissions) {
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                // 只要有一个权限没有被授予, 则直接返回 false
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 第 3 步: 申请权限结果返回处理
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSION_REQUEST_CODE:
+                boolean isAllGranted = true;
+
+                // 判断是否所有的权限都已经授予了
+                for (int grant : grantResults) {
+                    if (grant != PackageManager.PERMISSION_GRANTED) {
+                        isAllGranted = false;
+                        break;
+                    }
+                }
+
+                if (isAllGranted) {
+                    // 如果所有的权限都授予了, 则执行备份代码
+                    return;
+                } else {
+                    // 弹出对话框告诉用户需要权限的原因, 并引导用户去应用权限管理中手动打开权限按钮
+                    openAppDetails();
+                }
+                break;
+            case CAMERA_PERMISSIONS_REQUEST_CODE: {//调用系统相机申请拍照权限回调
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+                    Date date = new Date(System.currentTimeMillis());
+                    fileUri = new File(dir.getPath() + "head" + format.format(date) + ".jpg");
+                    imageUri = Uri.fromFile(fileUri);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                        imageUri = FileProvider.getUriForFile(UserInfoActivity.this, "com.youcoupon.john_li.youcouponshopping" + ".fileprovider", fileUri);//通过FileProvider创建一个content类型的Uri
+                    PhotoUtils.takePicture(UserInfoActivity.this, imageUri, CODE_CAMERA_REQUEST);
+                } else {
+                    Toast.makeText(UserInfoActivity.this, "请允许打开相机", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            }
+            case STORAGE_PERMISSIONS_REQUEST_CODE://调用系统相册申请Sdcard权限回调
+                // 使用意图直接调用手机相册
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                // 打开手机相册,设置请求码
+                startActivityForResult(intent, CODE_GALLERY_REQUEST);
+                break;
+        }
+    }
+
+    /**
+     * 打开 APP 的详情设置
+     */
+    private void openAppDetails() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("亲，请打开文件存储权限才可以修改头像哦！");
+        builder.setPositiveButton("去授权", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                intent.addCategory(Intent.CATEGORY_DEFAULT);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                startActivity(intent);
+            }
+        });
+        builder.setNegativeButton("取消", null);
+        builder.show();
+    }
+
+    /**
+     * 自动获取相机权限
+     */
+    private void autoObtainCameraPermission() {
+        try {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+                    Toast.makeText(UserInfoActivity.this, "您已经拒绝过一次", Toast.LENGTH_SHORT).show();
+                }
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE}, CAMERA_PERMISSIONS_REQUEST_CODE);
+            } else {//有权限直接调用系统相机拍照
+                SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+                Date date = new Date(System.currentTimeMillis());
+                fileUri = new File(dir.getPath() + "/head" + format.format(date) + ".jpg");
+                imageUri = Uri.fromFile(fileUri);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+                    imageUri = FileProvider.getUriForFile(UserInfoActivity.this, "com.youcoupon.john_li.youcouponshopping" + ".fileprovider", fileUri);//通过FileProvider创建一个content类型的Uri
+                }
+
+                PhotoUtils.takePicture(this, imageUri, CODE_CAMERA_REQUEST);
+            }
+        }catch (Exception e) {
+
+        }
     }
 
     /**
@@ -501,62 +638,6 @@ public class UserInfoActivity extends BaseActivity implements View.OnClickListen
 
             }
         });
-    }
-
-    /**
-     * 自动获取相机权限
-     */
-    private void autoObtainCameraPermission() {
-        try {
-            if (ContextCompat.checkSelfPermission(UserInfoActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(UserInfoActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                if (ActivityCompat.shouldShowRequestPermissionRationale(UserInfoActivity.this, Manifest.permission.CAMERA)) {
-                    Toast.makeText(UserInfoActivity.this, "您已经拒绝过一次", Toast.LENGTH_SHORT).show();
-                }
-                ActivityCompat.requestPermissions(UserInfoActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE}, CAMERA_PERMISSIONS_REQUEST_CODE);
-            } else {//有权限直接调用系统相机拍照
-                SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
-                Date date = new Date(System.currentTimeMillis());
-                fileUri = new File(dir.getPath() + "/headImg" + format.format(date) + ".jpg");
-                imageUri = Uri.fromFile(fileUri);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-                    imageUri = FileProvider.getUriForFile(UserInfoActivity.this, "com.youcoupon.john_li.youcouponshopping" + ".fileprovider", fileUri);//通过FileProvider创建一个content类型的Uri
-                }
-
-                PhotoUtils.takePicture(UserInfoActivity.this, imageUri, CODE_CAMERA_REQUEST);
-            }
-        }catch (Exception e) {
-
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        switch (requestCode) {
-            case CAMERA_PERMISSIONS_REQUEST_CODE: {//调用系统相机申请拍照权限回调
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
-                    Date date = new Date(System.currentTimeMillis());
-                    fileUri = new File(dir.getPath() + "head" + format.format(date) + ".jpg");
-                    imageUri = Uri.fromFile(fileUri);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                        imageUri = FileProvider.getUriForFile(UserInfoActivity.this, "com.youcoupon.john_li.youcouponshopping" + ".fileprovider", fileUri);//通过FileProvider创建一个content类型的Uri
-                    PhotoUtils.takePicture(UserInfoActivity.this, imageUri, CODE_CAMERA_REQUEST);
-                } else {
-                    Toast.makeText(UserInfoActivity.this, "请允许打开相机", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            }
-            case STORAGE_PERMISSIONS_REQUEST_CODE://调用系统相册申请Sdcard权限回调
-                // 使用意图直接调用手机相册
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                // 打开手机相册,设置请求码
-                startActivityForResult(intent, CODE_GALLERY_REQUEST);
-                break;
-        }
     }
 
     private void postImg(String filePath) {

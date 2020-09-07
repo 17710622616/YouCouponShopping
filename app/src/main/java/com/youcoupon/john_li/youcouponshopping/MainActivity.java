@@ -1,5 +1,6 @@
 package com.youcoupon.john_li.youcouponshopping;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,12 +9,14 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,7 +32,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -48,6 +54,7 @@ import com.gyf.immersionbar.BarHide;
 import com.gyf.immersionbar.ImmersionBar;
 import com.gyf.immersionbar.OnKeyboardListener;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.UserInfoActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.WebH5Activity;
 import com.youcoupon.john_li.youcouponshopping.YouFragment.ClassifyFragment;
 import com.youcoupon.john_li.youcouponshopping.YouFragment.MainFragment;
@@ -56,6 +63,7 @@ import com.youcoupon.john_li.youcouponshopping.YouFragment.ShopCartFragment;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.SearchOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.SysOperationOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.PhotoUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
@@ -69,6 +77,8 @@ import org.xutils.x;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,6 +88,8 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     private FragmentManager fm;
     private Fragment cacheFragment;
 
+    // 运行时权限
+    public static final int MY_PERMISSION_REQUEST_CODE = 10000;
     private AlibcShowParams alibcShowParams;//页面打开方式，默认，H5，Native
     private Map<String, String> exParams;//yhhpass参数
     private ImageOptions options = new ImageOptions.Builder().setSize(0, 0).setImageScaleType(ImageView.ScaleType.FIT_XY).setLoadingDrawableId(R.mipmap.img_loading).setFailureDrawableId(R.mipmap.load_img_fail).build();
@@ -97,6 +109,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         initData();
         checkAPPVersion();
         checkHasShowActivity();
+        checkRuntimePermission();
 
         /*alibcShowParams = new AlibcShowParams(OpenType.Native, false);
         exParams = new HashMap<>();
@@ -468,6 +481,92 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
             transaction.add(R.id.main_containor, cacheFragment, tag);
         }
         transaction.commit();
+    }
+
+    /********************************************检查运行时权限***************************************************/
+    /**
+     * 检查运行时权限
+     *      需要3个权限(都是危险权限):
+     *      1. 读取位置权限;
+     *      2. 读取外部存储器权限;
+     *      3. 写入外部存储器权限
+     */
+    private void checkRuntimePermission() {
+        //第 1 步: 检查是否有相应的权限
+        boolean isAllGranted = checkPermissionAllGranted(new String[] {android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE});
+        // 如果这3个权限全都拥有, 则直接执行备份代码
+        if (isAllGranted) {
+            return;
+        }
+
+        //第 2 步: 请求权限
+        // 一次请求多个权限, 如果其他有权限是已经授予的将会自动忽略掉
+        ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSION_REQUEST_CODE);
+    }
+
+    /**
+     * 检查是否拥有指定的所有权限
+     */
+    private boolean checkPermissionAllGranted(String[] permissions) {
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                // 只要有一个权限没有被授予, 则直接返回 false
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 第 3 步: 申请权限结果返回处理
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSION_REQUEST_CODE:
+                boolean isAllGranted = true;
+
+                // 判断是否所有的权限都已经授予了
+                for (int grant : grantResults) {
+                    if (grant != PackageManager.PERMISSION_GRANTED) {
+                        isAllGranted = false;
+                        break;
+                    }
+                }
+
+                if (isAllGranted) {
+                    // 如果所有的权限都授予了, 则执行备份代码
+                    return;
+                } else {
+                    // 弹出对话框告诉用户需要权限的原因, 并引导用户去应用权限管理中手动打开权限按钮
+                    openAppDetails();
+                }
+                break;
+        }
+    }
+
+    /**
+     * 打开 APP 的详情设置
+     */
+    private void openAppDetails() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("亲，请打开文件存储权限才可以修改头像哦！");
+        builder.setPositiveButton("去授权", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                intent.addCategory(Intent.CATEGORY_DEFAULT);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                startActivity(intent);
+            }
+        });
+        builder.setNegativeButton("取消", null);
+        builder.show();
     }
 
     /********************************************版本更新***************************************************/

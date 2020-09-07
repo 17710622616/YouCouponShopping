@@ -3,6 +3,7 @@ package com.youcoupon.john_li.youcouponshopping.YouFragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -189,11 +190,12 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
                         scrollFlag = false;
                         //判断滚动到底部
                         if (mListView.getLastVisiblePosition() == (mListView.getCount() - 1)) {
+                            Log.d("665","666");
 
                         }
                         //判断滚动到顶部
                         if (mListView.getFirstVisiblePosition() == 0) {
-
+                            Log.d("665","666");
                         }
 
 

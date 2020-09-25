@@ -47,6 +47,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
+        android:allowBackup="true"
+        tools:replace="android:supportsRtl,android:allowBackup"
         android:textIsSelectable="true"
         android:theme="@style/AppTheme">
         <activity android:name=".SplashActivity"
@@ -79,6 +81,9 @@
         <activity android:name=".YouActivity.WithDrawActivity" android:screenOrientation="portrait"/>
         <activity android:name=".YouActivity.WalletRecrodActivity" android:screenOrientation="portrait"/>
         <activity android:name=".YouActivity.PerformanceActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".YouActivity.OrderRetrievalActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".YouActivity.VisitorRetrievalActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".YouActivity.XinrenH5Activity" android:screenOrientation="portrait"/>
 
         <!-- Required SDK 核心功能-->
         <!-- 可配置android:process参数将PushService放在其他进程中 -->

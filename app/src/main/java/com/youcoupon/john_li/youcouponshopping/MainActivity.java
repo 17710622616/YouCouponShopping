@@ -287,11 +287,6 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
                         x.image().bind(iv, activityModel.getImgUrl(), options, new Callback.CommonCallback<Drawable>() {
                             @Override
                             public void onSuccess(Drawable result) {
-                                //显示对话框
-                                dialog.show();
-                                dialog.getWindow().setContentView(v);//自定义布局应该在这里添加，要在dialog.show()的后面
-                                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                                //dialog.getWindow().setGravity(Gravity.CENTER);//可以设置显示的位置
                             }
 
                             @Override
@@ -309,50 +304,23 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
 
                             }
                         });
-                    } else {
-                        x.image().bind(iv, "res://" + R.mipmap.taoqianggou, options, new Callback.CommonCallback<Drawable>() {
+                        iv.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void onSuccess(Drawable result) {
-                                //显示对话框
-                                dialog.show();
-                                dialog.getWindow().setContentView(v);//自定义布局应该在这里添加，要在dialog.show()的后面
-                                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                                //dialog.getWindow().setGravity(Gravity.CENTER);//可以设置显示的位置
-                            }
-
-                            @Override
-                            public void onError(Throwable ex, boolean isOnCallback) {
-
-                            }
-
-                            @Override
-                            public void onCancelled(CancelledException cex) {
-
-                            }
-
-                            @Override
-                            public void onFinished() {
-
+                            public void onClick(View v) {
+                                Intent intent = new Intent(MainActivity.this, WebH5Activity.class);
+                                intent.putExtra("title",model.getData().getFdesc());
+                                intent.putExtra("webUrl",activityModel.getUrl());
+                                startActivity(intent);
+                                dialog.dismiss();
                             }
                         });
+
+                        //显示对话框
+                        dialog.show();
+                        dialog.getWindow().setContentView(v);//自定义布局应该在这里添加，要在dialog.show()的后面
+                        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                        //dialog.getWindow().setGravity(Gravity.CENTER);//可以设置显示的位置
                     }
-                    iv.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            switch (model.getData().getFcategory()) {
-                                case "1":
-                                    Intent intent = new Intent(MainActivity.this, WebH5Activity.class);
-                                    intent.putExtra("title",model.getData().getFdesc());
-                                    intent.putExtra("webUrl",activityModel.getUrl());
-                                    startActivity(intent);
-                                    break;
-                                case "2":
-                                    openH5Url(model.getData().getFvalue());
-                                    break;
-                            }
-                            dialog.dismiss();
-                        }
-                    });
 
                     btn_sure.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -363,7 +331,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
 
                     SPUtils.put(MainActivity.this, "PasttDay", YouCommonUtils.getTimeToday());
                 } else {
-                    Toast.makeText(getApplicationContext(), "获取查询列表失敗！", Toast.LENGTH_SHORT).show();
+                    Log.d("YouCoupon","获取查询列表失敗！");
                 }
             }
 

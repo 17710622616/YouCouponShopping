@@ -283,6 +283,42 @@
                 <View style="@style/underLine"/>
 
                 <LinearLayout
+                    android:id="@+id/mine_bind_inviter"
+                    android:orientation="horizontal"
+                    style="@style/mineLinearLayout">
+                    <ImageView
+                        style="@style/MineItemImageView"
+                        android:src="@mipmap/update_pwd"/>
+
+                    <TextView
+                        style="@style/MineItemTextView"
+                        android:text="绑定邀请人"/>
+
+                    <ImageView
+                        style="@style/MineItemImageNext"/>
+                </LinearLayout>
+
+                <View style="@style/underLine"/>
+
+                <LinearLayout
+                    android:id="@+id/mine_bind_order"
+                    android:orientation="horizontal"
+                    style="@style/mineLinearLayout">
+                    <ImageView
+                        style="@style/MineItemImageView"
+                        android:src="@mipmap/update_pwd"/>
+
+                    <TextView
+                        style="@style/MineItemTextView"
+                        android:text="订单找回"/>
+
+                    <ImageView
+                        style="@style/MineItemImageNext"/>
+                </LinearLayout>
+
+                <View style="@style/underLine"/>
+
+                <LinearLayout
                     android:id="@+id/mine_share"
                     android:orientation="horizontal"
                     style="@style/mineLinearLayout">

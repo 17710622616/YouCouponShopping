@@ -25,4 +25,6 @@
     <string name="error_network">Failed to init due to network exception.</string>
     <string name="logining">Running in background. Please see log.</string>
     <string name="setting_su">Succeed to set</string>
+    <string name="order_retrieval_tips">The order synchronization time is 30-60 minutes. Sometimes there will be a slight delay in the system and the order cannot be displayed in time. If the order is not automatically obtained, please manually copy the "order no" from Taobao order details to the "Order Retrieval" of the YouCoupon APP Submit the order manually, if you have any questions, please contact customer service, thank you!
+Note: Do not use red envelopes for payment, otherwise the system cannot be settled!</string>
 </resources>

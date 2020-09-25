@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -59,12 +60,14 @@ import com.youcoupon.john_li.youcouponshopping.YouActivity.BecomePartnerActivity
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BussinesActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.ChangePwdActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.OrderListActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.OrderRetrievalActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.PerformanceActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.ServiceActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.SuggestActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.TeamListActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.TutorialActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.UserInfoActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.VisitorRetrievalActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.WalletActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.WalletRecrodActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.WebH5Activity;
@@ -72,6 +75,7 @@ import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.PerformanceOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.PhotoUtils;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.QrCodeUtil;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
@@ -108,7 +112,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     private ImageView headIv;//userInfoLL
     private RelativeLayout userInfoRl;
     private RefreshLayout mRefreshLayout;
-    private LinearLayout taobaoLL,courseLL,changePwdLL, suggestLL, shareLL, serviceLL, bussinessLL, commonLL, loginOutLL;
+    private LinearLayout taobaoLL,courseLL,changePwdLL, suggestLL, shareLL,orderRetrievalLL, visitorBindLL, serviceLL, bussinessLL, commonLL, loginOutLL;
     private LinearLayout incomeLL, teamLL, orderLL;
     private ProgressDialog dialog;
 
@@ -176,6 +180,8 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         shareLL = (LinearLayout) findViewById(R.id.mine_share);
         serviceLL = (LinearLayout) findViewById(R.id.mine_service);
         bussinessLL = (LinearLayout) findViewById(R.id.mine_bussiness);
+        orderRetrievalLL = (LinearLayout) findViewById(R.id.mine_bind_order);
+        visitorBindLL = (LinearLayout) findViewById(R.id.mine_bind_inviter);
         commonLL = (LinearLayout) findViewById(R.id.mine_common);
         loginOutLL = (LinearLayout) findViewById(R.id.mine_login_out);
         userInfoRl = (RelativeLayout) findViewById(R.id.user_info_rl);
@@ -203,6 +209,8 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         serviceLL.setOnClickListener(this);
         bussinessLL.setOnClickListener(this);
         commonLL.setOnClickListener(this);
+        orderRetrievalLL.setOnClickListener(this);
+        visitorBindLL.setOnClickListener(this);
         loginOutLL.setOnClickListener(this);
         mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
@@ -349,6 +357,30 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                     startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                 }
                 break;
+            case R.id.mine_bind_inviter:
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    if (!((String) SPUtils.get(getActivity(), "UserInfo", "")).equals("")) {
+                        startActivityForResult(new Intent(getActivity(), VisitorRetrievalActivity.class), 10004);
+                    } else {
+                        startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                        Toast.makeText(getActivity(), "登录信息错误，请重新登录", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
+                break;
+            case R.id.mine_bind_order:
+                if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
+                    if (!((String) SPUtils.get(getActivity(), "UserInfo", "")).equals("")) {
+                        startActivityForResult(new Intent(getActivity(), OrderRetrievalActivity.class), 10005);
+                    } else {
+                        startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                        Toast.makeText(getActivity(), "登录信息错误，请重新登录", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
+                }
+                break;
             case R.id.mine_login_out:
                 loginOut();
                 //taobaoAuth();
@@ -356,7 +388,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             case R.id.user_info_rl:
                 if (!((String) SPUtils.get(getActivity(), "UserToken", "")).equals("")) {
                     if (!((String) SPUtils.get(getActivity(), "UserInfo", "")).equals("")) {
-                        startActivityForResult(new Intent(getActivity(), UserInfoActivity.class), 10002);
+                        startActivityForResult(new Intent(getActivity(), UserInfoActivity.class), 10006);
                     } else {
                         startActivityForResult(new Intent(getActivity(), LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                         Toast.makeText(getActivity(), "登录信息错误，请重新登录", Toast.LENGTH_LONG).show();
@@ -375,7 +407,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     }
 
     private void mobShare() {
-        /*OnekeyShare oks = new OnekeyShare();
+        OnekeyShare oks = new OnekeyShare();
         // title标题，微信、QQ和QQ空间等平台使用
         oks.setTitle("优券商城");
         // titleUrl QQ和QQ空间跳转链接
@@ -387,16 +419,30 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         // url在微信、Facebook等平台中使用
         oks.setUrl("http://easybangbangda.top");
         // 启动分享GUI
-        oks.show(MobSDK.getContext());*/
+        oks.show(MobSDK.getContext());
+        /*String userInfoJson = (String) SPUtils.get(getActivity(), "UserInfo", "");
+        mUserInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
+        String visitorCode = "";
+        if (mUserInfoModel != null) {
+            if (mUserInfoModel.getInviteCode() != null) {
+                visitorCode = mUserInfoModel.getInviteCode();
+            }
+        }
+        String content="http://118.190.1.209:8083/?visitorCode=" + visitorCode;
+        Bitmap qrCodeBitmap = QrCodeUtil.createQRCode(content, 54);
+        Bitmap bgBitmap = ((BitmapDrawable)getResources().getDrawable(R.mipmap.share1)).getBitmap();
+        final Bitmap shareBitmap = YouCommonUtils.mergeBitmap(bgBitmap,qrCodeBitmap, 57,177);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         final View v = inflater.inflate(R.layout.dialog_app_share, null);
         v.setBackgroundResource(R.color.colorAlpha);
+        ImageView dialog_app_wechat_iv = (ImageView) v.findViewById(R.id.dialog_app_wechat_iv);
         LinearLayout wechat = (LinearLayout) v.findViewById(R.id.dialog_app_wechat);
         LinearLayout whatsapp = (LinearLayout) v.findViewById(R.id.dialog_app_whatsapp);
         LinearLayout fb = (LinearLayout) v.findViewById(R.id.dialog_app_fb);
         //TextView shareTv = (TextView) v.findViewById(R.id.dialog_share_tv);
+        ImageView haibaoIv = v.findViewById(R.id.dialog_app_iv);
         ImageView cancelIv = v.findViewById(R.id.dialog_app_cancel);
         final Dialog dialog = builder.create();
         dialog.show();
@@ -408,9 +454,16 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 dialog.dismiss();
             }
         });
-        wechat.setOnClickListener(this);
+        wechat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                YouCommonUtils.saveToLocal(shareBitmap, "shareHaiBao", getActivity());
+                dialog.dismiss();
+            }
+        });
         whatsapp.setOnClickListener(this);
         fb.setOnClickListener(this);
+        haibaoIv.setImageBitmap(shareBitmap);*/
     }
 
     @Override

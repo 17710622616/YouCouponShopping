@@ -37,6 +37,9 @@ allprojects {
         maven {
             url "http://repo.baichuan-android.taobao.com/content/groups/BaichuanRepositories/"
         }
+        maven {
+            url "https://jitpack.io"
+        }
     }
     subprojects {
         afterEvaluate {

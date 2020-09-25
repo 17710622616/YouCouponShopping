@@ -9,13 +9,21 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -30,6 +38,64 @@ import java.util.Map;
  */
 
 public class YouCommonUtils {
+    /**
+     * 拼接两张图片
+     * @param firstBitmap
+     * @param secondBitmap
+     * @return
+     */
+    public static Bitmap mergeBitmap(Bitmap firstBitmap, Bitmap secondBitmap, long left, long top) {
+        if( firstBitmap == null ) {
+            return null;
+        }
+
+        int bgWidth = firstBitmap.getWidth();
+        int bgHeight = firstBitmap.getHeight();
+        //create the new blank bitmap 创建一个新的和SRC长度宽度一样的位图
+        Bitmap newbmp = Bitmap.createBitmap(bgWidth, bgHeight, Bitmap.Config.ARGB_8888);
+        Canvas cv = new Canvas(newbmp);
+        //draw bg into
+        cv.drawBitmap(firstBitmap, 0, 0, null);//在 0，0坐标开始画入bg
+        //draw fg into
+        cv.drawBitmap(secondBitmap, left, top, null);//在 0，0坐标开始画入fg ，可以从任意位置画入
+        //save all clip
+        cv.save();//保存
+        //store
+        cv.restore();//存储
+        return newbmp;
+    }
+
+    /**
+     * 将图片保存到本地
+     * @param bitmap
+     * @param bitName
+     * @throws IOException
+     */
+    public static void saveToLocal(Bitmap bitmap, String bitName, Context context) {
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + bitName + ".jpg");
+        if (file.exists()) {
+            file.delete();
+        }
+        FileOutputStream out;
+        try {
+            out = new FileOutputStream(file);
+            if (bitmap.compress(Bitmap.CompressFormat.PNG, 90, out)) {
+                out.flush();
+                out.close();
+                //保存图片后发送广播通知更新数据库
+                // Uri uri = Uri.fromFile(file);
+                // sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                Uri uri = Uri.fromFile(file);
+                intent.setData(uri);
+                context.sendBroadcast(intent);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static String createLinkStringByGet(Map<String, String> params) {
         String prestr = "";

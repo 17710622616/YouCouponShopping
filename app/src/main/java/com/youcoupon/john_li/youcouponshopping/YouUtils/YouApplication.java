@@ -23,7 +23,7 @@ public class YouApplication extends Application {
         x.Ext.init(this);
         JPushInterface.init(this);
         String id = JPushInterface.getRegistrationID(this);
-        CrashCatchHandler.getInstance().init(this);
+        //CrashCatchHandler.getInstance().init(this);
         AlibcTradeSDK.asyncInit(this, new AlibcTradeInitCallback() {
             @Override
             public void onSuccess() {

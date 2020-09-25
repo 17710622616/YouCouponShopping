@@ -112,6 +112,12 @@ public class YouConfigor {
     public static final String POST_BUSINESS = "api/Tool/submitBusinessCooperation?";
     //提交意见反馈
     public static final String POST_FEEDBACK = "api/Tool/submitFeedBack?";
+    // 订单找回
+    public static final String POST_ORDER_RETRIRVAL = "/api/Order/orderRetrieval?";
+    // 绑定邀请人
+    public static final String POST_VISITOR_RETRIEVAL = "/api/User/submitInvitationCode";
+    // 查询上下级
+    public static final String GET_SUPIOR = "/api/User/getSuperior";
     // 上传头像
     public static String UPLOAD_FILE = "api/Tool/uploadTempFile?";
 }

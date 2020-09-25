@@ -28,11 +28,13 @@ import com.gyf.immersionbar.OnNavigationBarListener;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
+import com.youcoupon.john_li.youcouponshopping.LoginActivity;
 import com.youcoupon.john_li.youcouponshopping.MerchandiseDetialActivity;
 import com.youcoupon.john_li.youcouponshopping.R;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.CategoryListingsActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.SearchResultActivity;
 import com.youcoupon.john_li.youcouponshopping.YouActivity.WebH5Activity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.XinrenH5Activity;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.MainClassifyAdapter;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.MainHotRefreshAdapter;
 import com.youcoupon.john_li.youcouponshopping.YouAdapter.MaterialItemAdapter;
@@ -73,7 +75,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
     private Toolbar mToolbar;
     private ImageView activity01Iv, activity02Iv;
     private LinearLayout searchLL;
-    private TextView mainTv;
+    private ImageView mainIv;
 
     // 猜你喜歡商品列表是否為最後一頁
     private String isDefault = "true";
@@ -128,7 +130,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         mHotListView = (RecyclerView) findViewById(R.id.main_hot_lv);
         mHotListView.setHasFixedSize(true);
 
-        mainTv = (TextView) findViewById(R.id.main_tv);
+        mainIv = (ImageView) findViewById(R.id.main_iv);
         activity01Iv = (ImageView) findViewById(R.id.main_activity_01);
         activity02Iv = (ImageView) findViewById(R.id.main_activity_02);
         mListView = (NoScrollGridView) findViewById(R.id.main_lv);
@@ -145,12 +147,13 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
 
     private void setListener() {
         searchLL.setOnClickListener(this);
+        mainIv.setOnClickListener(this);
         mRefreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
             @Override
             public void onLoadmore(RefreshLayout refreshlayout) {
                 //和最大的数据比较
                 if (isDefault.equals("true")){
-                    mainTv.setVisibility(View.GONE);
+                    mainIv.setVisibility(View.GONE);
                     Toast.makeText(getActivity(), "没有更多数据了~", Toast.LENGTH_SHORT).show();
                     mRefreshLayout.finishRefresh();
                     mRefreshLayout.finishLoadmore();
@@ -163,7 +166,7 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
-                mainTv.setVisibility(View.VISIBLE);
+                mainIv.setVisibility(View.VISIBLE);
                 pageNo = 1;
                 mMapGuessLikeList.clear();
                 callNetGetMerchandiseList();
@@ -305,6 +308,12 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         switch (v.getId()) {
             case R.id.main_search_ll:
                 startActivity(new Intent(getActivity(), SearchResultActivity.class));
+                break;
+            case R.id.main_iv:
+                Intent intent = new Intent(getActivity(), XinrenH5Activity.class);
+                intent.putExtra("title", "新人免单");
+                intent.putExtra("webUrl", "http://www.youcoupon.top:8082/xinrenmiandan/index.html");
+                startActivity(intent);
                 break;
         }
     }

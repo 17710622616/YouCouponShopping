@@ -124,6 +124,8 @@ dependencies {
     implementation 'com.ethanhua:skeleton:1.1.2'
     //主要是动画的实现
     implementation 'io.supercharge:shimmerlayout:2.1.0'
+    // H5交互
+    implementation 'com.github.lzyzsd:jsbridge:1.0.4'
 }
 
 MobSDK {
@@ -133,8 +135,8 @@ MobSDK {
         loopShare true
         devInfo {
             Wechat {
-                appId "wx4868b35061f87885"
-                appSecret "64020361b8ec4c99936c0e3999a9f249"
+                appId "wx17ceb6780627c414"
+                appSecret "dc78d6a8a7dfcaadaa906b6011cb2676"
                 userName "gh_afb25ac019c9"
                 path "pages/index/index.html?id=1"
                 withShareTicket true

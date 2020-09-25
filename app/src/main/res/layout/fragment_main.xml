@@ -179,17 +179,14 @@
                 </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
-        <TextView
-            android:id="@+id/main_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/shape_order_status"
-            android:layout_marginRight="35dp"
-            android:layout_marginBottom="50dp"
-            android:text="上拉\n更多"
-            android:textSize="12sp"
-            android:textColor="@color/colorWhite"
-            android:padding="5dp"
+        <ImageView
+            android:id="@+id/main_iv"
+            android:layout_width="56dp"
+            android:layout_height="80dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="35dp"
+            android:src="@mipmap/xrmd_icon"
+            android:scaleType="fitXY"
             android:layout_gravity="right|bottom"/>
     </FrameLayout>
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>

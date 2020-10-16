@@ -95,10 +95,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import cn.sharesdk.facebook.Facebook;
 import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 import cn.sharesdk.tencent.qq.QQ;
+import cn.sharesdk.wechat.friends.Wechat;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -407,7 +410,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     }
 
     private void mobShare() {
-        OnekeyShare oks = new OnekeyShare();
+        /*OnekeyShare oks = new OnekeyShare();
         // title标题，微信、QQ和QQ空间等平台使用
         oks.setTitle("优券商城");
         // titleUrl QQ和QQ空间跳转链接
@@ -419,8 +422,8 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         // url在微信、Facebook等平台中使用
         oks.setUrl("http://easybangbangda.top");
         // 启动分享GUI
-        oks.show(MobSDK.getContext());
-        /*String userInfoJson = (String) SPUtils.get(getActivity(), "UserInfo", "");
+        oks.show(MobSDK.getContext());*/
+        String userInfoJson = (String) SPUtils.get(getActivity(), "UserInfo", "");
         mUserInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
         String visitorCode = "";
         if (mUserInfoModel != null) {
@@ -428,7 +431,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
                 visitorCode = mUserInfoModel.getInviteCode();
             }
         }
-        String content="http://118.190.1.209:8083/?visitorCode=" + visitorCode;
+        final String content="http://118.190.1.209:8083/?visitorCode=" + visitorCode;
         Bitmap qrCodeBitmap = QrCodeUtil.createQRCode(content, 54);
         Bitmap bgBitmap = ((BitmapDrawable)getResources().getDrawable(R.mipmap.share1)).getBitmap();
         final Bitmap shareBitmap = YouCommonUtils.mergeBitmap(bgBitmap,qrCodeBitmap, 57,177);
@@ -457,13 +460,91 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         wechat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String filePath = YouCommonUtils.saveToLocal(shareBitmap, "shareHaiBao", getActivity());
+                Platform.ShareParams sp = new Platform.ShareParams();
+                sp.setTitle("优券商城-全网返利最高");
+                sp.setText("优券商城-全网返利最高");
+                //sp.setImagePath("https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0YouCoupon/img/logo.png");
+                sp.setImagePath(filePath);
+                sp.setImageUrl(content);
+                sp.setShareType(Platform.SHARE_WEBPAGE);
+                //3.获取平台对象
+                Platform wechatPF = ShareSDK.getPlatform(Wechat.NAME);
+                //4.设置结果回调
+                wechatPF.setPlatformActionListener(new PlatformActionListener() {
+
+                    @Override
+                    public void onError(Platform arg0, int arg1, Throwable arg2) {
+                        //操作失败啦，打印提供的错误，方便调试
+                        arg2.printStackTrace();
+                        Toast.makeText(getActivity(), "分享失败！", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
+                        //操作成功，在这里可以做后续的步骤
+                        //这里需要说明的一个参数就是HashMap<String, Object> arg2
+                        //这个参数在你进行登录操作的时候里面会保存有用户的数据，例如用户名之类的。
+                        //Toast.makeText(getActivity(), "分享成功！", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onCancel(Platform arg0, int arg1) {
+                        //用户取消操作会调用这里
+                        Toast.makeText(getActivity(), "您已取消分享！", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                //5.执行分享
+                wechatPF.share(sp);
+                dialog.dismiss();
+            }
+        });
+        whatsapp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 YouCommonUtils.saveToLocal(shareBitmap, "shareHaiBao", getActivity());
                 dialog.dismiss();
             }
         });
-        whatsapp.setOnClickListener(this);
-        fb.setOnClickListener(this);
-        haibaoIv.setImageBitmap(shareBitmap);*/
+        fb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //YouCommonUtils.saveToLocal(shareBitmap, "shareHaiBao", getActivity());
+                //String path = BitmapHelper.downloadBitmap(MobSDK.getContext(), "http://pic28.photophoto.cn/20130818/0020033143720852_b.jpg");
+                //Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.kehu, null);
+                Platform.ShareParams shareParams = new Platform.ShareParams();
+                //shareParams.setImagePath(path);
+                //或者使用inmagedata参数
+                shareParams.setImageData(shareBitmap);
+                shareParams.setShareType(Platform.SHARE_IMAGE);
+                Platform platform = ShareSDK.getPlatform(Facebook.NAME);
+                // 设置分享事件回调（注：回调放在不能保证在主线程调用，不可以在里面直接处理UI操作）
+                platform.setPlatformActionListener(new PlatformActionListener() {
+                    @Override
+                    public void onError(Platform arg0, int arg1, Throwable arg2) {
+                        //失败的回调，arg:平台对象，arg1:表示当前的动作，arg2:异常信息
+                        Log.d("ShareSDK", "onError ---->  分享失败" + arg2.toString());
+                        Log.d("ShareSDK","ThreadID -----> : "+Thread.currentThread().getId());
+                    }
+
+                    @Override
+                    public void onComplete(Platform arg0, int arg1, HashMap arg2) {
+                        //分享成功的回调
+                        Log.d("ShareSDK", "onError ---->  分享cg" + arg2.toString());
+                    }
+
+                    @Override
+                    public void onCancel(Platform arg0, int arg1) {
+                        //取消分享的回调
+                        Log.d("ShareSDK", "onError ---->  分享xq" );
+                    }
+                });
+                platform.share(shareParams);
+                dialog.dismiss();
+            }
+        });
+        haibaoIv.setImageBitmap(shareBitmap);
     }
 
     @Override
@@ -943,24 +1024,7 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
     private void loginOut() {
         SPUtils.put(getActivity(), "UserToken", "");
         SPUtils.put(getActivity(), "UserInfo", "");
-        showUserInfo();
-        /*AlibcLogin alibcLogin = AlibcLogin.getInstance();
-        alibcLogin.logout(new AlibcLoginCallback() {
-            @Override
-            public void onSuccess(int loginResult, String openId, String userNick) {
-                // 参数说明：
-                // loginResult(3--登出成功)
-                // openId：用户id
-                // userNick: 用户昵称
-                Toast.makeText(getActivity(), "退出登录成功", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(int code, String msg) {
-                // code：错误码  msg： 错误信息
-                Toast.makeText(getActivity(), "退出登录失败 " + msg + code, Toast.LENGTH_SHORT).show();
-            }
-        });*/
+        refreshUI();
     }
 
     /**

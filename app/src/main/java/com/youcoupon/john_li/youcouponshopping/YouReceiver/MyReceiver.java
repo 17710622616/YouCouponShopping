@@ -1,4 +1,4 @@
-package com.youcoupon.john_li.youcouponshopping.YouUtils;
+package com.youcoupon.john_li.youcouponshopping.YouReceiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

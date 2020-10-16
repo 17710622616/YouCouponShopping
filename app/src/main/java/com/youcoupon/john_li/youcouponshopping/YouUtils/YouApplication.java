@@ -17,13 +17,15 @@ import cn.jpush.android.api.JPushInterface;
  */
 
 public class YouApplication extends Application {
+    public static YouApplication baseApplication;
     @Override
     public void onCreate() {
         super.onCreate();
+        baseApplication = this;
         x.Ext.init(this);
         JPushInterface.init(this);
         String id = JPushInterface.getRegistrationID(this);
-        //CrashCatchHandler.getInstance().init(this);
+        CrashCatchHandler.getInstance().init(this);
         AlibcTradeSDK.asyncInit(this, new AlibcTradeInitCallback() {
             @Override
             public void onSuccess() {
@@ -39,5 +41,9 @@ public class YouApplication extends Application {
         });
         // MOBSDK是否同意隐私协议
         MobSDK.submitPolicyGrantResult(false, null);
+    }
+
+    public static YouApplication getInstance(){
+        return baseApplication;
     }
 }

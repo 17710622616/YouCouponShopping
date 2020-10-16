@@ -60,7 +60,7 @@
                         android:layout_marginEnd="20dp"
                         android:gravity="center_vertical">
 
-                        <TextView
+                        <!--<TextView
                             android:layout_width="66dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="12dp"
@@ -68,7 +68,18 @@
                             android:alpha="0.4"
                             android:text="手机号"
                             android:textColor="@color/colorBlack"
-                            android:textSize="14sp" />
+                            android:textSize="14sp" />-->
+                        <Spinner
+                            android:id="@+id/register_area_phone"
+                            android:entries="@array/tel_area"
+                            android:layout_height="wrap_content"
+                            android:layout_width="66dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="12dp"
+                            android:textColor="@color/colorBlack"
+                            android:textSize="14sp"
+                            android:alpha="0.4"
+                            android:spinnerMode="dialog"/>
 
                         <EditText
                             android:id="@+id/register_et_phone"
@@ -76,7 +87,7 @@
                             android:layout_height="match_parent"
                             android:layout_marginStart="14dp"
                             android:background="@null"
-                            android:hint="请输入8位澳门手机号码"
+                            android:hint="请输入8位或11位手机号码"
                             android:inputType="number"
                             android:textColor="@color/colorPrimary"
                             android:textSize="14sp" />

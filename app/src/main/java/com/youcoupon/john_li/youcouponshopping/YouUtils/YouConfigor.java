@@ -6,6 +6,7 @@ package com.youcoupon.john_li.youcouponshopping.YouUtils;
 
 public class YouConfigor {
     public static final int LOGIN_FOR_RQUEST = 10001;
+    public static final  String EXTRA_BUNDLE = "JPUSH_START_MER";
 
     /*********************************************************************地址********************************************************************************/
     // 測試地址

@@ -54,7 +54,7 @@ public class OrderRetrievalActivity extends BaseActivity implements View.OnClick
     public void initData() {
         headView.setLeft(this);
         headView.setTitle("找回订单");
-        headView.setRightText("规则", this);
+        //headView.setRightText("规则", this);
     }
 
     @Override

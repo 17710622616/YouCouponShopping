@@ -1,5 +1,6 @@
 package com.youcoupon.john_li.youcouponshopping.YouUtils;
 
+import android.app.ActivityManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
@@ -12,18 +13,22 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -71,7 +76,7 @@ public class YouCommonUtils {
      * @param bitName
      * @throws IOException
      */
-    public static void saveToLocal(Bitmap bitmap, String bitName, Context context) {
+    public static String saveToLocal(Bitmap bitmap, String bitName, Context context) {
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + bitName + ".jpg");
         if (file.exists()) {
             file.delete();
@@ -89,11 +94,16 @@ public class YouCommonUtils {
                 Uri uri = Uri.fromFile(file);
                 intent.setData(uri);
                 context.sendBroadcast(intent);
+                return uri.getPath();
             }
+
+            return "";
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            return "";
         } catch (IOException e) {
             e.printStackTrace();
+            return "";
         }
     }
 
@@ -281,9 +291,7 @@ public class YouCommonUtils {
      * 打开fb
      */
     public static void openFb(Context context) {
-
     }
-
 
     /**
      * 获取软件版本号
@@ -317,4 +325,83 @@ public class YouCommonUtils {
         return verName;
     }
 
+    //在picture目录下新建一个自己文件夹
+    private static final String rootPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/appname";
+
+    /**
+     * 这个方法用来把已经存在的一个文件存储到相册
+     * @param context 用来发送广播
+     * @param srcString 需要拷贝的文件的地址
+     */
+    public static void saveFileToAlbum(Context context, String srcString) {
+        if (TextUtils.isEmpty(srcString)) {
+            return;
+        }
+        File srcFile = new File(srcString);
+        if (!srcFile.exists()) {
+            return;
+        }
+        //如果root文件夹没有需要新建一个
+        createDirIfNotExist();
+
+        //拷贝文件到picture目录下
+        File destFile = new File(rootPath + "/" + srcFile.getName());
+        copyFile(srcFile, destFile);
+
+        //将该文件扫描到相册
+        MediaScannerConnection.scanFile(context, new String[] { destFile.getPath() }, null, null);
+    }
+
+    public static void createDirIfNotExist() {
+        File file = new File(rootPath);
+        if (!file.exists()) {
+            try {
+                file.mkdirs();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void copyFile(File src, File dest) {
+        if (!src.getAbsolutePath().equals(dest.getAbsolutePath())) {
+            try {
+                InputStream in = new FileInputStream(src);
+                FileOutputStream out = new FileOutputStream(dest);
+                byte[] buf = new byte[1024];
+
+                int len;
+                while ((len = in.read(buf)) >= 0) {
+                    out.write(buf, 0, len);
+                }
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 判断应用是否已经启动
+     * @param context 一个context
+     * @param packageName 要判断应用的包名
+     * @return boolean
+     */
+    public static boolean isAppAlive(Context context, String packageName){
+        ActivityManager activityManager =
+                (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> processInfos
+                = activityManager.getRunningAppProcesses();
+        for(int i = 0; i < processInfos.size(); i++){
+            if(processInfos.get(i).processName.equals(packageName)){
+                Log.i("NotificationLaunch",
+                        String.format("the %s is running, isAppAlive return true", packageName));
+                return true;
+            }
+        }
+        Log.i("NotificationLaunch",
+                String.format("the %s is not running, isAppAlive return false", packageName));
+        return false;
+    }
 }

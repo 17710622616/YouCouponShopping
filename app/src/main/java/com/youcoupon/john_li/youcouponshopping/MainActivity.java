@@ -63,6 +63,7 @@ import com.youcoupon.john_li.youcouponshopping.YouFragment.ShopCartFragment;
 import com.youcoupon.john_li.youcouponshopping.YouModel.CommonModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.SearchOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.SysOperationOutModel;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.MyPushService;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.PhotoUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
@@ -110,6 +111,33 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
         checkAPPVersion();
         checkHasShowActivity();
         checkRuntimePermission();
+
+        // 推送打开APP
+        Intent intent = new Intent(this, MyPushService.class);
+        startService(intent);
+        Bundle bundle = getIntent().getBundleExtra(YouConfigor.EXTRA_BUNDLE);
+        if(bundle != null){
+            //如果bundle存在，取出其中的参数，启动DetailActivity
+            String isH5 = bundle.getString("isH5");
+            if (isH5 != null) {
+                if (isH5.equals("1")) {
+                    String title = bundle.getString("title");
+                    String webUrl = bundle.getString("webUrl");
+
+                    if(title != null && webUrl != null) {
+                        Intent activityIntent = new Intent(MainActivity.this, WebH5Activity.class);
+                        activityIntent.putExtra("title", title);
+                        activityIntent.putExtra("webUrl", webUrl);
+                    }
+                } else {
+                    String merchandiseJson = bundle.getString("MerchandiseModel");
+                    if (merchandiseJson != null) {
+                        Intent detailIntent = new Intent(MainActivity.this, MerchandiseDetialActivity.class);
+                        detailIntent.putExtra("MerchandiseModel", merchandiseJson);
+                    }
+                }
+            }
+        }
 
         /*alibcShowParams = new AlibcShowParams(OpenType.Native, false);
         exParams = new HashMap<>();

@@ -36,6 +36,10 @@ import org.xutils.x;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
+import cn.jpush.android.api.JPushInterface;
+import cn.jpush.android.api.TagAliasCallback;
 
 /**
  * Created by John_Li on 2019/10/30.
@@ -218,10 +222,10 @@ public class LoginActivity extends BaseActivity {
                     Log.d("getUserURI", "獲取用戶信息成功");
 
                     // 註冊極光別名
-                    //String alias = "user" + username;
+                    String alias = "user" + model.getData().getMobile();
                     //给极光推送设置标签和别名
-                    //JPushInterface.setAlias(RegisterActivity.this, alias, tagAliasCallback);
-                    //Toast.makeText(RegisterActivity.this, getString(R.string.login_success), Toast.LENGTH_SHORT).show();
+                    JPushInterface.setAlias(LoginActivity.this, alias, tagAliasCallback);
+                    //Toast.makeText(LoginActivity.this, getString(R.string.login_success), Toast.LENGTH_SHORT).show();
                     //setResult(YouConfigor.LOGIN_FOR_RESULT);
                     EventBus.getDefault().post("LOGIN");
                     finish();
@@ -248,6 +252,23 @@ public class LoginActivity extends BaseActivity {
             }
         });
     }
+
+    //极光服务器设置别名是否成功的回调
+    private final TagAliasCallback tagAliasCallback = new TagAliasCallback() {
+        @Override
+        public void gotResult(int code, String alias, Set<String> tagSet) {
+            switch (code) {
+                case 0:
+                    //Toast.makeText(LoginActivity.this, "设置别名成功", Toast.LENGTH_SHORT).show();
+                    Log.d("EasyLaundry", "设置别名成功");
+                    break;
+                default:
+                    //Toast.makeText(LoginActivity.this, "设置别名失败", Toast.LENGTH_SHORT).show();
+                    Log.d("EasyLaundry", "设置别名失败");
+                    break;
+            }
+        }
+    };
 
     /**
      * 绑定上下级关系

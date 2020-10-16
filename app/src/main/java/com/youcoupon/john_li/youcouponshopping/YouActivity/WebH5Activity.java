@@ -82,6 +82,11 @@ public class WebH5Activity extends BaseActivity implements View.OnClickListener 
         webUrl = intent.getStringExtra("webUrl");
         headView.setTitle(title);
         headView.setLeft(this);
+        if (webUrl != null) {
+            if (webUrl.equals("http://118.190.1.209:8082/xinrenmiandan/index.html")) {
+                headView.setRightText("规则", this);
+            }
+        }
 
         //支持javascript
         mWebView.getSettings().setJavaScriptEnabled(true);
@@ -151,6 +156,12 @@ public class WebH5Activity extends BaseActivity implements View.OnClickListener 
             case R.id.head_left:
                 setResult(RESULT_OK);
                 finish();
+                break;
+            case R.id.head_right_tv:
+                Intent intent = new Intent(WebH5Activity.this, WebH5Activity.class);
+                intent.putExtra("title", "新人免单规则");
+                intent.putExtra("webUrl", "https://test-pic-666.oss-cn-hongkong.aliyuncs.com/0html/YouCoupon/newcome_free.html");
+                startActivity(intent);
                 break;
         }
     }

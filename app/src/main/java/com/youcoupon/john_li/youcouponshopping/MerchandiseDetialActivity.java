@@ -3,11 +3,22 @@ package com.youcoupon.john_li.youcouponshopping;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Paint;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -63,6 +74,8 @@ import com.youcoupon.john_li.youcouponshopping.YouModel.ItemRecommondOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.MaterialClassifyItemOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.SellerOutModel;
 import com.youcoupon.john_li.youcouponshopping.YouModel.UserInfoOutsideModel;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.FileDownloadCallBack;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.HttpDownFileUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouCommonUtils;
 import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
@@ -74,6 +87,14 @@ import org.xutils.http.RequestParams;
 import org.xutils.image.ImageOptions;
 import org.xutils.x;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -194,9 +215,10 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         exParams = new HashMap<>();
         exParams.put("alibaba", "appisvcode");
 
+        DisplayMetrics dm=new DisplayMetrics();//创建矩阵
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
         // toolbar
-        /*setSupportActionBar(articalToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);*/
         setSupportActionBar(articalToolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -204,9 +226,6 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         }
         //  設置標題
         mCollapsingToolbarLayout.setTitle("详情");//设置标题的名字
-        /*mCollapsingToolbarLayout.setCollapsedTitleGravity(Gravity.CENTER);//设置收缩后标题的位置
-        mCollapsingToolbarLayout.setExpandedTitleGravity(Gravity.CENTER);////设置展开后标题的位置
-        mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimary));//设置展开后标题的颜色*/
 
         // 商品详情
         callNetGetItemInfo(mMaterialItemModel.getItemId());
@@ -236,53 +255,6 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
             sahreTv.setText("分享賺" + String.format("%.2f", mMaterialItemModel.getRebateMoney()));
             couponRedemptionTv.setText("点我购买，返" + String.format("%.2f", mMaterialItemModel.getRebateMoney()));
         }
-        /*if (mMaterialItemModel.getCouponInfo() != null) {
-            if(!mMaterialItemModel.getCouponInfo().equals("")) {
-                couponValueTv.setText(String.valueOf(mMaterialItemModel.getCouponInfo()));
-                couponRemainCountTv.setText("剩餘數量：" + String.valueOf(mMaterialItemModel.getCouponRemainCount()));
-                beforePriceTv.setText("原價¥" + mMaterialItemModel.getZkFinalPrice());
-                // 按指定模式在字符串查找
-                Pattern p=Pattern.compile("\\d+");
-                Matcher m=p.matcher(mMaterialItemModel.getCouponInfo());
-                double afterCoupon = Double.parseDouble(mMaterialItemModel.getZkFinalPrice());
-                double couponAmount = 0.001;
-                while(m.find()) {
-                    // 判断不为0，避开减.00的阶段
-                    if(Double.parseDouble(m.group()) != 0.0) {
-                        // 当不为0时判断是否是起减金额
-                        if (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) >= Double.parseDouble(m.group())) {
-                            while (m.find()){
-                                if (Double.parseDouble(m.group()) != 0.0) {
-                                    String price = mMaterialItemModel.getZkFinalPrice();
-                                    afterCoupon = Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) - Double.parseDouble(m.group());
-                                    couponAmount = Double.parseDouble(m.group());
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-
-                afterPriceTv.setText("¥" + String.format("%.2f", afterCoupon));
-                sahreTv.setText("分享賺" +String.format("%.2f", (0.78 * (afterCoupon * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
-                couponRedemptionTv.setText("领券购买，返" +String.format("%.2f", (0.78 * (afterCoupon * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
-            } else {
-                beforePriceTv.setVisibility(View.GONE);
-                couponValueTv.setVisibility(View.GONE);
-                couponRemainCountTv.setVisibility(View.GONE);
-                afterPriceTv.setText(String.valueOf(mMaterialItemModel.getZkFinalPrice()));
-                sahreTv.setText("分享賺" +String.format("%.2f", (0.78 * (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
-                couponRedemptionTv.setText("点我购买，返" +String.format("%.2f", (0.78 * (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
-            }
-        } else {
-            beforePriceTv.setVisibility(View.GONE);
-            couponValueTv.setVisibility(View.GONE);
-            couponRemainCountTv.setVisibility(View.GONE);
-            afterPriceTv.setText(String.valueOf(mMaterialItemModel.getZkFinalPrice()));
-            sahreTv.setText("分享賺" +String.format("%.2f", (0.78 * (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
-            couponRedemptionTv.setText("点我购买，返" +String.format("%.2f", (0.78 * (Double.parseDouble(mMaterialItemModel.getZkFinalPrice()) * Double.parseDouble(mMaterialItemModel.getCommissionRate()) * 0.01))));
-        }*/
         merchandiseTitleTv.setText(mMaterialItemModel.getTitle());
         inSaleTv.setText("售" + String.valueOf(mMaterialItemModel.getVolume()) + "件");
         if (mMaterialItemModel.getUserType() == 0) {
@@ -521,6 +493,7 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
             public void onSuccess(String result) {
                 CommonModel model = JSON.parseObject(result, CommonModel.class);
                 if (model.getStatus() == 0) {
+                    batchDownload(mMaterialItemModel.getSmallImages(), 0);
                     mTpwd = String.valueOf(model.getData());
                     openShare();
                 } else {
@@ -545,6 +518,52 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
         });
     }
 
+    Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Bundle data = msg.getData();
+            String val = data.getString("value");
+            Log.i(TAG,"请求结果:" + val);
+        }
+    };
+
+    /**
+     * 批量下载图片
+     * @param smallImages
+     */
+    private void batchDownload(final List<String> smallImages, final int postion) {
+        if (postion < smallImages.size()) {
+            //Bitmap bitmap = HttpDownFileUtils.GetImageInputStream(MerchandiseDetialActivity.this, smallImages.get(postion));
+            new Thread(new Runnable(){
+                @Override
+                public void run() {
+                    HttpURLConnection connection=null;
+                    Bitmap bitmap=null;
+                    try {
+                        URL url = new URL(smallImages.get(postion));
+                        connection=(HttpURLConnection)url.openConnection();
+                        connection.setConnectTimeout(10 * 1000); //超时设置
+                        connection.setDoInput(true);
+                        connection.setUseCaches(false); //设置不使用缓存
+                        InputStream inputStream=connection.getInputStream();
+                        bitmap= BitmapFactory.decodeStream(inputStream);
+                        HttpDownFileUtils.saveBitmap(MerchandiseDetialActivity.this, bitmap, HttpDownFileUtils.geFileName());
+                        inputStream.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    if (bitmap != null) {
+                        bitmap.recycle();
+                    }
+
+                    batchDownload(smallImages, postion + 1);
+                }
+            }).start();
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -559,9 +578,6 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.merchandise_share:
-                /*if (mSellerModel != null) {
-                    openH5Url(String.valueOf(mSellerModel.getShopUrl()));
-                }*/
                 dialog = new ProgressDialog(this);
                 dialog.setTitle("提示");
                 dialog.setMessage("正在加载中......");
@@ -612,46 +628,6 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                 } else {
                     startActivityForResult(new Intent(MerchandiseDetialActivity.this, LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                 }
-
-                /*//展示参数配置
-                AlibcTaokeParams taokeParams = new AlibcTaokeParams("", "", "");
-                //taokeParams.setPid("mm_132021823_45408225_571244745");
-                taokeParams.setPid("mm_132021823_45408225_109946850496");
-                taokeParams.setAdzoneid("109946850496");
-                //adzoneid是需要taokeAppkey参数才可以转链成功&店铺页面需要卖家id（sellerId），具体设置方式如下：
-                taokeParams.extraParams = new HashMap<>();
-                taokeParams.extraParams.put("taokeAppkey", "24882815");
-                taokeParams.extraParams.put("sellerId", String.valueOf(mMaterialItemModel.getSellerId()));
-                //自定义参数
-                Map<String, String> trackParams = new HashMap<>();
-                trackParams.put("isv_code", "appisvcode");
-                trackParams.put("alibaba", "阿里巴巴");//自定义参数部分，可任意增删改
-
-                alibcShowParams = new AlibcShowParams(OpenType.Auto);
-                alibcShowParams.setClientType("taobao");
-                String couponUrl = null;
-                if (mMaterialItemModel.getCouponShareUrl() == null) {
-                    couponUrl = "https:" +  mMaterialItemModel.getItemUrl();
-                } else {
-                    couponUrl = "https:" + mMaterialItemModel.getCouponShareUrl();
-                }
-
-                // 以显示传入url的方式打开页面（第二个参数是套件名称）
-                AlibcTrade.openByUrl(MerchandiseDetialActivity.this, "", couponUrl, null,
-                        new WebViewClient(), new WebChromeClient(), alibcShowParams,
-                        taokeParams, trackParams, new AlibcTradeCallback() {
-                            @Override
-                            public void onTradeSuccess(AlibcTradeResult tradeResult) {
-                                AlibcLogger.i(TAG, "request success");
-                            }
-                            @Override
-                            public void onFailure(int code, String msg) {
-                                AlibcLogger.e(TAG, "code=" + code + ", msg=" + msg);
-                                if (code == -1) {
-                                    Toast.makeText(MerchandiseDetialActivity.this, msg, Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });*/
                 break;
             case R.id.merchandise_detial_detial_title_rl:
                 // 宝贝详情
@@ -675,46 +651,6 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                 } else {
                     startActivityForResult(new Intent(MerchandiseDetialActivity.this, LoginActivity.class), YouConfigor.LOGIN_FOR_RQUEST);
                 }
-
-                //展示参数配置
-                /*AlibcTaokeParams detialTaokeParams = new AlibcTaokeParams("", "", "");
-                //detialTaokeParams.setPid("mm_132021823_45408225_571244745");
-                detialTaokeParams.setPid("mm_132021823_45408225_109946850496");
-                detialTaokeParams.setAdzoneid("109946850496");
-                //adzoneid是需要taokeAppkey参数才可以转链成功&店铺页面需要卖家id（sellerId），具体设置方式如下：
-                detialTaokeParams.extraParams = new HashMap<>();
-                detialTaokeParams.extraParams.put("taokeAppkey", "24882815");
-                detialTaokeParams.extraParams.put("sellerId", String.valueOf(mMaterialItemModel.getSellerId()));
-                //自定义参数
-                Map<String, String> detialTrackParams = new HashMap<>();
-                detialTrackParams.put("isv_code", "appisvcode");
-                detialTrackParams.put("alibaba", "阿里巴巴");//自定义参数部分，可任意增删改
-
-                alibcShowParams = new AlibcShowParams(OpenType.Auto);
-                alibcShowParams.setClientType("taobao");
-                String detialUrl = null;
-                if (mMaterialItemModel.getCouponShareUrl() == null) {
-                    detialUrl = mMaterialItemModel.getItemUrl().contains("http") ? mMaterialItemModel.getItemUrl() : "http:" + mMaterialItemModel.getItemUrl();
-                } else {
-                    detialUrl = mMaterialItemModel.getCouponShareUrl().contains("http") ? mMaterialItemModel.getCouponShareUrl() : "http:" + mMaterialItemModel.getCouponShareUrl();
-                }
-
-                // 以显示传入url的方式打开页面（第二个参数是套件名称）
-                AlibcTrade.openByUrl(MerchandiseDetialActivity.this, "", detialUrl, null,
-                        new WebViewClient(), new WebChromeClient(), alibcShowParams,
-                        detialTaokeParams, detialTrackParams, new AlibcTradeCallback() {
-                            @Override
-                            public void onTradeSuccess(AlibcTradeResult tradeResult) {
-                                AlibcLogger.i(TAG, "request success");
-                            }
-                            @Override
-                            public void onFailure(int code, String msg) {
-                                AlibcLogger.e(TAG, "code=" + code + ", msg=" + msg);
-                                if (code == -1) {
-                                    Toast.makeText(MerchandiseDetialActivity.this, msg, Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });*/
                 break;
             case R.id.merchandise_detial_shop_rl:
                 if (mSellerModel != null) {
@@ -729,7 +665,6 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
      * @param way 0打开，1为分享
      */
     private void showTBAuthDialog(final int way) {
-        //dialog_taobao_auth
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("请完成淘宝登录");
         builder.setMessage("淘宝授权后下单或分享产品可以获得收益哦");

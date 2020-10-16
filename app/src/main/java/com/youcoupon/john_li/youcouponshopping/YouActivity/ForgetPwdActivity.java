@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +47,8 @@ public class ForgetPwdActivity extends BaseActivity {
     private EditText phoneEt, pwEt,verificaEt;
     private LinearLayout mVisitorLL;
     private ProgressDialog dialog;
+    private Spinner mSpinner;
+    private String area = "853";
 
     private CountDownButtonHelper helper;
     private SmsOutModel.SmsModel mSmsModel;
@@ -68,6 +71,7 @@ public class ForgetPwdActivity extends BaseActivity {
         loginTv = findViewById(R.id.tv_login);
         codeTv = findViewById(R.id.register_verifica_tv);
         phoneEt = findViewById(R.id.register_et_phone);
+        mSpinner=(Spinner)findViewById(R.id.register_area_phone);
         pwEt = findViewById(R.id.register_et_password);
         verificaEt = findViewById(R.id.register_et_verifica);
         mVisitorLL = findViewById(R.id.register_visitor_ll);
@@ -88,7 +92,36 @@ public class ForgetPwdActivity extends BaseActivity {
                 if (phone != null && verifica != null&& pw != null) {
                     if (!YouCommonUtils.compareTwoTimes(mSmsModel.getOverTime())) {
                         if (verifica.equals(mSmsModel.getCode())) {
-                            callNetRegister(phone, pw);
+                            if ((phone.equals(mSmsModel.getTel()))) {
+                                callNetRegister(phone, pw);
+                            } else {
+                                Toast.makeText(ForgetPwdActivity.this, "请勿修改手机号！", Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            Toast.makeText(ForgetPwdActivity.this, "验证码错误！", Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(ForgetPwdActivity.this, "验证码已超时！", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(ForgetPwdActivity.this, "请填写账户密码或验证码！", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        registerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String phone = phoneEt.getText().toString();
+                String pw = pwEt.getText().toString();
+                String verifica = verificaEt.getText().toString();
+                if (phone != null && verifica != null&& pw != null) {
+                    if (!YouCommonUtils.compareTwoTimes(mSmsModel.getOverTime())) {
+                        if (verifica.equals(mSmsModel.getCode())) {
+                            if ((phone.equals(mSmsModel.getTel()))) {
+                                callNetRegister(phone, pw);
+                            } else {
+                                Toast.makeText(ForgetPwdActivity.this, "请勿修改手机号！", Toast.LENGTH_LONG).show();
+                            }
                         } else {
                             Toast.makeText(ForgetPwdActivity.this, "验证码错误！", Toast.LENGTH_LONG).show();
                         }
@@ -210,6 +243,7 @@ public class ForgetPwdActivity extends BaseActivity {
     private void callNetGetVerCode() {
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_VERIFICATION_CODE);
         params.addQueryStringParameter("mobile", phoneEt.getText().toString());
+        params.addQueryStringParameter("areaCode", String.valueOf(area));
         String uri = params.getUri();
         params.setConnectTimeout(30 * 1000);
         x.http().get(params, new Callback.CommonCallback<String>() {

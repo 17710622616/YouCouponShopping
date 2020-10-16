@@ -288,7 +288,7 @@
                     style="@style/mineLinearLayout">
                     <ImageView
                         style="@style/MineItemImageView"
-                        android:src="@mipmap/update_pwd"/>
+                        android:src="@mipmap/vistor_band"/>
 
                     <TextView
                         style="@style/MineItemTextView"
@@ -306,7 +306,7 @@
                     style="@style/mineLinearLayout">
                     <ImageView
                         style="@style/MineItemImageView"
-                        android:src="@mipmap/update_pwd"/>
+                        android:src="@mipmap/order_band"/>
 
                     <TextView
                         style="@style/MineItemTextView"

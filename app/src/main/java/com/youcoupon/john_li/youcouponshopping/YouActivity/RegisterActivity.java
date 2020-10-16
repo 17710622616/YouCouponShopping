@@ -8,8 +8,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,10 +46,11 @@ public class RegisterActivity extends BaseActivity {
     private TextView loginTv, codeTv, userAggrementTV, secretServiceTV;
     private Button registerBtn;
     private EditText phoneEt, pwEt,verificaEt,visitorTv;
+    private Spinner mSpinner;
     private ProgressDialog dialog;
     private CountDownButtonHelper helper;
-
     private SmsOutModel.SmsModel mSmsModel;
+    private String area = "853";
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +70,7 @@ public class RegisterActivity extends BaseActivity {
         pwEt = findViewById(R.id.register_et_password);
         verificaEt = findViewById(R.id.register_et_verifica);
         visitorTv = findViewById(R.id.register_et_visitor);
+        mSpinner=(Spinner)findViewById(R.id.register_area_phone);
         userAggrementTV = findViewById(R.id.register_secret_service_tv);
         secretServiceTV = findViewById(R.id.register_user_aggrement_tv);
 
@@ -76,6 +80,25 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     public void setListener() {
+        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                try {
+                    if (position == 0) {
+                        area = "853";
+                    } else {
+                        area = "86";
+                    }
+                } catch (Exception e) {
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,7 +108,11 @@ public class RegisterActivity extends BaseActivity {
                 if (phone != null && verifica != null&& pw != null) {
                     if (!YouCommonUtils.compareTwoTimes(mSmsModel.getOverTime())) {
                         if (verifica.equals(mSmsModel.getCode())) {
-                            callNetRegister(phone, pw);
+                            if ((phone.equals(mSmsModel.getTel()))) {
+                                callNetRegister(phone, pw);
+                            } else {
+                                Toast.makeText(RegisterActivity.this, "请勿修改手机号！", Toast.LENGTH_LONG).show();
+                            }
                         } else {
                             Toast.makeText(RegisterActivity.this, "验证码错误！", Toast.LENGTH_LONG).show();
                         }
@@ -225,6 +252,7 @@ public class RegisterActivity extends BaseActivity {
     private void callNetGetVerCode() {
         RequestParams params = new RequestParams(YouConfigor.BASE_URL + YouConfigor.GET_VERIFICATION_CODE);
         params.addQueryStringParameter("mobile", phoneEt.getText().toString());
+        params.addQueryStringParameter("areaCode", String.valueOf(area));
         String uri = params.getUri();
         params.setConnectTimeout(30 * 1000);
         x.http().get(params, new Callback.CommonCallback<String>() {

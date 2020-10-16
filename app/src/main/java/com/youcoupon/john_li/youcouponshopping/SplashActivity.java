@@ -9,6 +9,9 @@ import android.widget.ImageView;
 import androidx.annotation.Nullable;
 
 import com.youcoupon.john_li.youcouponshopping.YouActivity.BaseActivity;
+import com.youcoupon.john_li.youcouponshopping.YouActivity.FirstLoadActivity;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.SPUtils;
+import com.youcoupon.john_li.youcouponshopping.YouUtils.YouConfigor;
 
 /**
  * Created by John_Li on 25/5/2018.
@@ -40,7 +43,24 @@ public class SplashActivity extends BaseActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                Intent intent = null;
+                int loadCount = (int) SPUtils.get(SplashActivity.this, "loadCount", 0);
+                if (loadCount == 0) {
+                    SPUtils.put(SplashActivity.this, "loadCount", ++loadCount);
+                    intent = new Intent(SplashActivity.this, FirstLoadActivity.class);
+                    finish();
+                } else {
+                    intent = new Intent(SplashActivity.this, MainActivity.class);
+                    finish();
+                }
+
+                //如果启动app的Intent中带有额外的参数，表明app是从点击通知栏的动作中启动的
+                //将参数取出，传递到MainActivity中
+                if(getIntent().getBundleExtra(YouConfigor.EXTRA_BUNDLE) != null){
+                    intent.putExtra(YouConfigor.EXTRA_BUNDLE, getIntent().getBundleExtra(YouConfigor.EXTRA_BUNDLE));
+                }
+
+                startActivity(intent);
                 finish();
             }
         }, 1500);

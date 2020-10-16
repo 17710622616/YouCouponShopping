@@ -57,7 +57,7 @@ public class VisitorRetrievalActivity extends BaseActivity implements View.OnCli
     public void initData() {
         headView.setLeft(this);
         headView.setTitle("绑定邀请人");
-        headView.setRightText("规则", this);
+        //headView.setRightText("规则", this);
 
         if (dialog == null) {
             dialog = new ProgressDialog(this);

@@ -32,6 +32,15 @@ public class SmsOutModel {
     public class SmsModel {
         private String code;
         private String overTime;
+        private String tel;
+
+        public String getTel() {
+            return tel;
+        }
+
+        public void setTel(String tel) {
+            this.tel = tel;
+        }
 
         public String getCode() {
             return code;

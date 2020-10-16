@@ -126,6 +126,8 @@ dependencies {
     implementation 'io.supercharge:shimmerlayout:2.1.0'
     // H5交互
     implementation 'com.github.lzyzsd:jsbridge:1.0.4'
+    implementation 'com.google.zxing:core:3.3.0';
+    implementation 'com.google.zxing:android-core:3.3.0';
 }
 
 MobSDK {
@@ -140,6 +142,7 @@ MobSDK {
                 userName "gh_afb25ac019c9"
                 path "pages/index/index.html?id=1"
                 withShareTicket true
+                BypassApproval="true"
                 miniprogramType 2
             }
             QQ {
@@ -147,19 +150,19 @@ MobSDK {
                 appKey "aed9b0303e3ed1e27bae87c33761161d"
             }
             Facebook {
-                appKey "1412473428822331"
-                appSecret "a42f4f3f867dc947b9ed6020c2e93558"
+                appKey "750678022166185"
+                appSecret "5d60f4e18e6ba9ca87ddfdb8de9c9913"
                 callbackUri "https://mob.com"
             }
             ShortMessage {}
             WhatsApp {}
             WechatMoments {
-                appId "wx4868b35061f87885"
-                appSecret "64020361b8ec4c99936c0e3999a9f249"
+                appId "wx17ceb6780627c414"
+                appSecret "dc78d6a8a7dfcaadaa906b6011cb2676"
             }
             WechatFavorite {
-                appId "wx4868b35061f87885"
-                appSecret "64020361b8ec4c99936c0e3999a9f249"
+                appId "wx17ceb6780627c414"
+                appSecret "dc78d6a8a7dfcaadaa906b6011cb2676"
             }
             QZone {
                 appId "100371282"

@@ -11,11 +11,16 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -30,6 +35,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -291,6 +298,26 @@ public class YouCommonUtils {
      * 打开fb
      */
     public static void openFb(Context context) {
+    }
+
+    public static Bitmap loadImageFromNetwork(String url) {
+        //得到可用的图片
+        Bitmap bitmap = simpleNetworkImage(url);
+        if (bitmap == null) {
+            Log.i("loadImageFromNetwork:", "bitmap is null");
+        }
+        return bitmap;
+    }
+
+    public static Bitmap simpleNetworkImage(String url) {
+        Bitmap imgBitmap = null;
+        try {
+            URL picUrl = new URL(url);
+            imgBitmap = BitmapFactory.decodeStream(picUrl.openStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return imgBitmap;
     }
 
     /**

@@ -121,4 +121,6 @@ public class YouConfigor {
     public static final String GET_SUPIOR = "/api/User/getSuperior";
     // 上传头像
     public static String UPLOAD_FILE = "api/Tool/uploadTempFile?";
+    // 获取分享图片
+    public static String GET_SHARE_HAIBAO = "api/Tool/stitchingPoster?visitorCode=";
 }

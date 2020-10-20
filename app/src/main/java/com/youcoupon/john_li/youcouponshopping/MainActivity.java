@@ -97,6 +97,7 @@ public class MainActivity extends BaseActivity implements RadioGroup.OnCheckedCh
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //overridePendingTransition(R.anim.translate_left_in,0);
         setContentView(R.layout.activity_main);
         //当系统版本为4.4或者4.4以上时可以使用沉浸式状态栏
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

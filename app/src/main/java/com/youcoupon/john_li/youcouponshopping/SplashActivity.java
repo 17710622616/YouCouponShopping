@@ -75,4 +75,10 @@ public class SplashActivity extends BaseActivity {
     public void initData() {
 
     }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0,R.anim.translate_out);
+    }
 }

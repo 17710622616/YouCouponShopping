@@ -639,7 +639,14 @@ public class MerchandiseDetialActivity extends AppCompatActivity implements View
                         UserInfoOutsideModel.DataBean userInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
                         if (userInfoModel.getRelationId() != 0) {
                             // 拼接relationId打开领券链接
-                            openTBKUrl(userInfoModel.getRelationId());
+                            //openTBKUrl(userInfoModel.getRelationId());
+                            String couponUrl = "";
+                            if (mMaterialItemModel.getCouponShareUrl() == null) {
+                                couponUrl = mMaterialItemModel.getItemUrl().contains("https") ? mMaterialItemModel.getItemUrl() : "https:" + mMaterialItemModel.getItemUrl() + "&relationId=" + userInfoModel.getRelationId();
+                            } else {
+                                couponUrl = mMaterialItemModel.getCouponShareUrl().contains("https") ? mMaterialItemModel.getCouponShareUrl() : "https:" + mMaterialItemModel.getCouponShareUrl() + "&relationId=" + userInfoModel.getRelationId();
+                            }
+                            openH5Url(couponUrl);
                         } else {
                             // 打开提示成为合作者视窗
                             showTBAuthDialog(0);

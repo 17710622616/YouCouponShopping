@@ -63,9 +63,9 @@ public class MainClassifyAdapter extends RecyclerView.Adapter<MainClassifyAdapte
 
     @Override
     public int getItemCount() {
-        if (list.size() > 5) {
+        /*if (list.size() > 5) {
             return 5;
-        }
+        }*/
 
         return list.size();
     }

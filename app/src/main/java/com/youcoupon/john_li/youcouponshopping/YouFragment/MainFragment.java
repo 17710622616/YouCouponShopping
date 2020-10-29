@@ -243,7 +243,8 @@ public class MainFragment extends LazyLoadFragment implements View.OnClickListen
         // 分类
         mainClassifyList = new ArrayList<>();
         mMainClassifyAdapter = new MainClassifyAdapter(mainClassifyList, getActivity());
-        mGridView.setLayoutManager(new GridLayoutManager(getActivity(), 5, LinearLayoutManager.VERTICAL,false));
+        //mGridView.setLayoutManager(new GridLayoutManager(getActivity(), 5, LinearLayoutManager.VERTICAL,false));
+        mGridView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL,false));
         classifyhotBuilder =  Skeleton.bind(mGridView);
         classifySkeletonScreen = classifyhotBuilder
                 .adapter(mMainClassifyAdapter)//设置实际adapter

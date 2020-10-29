@@ -427,6 +427,11 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         oks.setUrl("http://easybangbangda.top");
         // 启动分享GUI
         oks.show(MobSDK.getContext());*/
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setTitle("加載");
+        progressDialog.setMessage("生成圖片中......");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
         String userInfoJson = (String) SPUtils.get(getActivity(), "UserInfo", "");
         mUserInfoModel = JSON.parseObject(userInfoJson, UserInfoOutsideModel.DataBean.class);
         String visitorCode = "";
@@ -450,8 +455,13 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             public void onSuccess(String result) {
                 final CommonModel model =  JSON.parseObject(result.toString(), CommonModel.class);
                 if (model.getStatus() == 0) {
-                    new DownImage(content).execute(model.getData());;
+                    new DownImage(content, progressDialog).execute(model.getData());;
                 } else {
+                    if (progressDialog != null) {
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
+                    }
                     Toast.makeText(getActivity(), String.valueOf(model.getMessage()), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -460,6 +470,11 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
                 Toast.makeText(getActivity(), "获取分享海报异常，请重试！", Toast.LENGTH_SHORT).show();
+                if (progressDialog != null) {
+                    if (progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                    }
+                }
             }
             //主动调用取消请求的回调方法
             @Override
@@ -473,8 +488,10 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
 
     class DownImage extends AsyncTask {
         private String content;
-        public DownImage(String content) {
+        private ProgressDialog progressDialog;
+        public DownImage(String content, ProgressDialog progressDialog) {
             this.content = content;
+            this.progressDialog = progressDialog;
         }
 
         @Override
@@ -494,6 +511,11 @@ public class MineFragment extends LazyLoadFragment implements View.OnClickListen
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
+            if (progressDialog != null) {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            }
             openShareDialog((Bitmap) o, content);
         }
     }
